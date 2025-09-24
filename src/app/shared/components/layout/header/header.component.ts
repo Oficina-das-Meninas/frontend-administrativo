@@ -7,7 +7,6 @@ import { Profile } from '../../../models/profile';
 
 @Component({
   selector: 'app-header',
-  standalone: true,
   imports: [
     MatMenuModule, 
     BreadcrumbComponent, 

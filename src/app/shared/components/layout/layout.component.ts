@@ -10,7 +10,6 @@ import { Profile } from '../../models/profile';
 
 @Component({
   selector: 'app-layout',
-  standalone: true,
   imports: [
     MatSidenavModule,
     RouterOutlet,

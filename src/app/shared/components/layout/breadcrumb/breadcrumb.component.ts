@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { RouterLink } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
@@ -18,10 +18,7 @@ import { BreadcrumbService } from '../../../services/breadcrumb.service';
 })
 export class BreadcrumbComponent {
 
-  breadcrumbs$!: Observable<Breadcrumb[]>;
-
-  constructor(private breadcrumbService: BreadcrumbService) { 
-    this.breadcrumbs$ = this.breadcrumbService.breadcrumbs$()
-  }
+  private breadcrumbService = inject(BreadcrumbService);
+  breadcrumbs$: Observable<Breadcrumb[]> = this.breadcrumbService.breadcrumbs$();
 
 }

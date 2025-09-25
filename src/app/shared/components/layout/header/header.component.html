@@ -16,11 +16,7 @@
       <h1 class="text-sm font-bold text-gray-500">{{ profile().username }}</h1>
       <p class="text-xs text-gray-400 font-semibold">{{ profile().role }}</p>
     </div>
-    <img
-      [src]="profile().image || 'perfil_default.png'"
-      alt="perfil_default"
-      class="w-8 h-8 rounded-full"
-    />
+    <span class="material-symbols-outlined text-gray-500 font-semibold profile-icon">person</span>
   </div>
 
   <mat-menu #menu="matMenu" xPosition="before">

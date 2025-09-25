@@ -7,14 +7,14 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadComponent: () => import('./shared/components/home/home.component').then(m => m.HomeComponent),
+                loadComponent: () => import('./domain/home/containers/home/home.component').then(m => m.HomeComponent),
             },
             {
                 path: 'transparencia',
-                loadComponent: () => import('./shared/components/transparency/transparency.component').then(m => m.TransparencyComponent),
+                loadComponent: () => import('./domain/transparency/containers/transparency/transparency.component').then(m => m.TransparencyComponent),
                 data: {
                     breadcrumb: 'Transparência'
-                }
+                },
             },
         ]
     }

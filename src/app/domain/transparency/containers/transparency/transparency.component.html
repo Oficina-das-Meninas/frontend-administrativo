@@ -1,0 +1,21 @@
+<div class="flex flex-col justify-between">
+  <div class="py-40">
+    <div cdkDropList (cdkDropListDropped)="drop($event)" class="px-[2%] md:px-[5%] xl:px-[10%]">
+      @if (accordionContent$ | async; as content) {
+        @for (item of content; track $index) {
+          <div class="py-2">
+            <app-transparency-accordion cdkDrag [content]="item" />
+          </div>
+        }
+      } @else {
+        <div class="py-2 animate-pulse">
+          <div class="h-16 bg-gray-300 rounded-xl my-2"></div>
+          <div class="h-16 bg-gray-300 rounded-xl my-2"></div>
+          <div class="h-16 bg-gray-300 rounded-xl my-2"></div>
+          <div class="h-16 bg-gray-300 rounded-xl my-2"></div>
+          <div class="h-16 bg-gray-300 rounded-xl my-2"></div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

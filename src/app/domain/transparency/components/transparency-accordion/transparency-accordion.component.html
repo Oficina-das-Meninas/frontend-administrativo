@@ -1,0 +1,47 @@
+<mat-accordion>
+  <mat-expansion-panel
+    (opened)="panelOpenState.set(true)"
+    (closed)="panelOpenState.set(false)"
+    hideToggle
+  >
+    <mat-expansion-panel-header class="!h-16">
+      <mat-panel-title class="text-xl font-bold">
+        {{ content()?.categoryName }}
+      </mat-panel-title>
+
+      @if (!panelOpenState()) {
+        <img src="/svg/plus-circle.svg" alt="plus-circle" class="w-10" />
+      } @else {
+        <img src="/svg/minus-circle.svg" alt="minus-circle" class="w-10" />
+      }
+    </mat-expansion-panel-header>
+
+    @if (content()?.type === accordionContentType.DOCUMENT) {
+      <section class="py-4">
+        @for (item of content()?.documents; track $index) {
+          <a [href]="item.url" target="_blank" class="flex items-center gap-2 py-2">
+            <p class="text-lg font-semibold">{{ item.name }}</p>
+            <mat-icon fontSet="material-symbols-rounded">download</mat-icon>
+          </a>
+        }
+      </section>
+    }
+    @if (content()?.type === accordionContentType.COLLABORATOR) {
+      <section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 py-4">
+        @for (item of content()?.collaborators; track $index) {
+          <div class="flex flex-col justify-start items-center gap-1">
+            <img
+              [src]="item.imageUrl"
+              alt="collaborator-image"
+              class="w-25 rounded-full object-cover"
+            />
+            <h1 class="text-lg text-center font-semibold">{{ item.name }}</h1>
+            <p class="text-stone-500">{{ item.role }}</p>
+            <p class="text-stone-500">{{ item.description }}</p>
+          </div>
+        }
+      </section>
+    }
+  </mat-expansion-panel>
+</mat-accordion>
+

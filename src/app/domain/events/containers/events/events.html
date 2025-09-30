@@ -1,0 +1,126 @@
+<div class="flex flex-col items-center mx-auto bg-gradient">
+
+  <mat-card class="w-full" appearance="outlined">
+
+    <mat-card-header>
+      <mat-card-title>Eventos</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+
+      <div class="flex items-center justify-between mt-4 gap-2 w-full">
+        <div class="flex items-center justify-start gap-2 w-full">
+          <mat-form-field class="md:max-w-4/8 w-full" appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Busque por eventos...</mat-label>
+            <input matInput (keyup)="applyFilter($event)" #input>
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <app-calendar-filter
+            [(dateRange)]="dateRange"
+            (apply)="applyDateFilter()"
+            (clear)="clearFilters()"
+            tooltipText="Filtrar eventos por data"
+          />
+
+        </div>
+
+        <mat-button-toggle-group
+            name="view"
+            aria-label="Visualização"
+            class="hidden md:inline-flex view-toggle-group w-fit"
+            [value]="viewMode"
+            (change)="onViewModeChange($event.value)">
+          <mat-button-toggle value="cards">
+            <mat-icon>grid_view</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="table">
+            <mat-icon>format_align_justify</mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+
+        <button
+          mat-fab
+          matTooltip="Adicionar Evento"
+          class="md:w-auto! md:px-4!">
+          <mat-icon class="md:mr-2">add</mat-icon>
+          <span class="hidden md:inline">Criar novo</span>
+        </button>
+
+      </div>
+
+      @if (events$ | async; as events) {
+        @if (events.data.length > 0) {
+          @if (viewMode === 'table') {
+            <div class="mat-elevation-z8 w-full mt-5">
+              <div class="overflow-x-auto w-full">
+                <table mat-table [dataSource]="events.data" class="w-full min-w-[600px] border-collapse md:text-sm">
+
+                  <ng-container matColumnDef="imagem">
+                    <th mat-header-cell *matHeaderCellDef> Imagem </th>
+                    <td mat-cell *matCellDef="let element">
+                      <div class="size-24 flex items-center justify-center">
+                        <img class="rounded-lg m-2 object-contain" [src]="element.previewImageUrl"/>
+                      </div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="nome">
+                    <th mat-header-cell *matHeaderCellDef> Título </th>
+                    <td mat-cell *matCellDef="let element"> {{element.title}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="data">
+                    <th mat-header-cell *matHeaderCellDef> Data </th>
+                    <td mat-cell *matCellDef="let element"> {{element.eventDate | date}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="local">
+                    <th mat-header-cell *matHeaderCellDef> Local </th>
+                    <td mat-cell *matCellDef="let element"> {{element.location}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="acoes">
+                    <th mat-header-cell *matHeaderCellDef> &nbsp;</th>
+                    <td mat-cell *matCellDef="let element">
+                      <button mat-button="filled">
+                        <mat-icon>add</mat-icon>
+                      </button>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+              </div>
+
+              <mat-paginator [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageIndex" [pageSize]="pageSize"
+                [length]="events.totalElements" (page)="refresh($event)" showFirstLastButtons
+                aria-label="Selecione a página de eventos"
+                class="relative z-10"></mat-paginator>
+            </div>
+          } @else {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
+              <span>Cards</span>
+            </div>
+
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageIndex" [pageSize]="pageSize"
+              [length]="events.totalElements" (page)="refresh($event)" showFirstLastButtons
+              aria-label="Selecione a página de eventos"
+              class="relative z-10 mt-4"></mat-paginator>
+          }
+        } @else {
+        <div class="flex flex-col items-center gap-4 text-white">
+          <mat-icon>event_busy</mat-icon>
+          <span class="font-medium text-lg">Nenhum evento encontrado</span>
+        </div>
+        }
+      } @else {
+        <div class="flex flex-col items-center gap-4 text-white">
+          <mat-spinner diameter="50" color="primary"></mat-spinner>
+          <span class="font-medium text-lg">Carregando eventos...</span>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

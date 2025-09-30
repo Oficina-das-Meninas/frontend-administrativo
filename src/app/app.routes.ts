@@ -16,6 +16,13 @@ export const routes: Routes = [
                     breadcrumb: 'Transparência'
                 },
             },
+            {
+              path: 'eventos',
+              loadComponent: () => import('./domain/events/containers/events/events').then(m => m.Events),
+              data: {
+                  breadcrumb: 'Eventos'
+              }
+            },
         ]
     }
 ];

@@ -1,0 +1,32 @@
+<header class="bg-white border-b-1 border-b-gray-300 flex justify-between items-center h-14">
+  <div class="flex items-center">
+    @if (isMobile()) {
+      <span class="material-symbols-outlined cursor-pointer px-4" (click)="onMenuClick()">menu</span>
+    }
+    @else {
+      <app-breadcrumb />
+    }
+  </div>
+
+  <div
+    class="flex items-center gap-2 px-4 cursor-pointer h-full hover:bg-gray-100"
+    [matMenuTriggerFor]="menu"
+  >
+    <div class="flex flex-col items-end">
+      <h1 class="text-sm font-bold text-gray-500">{{ profile().username }}</h1>
+      <p class="text-xs text-gray-400 font-semibold">{{ profile().role }}</p>
+    </div>
+    <span class="material-symbols-outlined text-gray-500 font-semibold profile-icon">person</span>
+  </div>
+
+  <mat-menu #menu="matMenu" xPosition="before">
+    @for (item of menuItems(); track $index) {
+      <button mat-menu-item [routerLink]="item.path">
+        <div class="flex items-center p-2 gap-2 text-gray-500 font-bold">
+          <span class="material-symbols-outlined">{{ item.matIcon }}</span>
+          <p>{{ item.title }}</p>
+        </div>
+      </button>
+    }
+  </mat-menu>
+</header>

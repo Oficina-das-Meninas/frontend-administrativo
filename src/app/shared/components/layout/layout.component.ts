@@ -45,6 +45,11 @@ export class LayoutComponent implements OnInit {
         title: "Transparência",
         path: "/transparencia"
       },
+      {
+        matIcon: "calendar_month",
+        title: "Eventos",
+        path: "/eventos"
+      },
     ];
 
     this.menuItems = [

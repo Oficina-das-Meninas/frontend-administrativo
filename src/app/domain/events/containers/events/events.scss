@@ -1,0 +1,50 @@
+@use '@angular/material' as mat;
+
+mat-paginator {
+  @include mat.paginator-overrides((
+    container-background-color: white
+  ));
+}
+
+table {
+  @include mat.table-overrides((
+    background-color: white
+  ));
+}
+
+mat-card {
+  @include mat.card-overrides((
+    outlined-container-color: white
+  ));
+}
+
+.mat-mdc-fab {
+  @include mat.fab-overrides((
+    container-elevation-shadow: none,
+    hover-container-elevation-shadow: none,
+    focus-container-elevation-shadow: none,
+    pressed-container-elevation-shadow: none,
+    extended-container-elevation-shadow: none,
+    extended-hover-container-elevation-shadow: none,
+    extended-focus-container-elevation-shadow: none,
+    extended-pressed-container-elevation-shadow: none
+  ));
+}
+
+.view-toggle-group {
+  @media (max-width: 767px) {
+    display: none !important;
+    visibility: hidden !important;
+    border: none !important;
+
+    .mat-button-toggle {
+      border: none !important;
+      outline: none !important;
+    }
+  }
+
+  @media (min-width: 768px) {
+    display: inline-flex !important;
+    visibility: visible !important;
+  }
+}

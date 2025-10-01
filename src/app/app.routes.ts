@@ -18,17 +18,22 @@ export const routes: Routes = [
             },
             {
               path: 'eventos',
-              loadComponent: () => import('./domain/events/containers/events/events').then(m => m.Events),
               data: {
-                  breadcrumb: 'Eventos'
-              }
-            },
-            {
-              path: 'eventos',
-              loadComponent: () => import('./domain/events/containers/events/events').then(m => m.Events),
-              data: {
-                  breadcrumb: 'Eventos'
-              }
+                breadcrumb: 'Eventos'
+              },
+              children: [
+                {
+                  path: '',
+                  loadComponent: () => import('./domain/events/containers/events/events').then(m => m.Events)
+                },
+                {
+                  path: 'criar',
+                  loadComponent: () => import('./domain/events/containers/add-event/add-event.component').then(m => m.AddEventComponent),
+                  data: {
+                      breadcrumb: 'Criar Evento'
+                  }
+                }
+              ]
             },
         ]
     }

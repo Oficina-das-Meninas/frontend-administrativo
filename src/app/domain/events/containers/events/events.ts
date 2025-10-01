@@ -15,6 +15,7 @@ import { CalendarFilter } from '../../../../shared/components/calendar-filter/ca
 import { DateRange } from '../../../../shared/models/date-range';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-events',
@@ -31,8 +32,9 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     MatInputModule,
     CalendarFilter,
     MatTooltipModule,
-    MatButtonToggleModule
-  ],
+    MatButtonToggleModule,
+    RouterLink
+],
   templateUrl: './events.html',
   styleUrl: './events.scss',
 })

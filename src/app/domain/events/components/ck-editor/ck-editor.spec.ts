@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddEventComponent } from './add-event.component';
+import { CKEditorComponent } from './ck-editor';
 
-describe('AddEventComponent', () => {
-  let component: AddEventComponent;
-  let fixture: ComponentFixture<AddEventComponent>;
+describe('CKEditorComponent', () => {
+  let component: CKEditorComponent;
+  let fixture: ComponentFixture<CKEditorComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AddEventComponent]
+      imports: [CKEditorComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AddEventComponent);
+    fixture = TestBed.createComponent(CKEditorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

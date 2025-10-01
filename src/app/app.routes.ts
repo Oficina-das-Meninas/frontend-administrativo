@@ -28,7 +28,7 @@ export const routes: Routes = [
                 },
                 {
                   path: 'criar',
-                  loadComponent: () => import('./domain/events/containers/add-event/add-event.component').then(m => m.AddEventComponent),
+                  loadComponent: () => import('./domain/events/containers/add-event/add-event').then(m => m.AddEventComponent),
                   data: {
                       breadcrumb: 'Criar Evento'
                   }

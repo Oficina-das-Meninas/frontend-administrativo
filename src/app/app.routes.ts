@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { partnerResolver } from './domain/partners/guards/partner-resolver';
 
 export const routes: Routes = [
   {
@@ -11,9 +12,7 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () =>
-          import('./domain/home/containers/home/home').then(
-            (m) => m.Home
-          ),
+          import('./domain/home/containers/home/home').then((m) => m.Home),
       },
       {
         path: 'transparencia',
@@ -24,6 +23,34 @@ export const routes: Routes = [
         data: {
           breadcrumb: 'Transparência',
         },
+      },
+      {
+        path: 'parceiros',
+        data: {
+          breadcrumb: 'Parceiros',
+        },
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./domain/partners/containers/partners/partners').then(
+                (m) => m.Partners
+              ),
+          },
+          {
+            path: 'cadastro',
+            loadComponent: () =>
+              import(
+                './domain/partners/containers/partner-form/partner-form'
+              ).then((m) => m.PartnerForm),
+            data: {
+              breadcrumb: 'Cadastro',
+            },
+            resolve: {
+              partner: partnerResolver,
+            },
+          },
+        ],
       },
     ],
   },

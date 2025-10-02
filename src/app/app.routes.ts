@@ -27,10 +27,10 @@ export const routes: Routes = [
                   loadComponent: () => import('./domain/events/containers/events/events').then(m => m.Events)
                 },
                 {
-                  path: 'criar',
-                  loadComponent: () => import('./domain/events/containers/add-event/add-event').then(m => m.AddEventComponent),
+                  path: 'cadastro',
+                  loadComponent: () => import('./domain/events/containers/add-event/form-event').then(m => m.FormEventComponent),
                   data: {
-                      breadcrumb: 'Criar Evento'
+                      breadcrumb: 'Cadastro de Evento'
                   }
                 }
               ]

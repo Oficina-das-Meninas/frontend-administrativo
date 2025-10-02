@@ -1,0 +1,64 @@
+<!--
+{
+  title,
+  description,
+  eventDate,
+  location,
+  urlToPlataform,
+  partnersImage,
+  previewImage
+}
+
+-->
+
+<div class="flex flex-col items-center mx-auto mat-card-component">
+  <mat-card class="w-full max-w-2xl" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Criar Evento</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Título</mat-label>
+          <input matInput formControlName="title" placeholder="Digite o título do evento" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Data do Evento</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="eventDate" />
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Localização</mat-label>
+          <input matInput formControlName="location" placeholder="Digite a localização do evento" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Link para a plataforma</mat-label>
+          <input matInput formControlName="urlToPlataform" placeholder="Digite o link da plataforma" />
+        </mat-form-field>
+
+        <div class="w-full flex gap-4 justify-center">
+          <mat-card class="p-4">
+            <label class="block text-sm font-medium mb-2">Imagem de Parceiros</label>
+            <app-image-input [text]="'Anexar imagem de Parceiros'" (filesSelected)="onPartnersImageSelected($event)"></app-image-input>
+          </mat-card>
+
+          <mat-card class="p-4">
+            <label class="block text-sm font-medium mb-2">Imagem do Evento</label>
+            <app-image-input [text]="'Anexar imagem do Evento'" (filesSelected)="onPreviewImageSelected($event)"></app-image-input>
+          </mat-card>
+        </div>
+
+        <div class="w-full">
+          <app-ck-editor (dataChange)="onDataChange($event)"></app-ck-editor>
+        </div>
+
+        <button matButton="filled" type="submit" [disabled]="!eventForm.valid" class="w-full">Criar Evento</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

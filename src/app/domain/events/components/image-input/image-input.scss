@@ -1,0 +1,10 @@
+:host {
+  position: relative;
+}
+
+.scale {
+  transition: transform 0.2s ease;
+  &:hover {
+    transform: scale(1.02);
+  }
+}

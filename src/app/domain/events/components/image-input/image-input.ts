@@ -10,6 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class ImageInputComponent implements OnChanges {
   @Input() text: string = '';
+  @Input() label: string = '';
+  @Input() hint: string = '';
   @Input() limit: number = 1;
   @Input() fullPreview: boolean = false;
   @Input() initialUrls: string[] = [];
@@ -20,6 +22,8 @@ export class ImageInputComponent implements OnChanges {
 
   previewUrls: WritableSignal<string[]> = signal([]);
   selectedFiles: File[] = [];
+  isDragging = false;
+  private dragCounter = 0;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['initialUrls']) {
@@ -73,5 +77,45 @@ export class ImageInputComponent implements OnChanges {
 
   closePreview() {
     this.fullPreviewUrl = null;
+  }
+
+  onDragOver(event: DragEvent) {
+    if (this.readonly) return;
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  onDragEnter(event: DragEvent) {
+    if (this.readonly) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.dragCounter++;
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    if (this.readonly) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.dragCounter--;
+    if (this.dragCounter === 0) {
+      this.isDragging = false;
+    }
+  }
+
+  onDrop(event: DragEvent) {
+    if (this.readonly) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+    this.dragCounter = 0;
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+      if (imageFiles.length > 0) {
+        this.addFiles(imageFiles);
+      }
+    }
   }
 }

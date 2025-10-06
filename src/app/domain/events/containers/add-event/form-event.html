@@ -11,54 +11,76 @@
 
 -->
 
-<div class="flex flex-col items-center mx-auto mat-card-component">
-  <mat-card class="w-full max-w-2xl" appearance="outlined">
-    <mat-card-header>
-      <mat-card-title>Criar Evento</mat-card-title>
-    </mat-card-header>
+<div class="flex justify-center items-start min-h-screen p-8 bg-gray-100">
+  <div class="w-full max-w-[920px] bg-white rounded-lg p-12 shadow-sm">
+    <h1 class="text-4xl font-bold text-gray-900 mb-10">Criar Evento</h1>
 
-    <mat-card-content>
-      <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Título</mat-label>
-          <input matInput formControlName="title" placeholder="Digite o título do evento" />
-        </mat-form-field>
+    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+      <!-- Título -->
+      <mat-form-field appearance="outline" class="w-full custom-form-field">
+        <mat-label>Título</mat-label>
+        <input matInput formControlName="title" placeholder="Digite o título do evento" />
+      </mat-form-field>
 
-        <mat-form-field appearance="outline" class="w-full">
+      <!-- Data e Localização -->
+      <div class="flex flex-col md:flex-row gap-6 w-full">
+        <mat-form-field appearance="outline" class="w-full md:flex-1 custom-form-field">
           <mat-label>Data do Evento</mat-label>
-          <input matInput [matDatepicker]="picker" formControlName="eventDate" />
+          <input matInput [matDatepicker]="picker" formControlName="eventDate" placeholder="Selecione a data" />
           <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="w-full">
+        <mat-form-field appearance="outline" class="w-full md:flex-1 custom-form-field">
           <mat-label>Localização</mat-label>
-          <input matInput formControlName="location" placeholder="Digite a localização do evento" />
+          <input matInput formControlName="location" placeholder="Digite a localização" />
         </mat-form-field>
+      </div>
 
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Link para a plataforma</mat-label>
-          <input matInput formControlName="urlToPlataform" placeholder="Digite o link da plataforma" />
-        </mat-form-field>
+      <!-- Link para plataforma -->
+      <mat-form-field appearance="outline" class="w-full custom-form-field">
+        <mat-label>Link para a plataforma</mat-label>
+        <input matInput formControlName="urlToPlataform" placeholder="https://exemplo.com" />
+      </mat-form-field>
 
-        <div class="w-full flex gap-4 justify-center">
-          <mat-card class="p-4">
-            <label class="block text-sm font-medium mb-2">Imagem de Parceiros</label>
-            <app-image-input [text]="'Anexar imagem de Parceiros'" (filesSelected)="onPartnersImageSelected($event)"></app-image-input>
-          </mat-card>
-
-          <mat-card class="p-4">
-            <label class="block text-sm font-medium mb-2">Imagem do Evento</label>
-            <app-image-input [text]="'Anexar imagem do Evento'" (filesSelected)="onPreviewImageSelected($event)"></app-image-input>
-          </mat-card>
+      <!-- Imagens -->
+      <div class="flex flex-col md:flex-row gap-6 my-4">
+        <div class="w-full md:w-1/2">
+          <app-image-input
+            label="Imagem de Parceiros"
+            text="Clique para anexar"
+            hint="PNG, JPG, JPEG ou WEBP"
+            (filesSelected)="onPartnersImageSelected($event)">
+          </app-image-input>
         </div>
 
-        <div class="w-full">
-          <app-ck-editor (dataChange)="onDataChange($event)"></app-ck-editor>
+        <div class="w-full md:w-1/2">
+          <app-image-input
+            label="Imagem do Evento"
+            text="Clique para anexar"
+            hint="PNG, JPG, JPEG ou WEBP"
+            (filesSelected)="onPreviewImageSelected($event)">
+          </app-image-input>
         </div>
+      </div>
 
-        <button matButton="filled" type="submit" [disabled]="!eventForm.valid" class="w-full">Criar Evento</button>
-      </form>
-    </mat-card-content>
-  </mat-card>
+      <!-- Editor de descrição -->
+      <div class="my-4">
+        <label class="block text-sm font-medium text-gray-600 mb-3">Descrição do Evento</label>
+        <app-ck-editor (dataChange)="onDataChange($event)"></app-ck-editor>
+      </div>
+
+      <!-- Botão de submit -->
+      <div class="flex justify-end mt-6">
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="!eventForm.valid"
+          class="px-8 py-3 font-semibold text-base rounded-md normal-case tracking-normal">
+          Criar Evento
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

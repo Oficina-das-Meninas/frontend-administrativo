@@ -1,4 +1,4 @@
-import { Component, signal, ViewEncapsulation } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -23,8 +23,7 @@ import { ImageInputComponent } from "../../components/image-input/image-input";
     ImageInputComponent
   ],
   templateUrl: './form-event.html',
-  styleUrl: './form-event.scss',
-  encapsulation: ViewEncapsulation.None
+  styleUrl: './form-event.scss'
 })
 export class FormEventComponent {
   public eventForm: FormGroup;

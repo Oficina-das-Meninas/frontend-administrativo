@@ -26,7 +26,7 @@ export class EventService {
           data: eventPage.data.map(ev => ({
             ...ev,
             previewImageUrl: ev.previewImageUrl
-              ? this.BUCKET_URL + ev.previewImageUrl
+              ? this.BUCKET_URL + 'pub/' + ev.previewImageUrl
               : ''
           }))
         }))
@@ -41,8 +41,8 @@ export class EventService {
     return this.httpClient.get<any>(`${this.API_URL}/${eventId}`).pipe(
       map((event) => ({
         ...event,
-        previewImageUrl: event.previewImageUrl ? this.BUCKET_URL + event.previewImageUrl : '',
-        partnersImageUrl: event.partnersImageUrl ? this.BUCKET_URL + event.partnersImageUrl : '',
+        previewImageUrl: event.previewImageUrl ? this.BUCKET_URL + 'pub/' + event.previewImageUrl : '',
+        partnersImageUrl: event.partnersImageUrl ? this.BUCKET_URL + 'pub/' + event.partnersImageUrl : '',
       }))
     );
   }

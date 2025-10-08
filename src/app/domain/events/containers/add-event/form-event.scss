@@ -3,5 +3,6 @@
 mat-card {
   @include mat.card-overrides((
     outlined-container-color: white,
+    outlined-outline-color: var(--color-gray-300),
   ));
 }

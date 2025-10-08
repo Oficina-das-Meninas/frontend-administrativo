@@ -43,10 +43,11 @@
 
         <app-form-input
           formControlName="urlToPlatform"
-          label="Link para a plataforma*"
+          label="Link da plataforma*"
           type="url"
           placeholder="exemplo.com"
           prefix="https://"
+          hint="Coloque o url para a inscrição do evento na plataforma externa."
           (input)="onUrlInput($event)"
           [errorMessage]="getErrorMessage('urlToPlatform')"></app-form-input>
 
@@ -86,7 +87,7 @@
             [matTooltip]="!eventForm.valid ? 'Preencha todos os campos' : ''"
             [disabled]="!eventForm.valid"
             [disabledInteractive]="!eventForm.valid"
-            class="px-8 py-3 font-semibold text-base rounded-md normal-case tracking-normal">
+            class="!px-16 !py-6 font-semibold text-base rounded-md normal-case tracking-normal">
             Criar Evento
           </button>
         </div>

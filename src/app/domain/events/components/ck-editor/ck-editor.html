@@ -4,7 +4,7 @@
       <div class="editor-container__editor">
         <div #editorElement>
           @if(isLayoutReady) {
-          <ckeditor [editor]="Editor" [config]="config" (change)="onChange($event)" />
+          <ckeditor [editor]="Editor" [config]="config" [data]="initialData" (change)="onChange($event)" />
           }
         </div>
       </div>

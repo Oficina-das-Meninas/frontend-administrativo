@@ -32,6 +32,13 @@ export const routes: Routes = [
                   data: {
                       breadcrumb: 'Cadastro de Evento'
                   }
+                },
+                {
+                  path: 'editar/:id',
+                  loadComponent: () => import('./domain/events/containers/add-event/form-event').then(m => m.FormEventComponent),
+                  data: {
+                      breadcrumb: 'Edição de Evento'
+                  }
                 }
               ]
             },

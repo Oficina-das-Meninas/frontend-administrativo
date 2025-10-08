@@ -37,6 +37,16 @@ export class EventService {
     return this.httpClient.post<void>(this.API_URL, eventData);
   }
 
+  getById(eventId: string): Observable<any> {
+    return this.httpClient.get<any>(`${this.API_URL}/${eventId}`).pipe(
+      map((event) => ({
+        ...event,
+        previewImageUrl: event.previewImageUrl ? this.BUCKET_URL + event.previewImageUrl : '',
+        partnersImageUrl: event.partnersImageUrl ? this.BUCKET_URL + event.partnersImageUrl : '',
+      }))
+    );
+  }
+
   update(eventId: string, eventData: FormData): Observable<void> {
     return this.httpClient.put<void>(`${this.API_URL}/${eventId}`, eventData);
   }

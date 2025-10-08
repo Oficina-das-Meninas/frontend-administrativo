@@ -1,7 +1,7 @@
 <div class="flex flex-col items-center mx-auto bg-gradient">
   <mat-card class="w-full max-w-[920px]" appearance="outlined">
     <mat-card-header class="mb-6 !text-4xl !font-bold !text-gray-900">
-      <mat-card-title>Criar Evento</mat-card-title>
+      <mat-card-title>{{ isEditMode() ? 'Editar Evento' : 'Criar Evento' }}</mat-card-title>
     </mat-card-header>
 
     <mat-card-content>
@@ -57,6 +57,7 @@
               label="Imagem do Evento*"
               text="Clique ou arraste para anexar"
               hint="PNG, JPG, JPEG ou WEBP"
+              [initialUrls]="existingPreviewImageUrl() ? [existingPreviewImageUrl()] : []"
               (filesSelected)="onPreviewImageSelected($event)"></app-image-input>
             @if (hasImageError('previewImage')) {
             <div class="text-red-700 text-xs mt-1 ml-3">{{ getImageErrorMessage('previewImage') }}</div>
@@ -67,6 +68,7 @@
               label="Imagem de Parceiros*"
               text="Clique ou arraste para anexar"
               hint="PNG, JPG, JPEG ou WEBP"
+              [initialUrls]="existingPartnersImageUrl() ? [existingPartnersImageUrl()] : []"
               (filesSelected)="onPartnersImageSelected($event)"></app-image-input>
             @if (hasImageError('partnersImage')) {
             <div class="text-red-700 text-xs mt-1 ml-3">{{ getImageErrorMessage('partnersImage') }}</div>
@@ -76,7 +78,7 @@
 
         <div class="my-4">
           <label class="block text-sm font-medium text-gray-600 mb-3">Descrição do Evento*</label>
-          <app-ck-editor (dataChange)="onDataChange($event)"></app-ck-editor>
+          <app-ck-editor [initialData]="description()" (dataChange)="onDataChange($event)"></app-ck-editor>
         </div>
 
         <div class="flex justify-end mt-6">
@@ -88,7 +90,7 @@
             [disabled]="!eventForm.valid"
             [disabledInteractive]="!eventForm.valid"
             class="!px-16 !py-6 font-semibold text-base rounded-md normal-case tracking-normal">
-            Criar Evento
+            {{ isEditMode() ? 'Atualizar Evento' : 'Criar Evento' }}
           </button>
         </div>
       </form>

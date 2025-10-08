@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import {
   Alignment,
@@ -45,6 +45,7 @@ const LICENSE_KEY = 'GPL';
   encapsulation: ViewEncapsulation.None,
 })
 export class CKEditorComponent {
+  @Input() initialData: string = '';
   @Output() dataChange = new EventEmitter<string>();
 
   constructor(private changeDetector: ChangeDetectorRef) {}

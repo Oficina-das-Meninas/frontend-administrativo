@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -6,7 +6,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltip } from '@angular/material/tooltip';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
 import { FormHelperService } from '../../../../shared/services/form/form-helps';
 import { CKEditorComponent } from '../../components/ck-editor/ck-editor';
@@ -54,13 +54,18 @@ const ERROR_MESSAGES: Record<string, Record<string, string>> = {
   templateUrl: './form-event.html',
   styleUrl: './form-event.scss',
 })
-export class FormEventComponent {
+export class FormEventComponent implements OnInit {
   private fb = inject(FormBuilder);
   private eventService = inject(EventService);
   private formHelperService = inject(FormHelperService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   public description = signal<string>('');
+  public isEditMode = signal<boolean>(false);
+  public eventId: string | null = null;
+  public existingPreviewImageUrl = signal<string>('');
+  public existingPartnersImageUrl = signal<string>('');
 
   public eventForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
@@ -75,6 +80,50 @@ export class FormEventComponent {
     partnersImage: [[] as File[], [Validators.required, EventValidators.imageValidator]],
     previewImage: [[] as File[], [Validators.required, EventValidators.imageValidator]],
   });
+
+  ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      this.eventId = params.get('id');
+      if (this.eventId) {
+        this.isEditMode.set(true);
+        this.loadEventData(this.eventId);
+      }
+    });
+  }
+
+  private loadEventData(eventId: string): void {
+    this.eventService.getById(eventId).subscribe(async event => {
+      const eventDate = new Date(event.eventDate);
+      const eventTime = eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+      const previewFile = event.previewImageUrl ? await this.urlToFile(event.previewImageUrl) : null;
+      const partnersFile = event.partnersImageUrl ? await this.urlToFile(event.partnersImageUrl) : null;
+
+      this.existingPreviewImageUrl.set(event.previewImageUrl || '');
+      this.existingPartnersImageUrl.set(event.partnersImageUrl || '');
+
+      this.eventForm.patchValue({
+        title: event.title,
+        description: event.description,
+        eventDate: eventDate,
+        eventTime: eventTime,
+        location: event.location,
+        urlToPlatform: UrlUtils.removeHttpPrefix(event.urlToPlatform),
+        previewImage: previewFile ? [previewFile] : [],
+        partnersImage: partnersFile ? [partnersFile] : [],
+      });
+
+      this.description.set(event.description);
+    });
+  }
+
+  private async urlToFile(url: string): Promise<File> {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const filename = url.substring(url.lastIndexOf('/') + 1);
+    const mimeType = blob.type || 'image/jpeg';
+    return new File([blob], filename, { type: mimeType });
+  }
 
   onSubmit() {
     if (!this.eventForm.valid) {
@@ -92,7 +141,11 @@ export class FormEventComponent {
 
     const formData = this.buildFormData(finalData, formValue);
 
-    this.eventService.create(formData).subscribe(() => {
+    const request$ = this.isEditMode()
+      ? this.eventService.update(this.eventId!, formData)
+      : this.eventService.create(formData);
+
+    request$.subscribe(() => {
       this.eventForm.reset();
       this.description.set('');
       this.router.navigate(['/eventos']);
@@ -109,8 +162,15 @@ export class FormEventComponent {
     formData.append('eventDate', DateTimeUtils.formatForBackend(finalData.eventDate));
     formData.append('location', finalData.location);
     formData.append('urlToPlatform', finalData.urlToPlatform);
-    formData.append('partnersImage', formValue.partnersImage[0]);
-    formData.append('previewImage', formValue.previewImage[0]);
+
+    if (formValue.partnersImage && formValue.partnersImage.length > 0) {
+      formData.append('partnersImage', formValue.partnersImage[0]);
+    }
+
+    if (formValue.previewImage && formValue.previewImage.length > 0) {
+      formData.append('previewImage', formValue.previewImage[0]);
+    }
+
     return formData;
   }
 

@@ -11,68 +11,54 @@
 
 -->
 
-<div class="flex justify-center items-start min-h-screen p-8">
-  <div class="w-full max-w-[920px] bg-white rounded-lg p-12 shadow-sm">
-    <h1 class="text-4xl font-bold text-gray-900 mb-10">Criar Evento</h1>
+<div class="flex flex-col items-center mx-auto bg-gradient">
+  <mat-card class="w-full max-w-[920px]" appearance="outlined">
+    <mat-card-header  class="mb-6 !text-4xl !font-bold !text-gray-900">
+      <mat-card-title>Criar Evento</mat-card-title>
+    </mat-card-header>
 
-    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
-      <!-- Título -->
-      <mat-form-field appearance="outline" class="w-full custom-form-field">
-        <mat-label>Título</mat-label>
-        <input matInput formControlName="title" placeholder="Digite o título do evento" />
-        @if (eventForm.get('title')?.invalid && eventForm.get('title')?.touched) {
-          <mat-error>{{ getErrorMessage('title') }}</mat-error>
-        }
-      </mat-form-field>
+    <mat-card-content>
+      <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+        <app-form-input
+          formControlName="title"
+          label="Título"
+          placeholder="Digite o título do evento"
+          [maxLength]="200"
+          [errorMessage]="getErrorMessage('title')">
+        </app-form-input>
 
-      <!-- Data e Localização -->
       <div class="flex flex-col md:flex-row gap-6 w-full">
-        <mat-form-field appearance="outline" class="w-full md:flex-1 custom-form-field">
-          <mat-label>Data do Evento</mat-label>
-          <input
-            matInput
+        <div class="w-full md:flex-1">
+          <app-date-picker
             formControlName="eventDate"
+            label="Data do Evento"
             placeholder="DD/MM/YYYY"
-            (input)="onDateInput($event)"
-            (blur)="onDateBlur()"
-            maxlength="10" />
-          <input
-            matInput
-            [formControl]="datePickerControl"
-            [matDatepicker]="picker"
-            style="display: none;" />
-          <button
-            mat-icon-button
-            matIconSuffix
-            (click)="picker.open()"
-            type="button">
-            <mat-icon>calendar_today</mat-icon>
-          </button>
-          <mat-datepicker #picker (closed)="onDatePickerClosed()"></mat-datepicker>
-          @if (eventForm.get('eventDate')?.invalid && eventForm.get('eventDate')?.touched) {
-            <mat-error>{{ getErrorMessage('eventDate') }}</mat-error>
-          }
-        </mat-form-field>
+            [errorMessage]="getErrorMessage('eventDate')">
+          </app-date-picker>
+        </div>
 
-        <mat-form-field appearance="outline" class="w-full md:flex-1 custom-form-field">
-          <mat-label>Localização</mat-label>
-          <input matInput formControlName="location" placeholder="Digite a localização" />
-          @if (eventForm.get('location')?.invalid && eventForm.get('location')?.touched) {
-            <mat-error>{{ getErrorMessage('location') }}</mat-error>
-          }
-        </mat-form-field>
+        <div class="w-full md:flex-1">
+          <app-form-input
+            formControlName="location"
+            label="Localização"
+            placeholder="Digite a localização"
+            prefixIcon="location_on"
+            [errorMessage]="getErrorMessage('location')">
+          </app-form-input>
+        </div>
       </div>
 
-      <!-- Link para plataforma -->
-      <mat-form-field appearance="outline" class="w-full custom-form-field">
-        <mat-label>Link para a plataforma</mat-label>
-        <input matInput formControlName="urlToPlataform" placeholder="https://exemplo.com" />
-        @if (eventForm.get('urlToPlataform')?.invalid && eventForm.get('urlToPlataform')?.touched) {
-          <mat-error>{{ getErrorMessage('urlToPlataform') }}</mat-error>
-        }
-      </mat-form-field>
+            <!-- Link para plataforma -->
+      <app-form-input
+        formControlName="urlToPlataform"
+        label="Link para a plataforma"
+        type="url"
+        placeholder="exemplo.com"
+        prefix="https://"
+        hint="Cole aqui o link da plataforma do evento"
+        [errorMessage]="getErrorMessage('urlToPlataform')">
+      </app-form-input>
 
-      <!-- Imagens -->
       <div class="flex flex-col md:flex-row gap-6 my-4">
         <div class="w-full md:w-1/2">
           <app-image-input
@@ -103,13 +89,11 @@
         </div>
       </div>
 
-      <!-- Editor de descrição -->
       <div class="my-4">
         <label class="block text-sm font-medium text-gray-600 mb-3">Descrição do Evento</label>
         <app-ck-editor (dataChange)="onDataChange($event)"></app-ck-editor>
       </div>
 
-      <!-- Botão de submit -->
       <div class="flex justify-end mt-6">
         <button
           mat-raised-button
@@ -123,5 +107,6 @@
         </button>
       </div>
     </form>
-  </div>
+    </mat-card-content>
+  </mat-card>
 </div>

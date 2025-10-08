@@ -28,10 +28,6 @@
 }
 
 .ck-editor {
-  .ck.ck-button.ck-on {
-    color: #ffffff ;
-  }
-
   .ck.ck-list__item .ck-button:hover:not(.ck-disabled),
   .ck.ck-list__item .ck-button.ck-on {
     color: #8a0042 !important;
@@ -177,3 +173,7 @@
     width: 100%;
   }
 }
+
+  .ck.ck-button.ck-on {
+    color: #ffffff !important;
+  }

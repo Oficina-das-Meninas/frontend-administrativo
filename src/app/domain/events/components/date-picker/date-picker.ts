@@ -1,21 +1,63 @@
-import { Component, Input, Optional, Self } from '@angular/core';
+import { Component, Injectable, Input, Optional, Self } from '@angular/core';
 import { ControlValueAccessor, FormControl, NgControl, ReactiveFormsModule } from '@angular/forms';
-import { MatNativeDateModule } from '@angular/material/core';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatNativeDateModule, NativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 
+@Injectable()
+export class CustomDateAdapter extends NativeDateAdapter {
+  override parse(value: any): Date | null {
+    if (typeof value === 'string') {
+      const parts = value.split('/');
+      if (parts.length === 3) {
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+
+        if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+          const date = new Date(year, month, day);
+          if (date.getDate() === day && date.getMonth() === month && date.getFullYear() === year) {
+            return date;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  override format(date: Date, displayFormat: Object): string {
+    if (!date) {
+      return '';
+    }
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+}
+
+export const BR_DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'DD/MM/YYYY',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
+
 @Component({
   selector: 'app-date-picker',
   standalone: true,
-  imports: [
-    MatFormFieldModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatIconModule,
-    ReactiveFormsModule
+  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatNativeDateModule, MatIconModule, ReactiveFormsModule],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' },
+    { provide: DateAdapter, useClass: CustomDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: BR_DATE_FORMATS },
   ],
   templateUrl: './date-picker.html',
   styleUrls: ['./date-picker.scss'],
@@ -28,6 +70,7 @@ export class DatePickerComponent implements ControlValueAccessor {
 
   value: Date | null = null;
   disabled = false;
+  hasInvalidInput = false;
 
   private onChange: (value: Date | null) => void = () => {};
   private onTouched: () => void = () => {};
@@ -50,6 +93,19 @@ export class DatePickerComponent implements ControlValueAccessor {
     if (!this.shouldShowError) {
       return '';
     }
+
+    if (this.hasInvalidInput) {
+      return 'Data inválida';
+    }
+
+    if (this.ngControl?.errors?.['matDatepickerParse']) {
+      return 'Data inválida';
+    }
+
+    if (this.ngControl?.errors?.['required']) {
+      return this.errorMessage || 'Campo obrigatório';
+    }
+
     return this.errorMessage;
   }
 
@@ -94,8 +150,8 @@ export class DatePickerComponent implements ControlValueAccessor {
 
       if (day < 1 || day > 31 || month < 0 || month > 11 || year < 1000) {
         this.value = null;
-        this.onChange(value as any);
-        this.onTouched();
+        this.hasInvalidInput = true;
+        this.onChange(null);
         return;
       }
 
@@ -103,17 +159,20 @@ export class DatePickerComponent implements ControlValueAccessor {
 
       if (date.getDate() === day && date.getMonth() === month && date.getFullYear() === year) {
         this.value = date;
+        this.hasInvalidInput = false;
         this.onChange(date);
       } else {
         this.value = null;
-        this.onChange(value as any);
-        this.onTouched();
+        this.hasInvalidInput = true;
+        this.onChange(null);
       }
     } else if (value.length > 0) {
       this.value = null;
-      this.onChange(value as any);
+      this.hasInvalidInput = false;
+      this.onChange(null);
     } else {
       this.value = null;
+      this.hasInvalidInput = false;
       this.onChange(null);
     }
   }

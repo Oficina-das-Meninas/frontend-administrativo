@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -42,6 +43,7 @@ const ERROR_MESSAGES: Record<string, Record<string, string>> = {
     CKEditorComponent,
     ReactiveFormsModule,
     MatButtonModule,
+    MatIconModule,
     ImageInputComponent,
     MatTooltip,
     TimePickerComponent,
@@ -221,5 +223,9 @@ export class FormEventComponent implements OnInit {
 
   getImageErrorMessage(fieldName: string): string {
     return this.hasImageError(fieldName) ? 'É obrigatório selecionar uma imagem' : '';
+  }
+
+  goBack(): void {
+    this.router.navigate(['/eventos']);
   }
 }

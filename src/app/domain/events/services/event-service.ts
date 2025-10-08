@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
-import { EventPage } from '../models/event-page';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { EventPage } from '../models/event-page';
 
 @Injectable({
   providedIn: 'root',
@@ -31,5 +31,13 @@ export class EventService {
           }))
         }))
       );
+  }
+
+  create(eventData: FormData): Observable<void> {
+    return this.httpClient.post<void>(this.API_URL, eventData);
+  }
+
+  update(eventId: string, eventData: FormData): Observable<void> {
+    return this.httpClient.put<void>(`${this.API_URL}/${eventId}`, eventData);
   }
 }

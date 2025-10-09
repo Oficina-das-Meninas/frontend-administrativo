@@ -114,4 +114,10 @@ export class ImageInputComponent implements OnChanges {
       }
     }
   }
+
+  getFileName(url: string): string {
+    if (!url) return '';
+    const urlParts = url.split('/');
+    return urlParts[urlParts.length - 1] || '';
+  }
 }

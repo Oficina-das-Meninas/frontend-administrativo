@@ -12,14 +12,14 @@ export const routes: Routes = [
         path: '',
         loadComponent: () =>
           import('./domain/home/containers/home/home').then(
-            (m) => m.HomeComponent ?? m.Home
+            (m) => m.Home
           ),
       },
       {
         path: 'transparencia',
         loadComponent: () =>
           import('./domain/transparency/containers/transparency/transparency').then(
-            (m) => m.TransparencyComponent ?? m.Transparency
+            (m) => m.Transparency
           ),
         data: {
           breadcrumb: 'Transparência',

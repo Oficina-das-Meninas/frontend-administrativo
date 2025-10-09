@@ -10,6 +10,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
 import { FormHelperService } from '../../../../shared/services/form/form-helps';
+import { SnackbarService } from '../../../../shared/services/snackbar-service';
 import { CKEditorComponent } from '../../components/ck-editor/ck-editor';
 import { DatePickerComponent } from "../../components/date-picker/date-picker";
 import { ImageInputComponent } from '../../components/image-input/image-input';
@@ -60,6 +61,7 @@ export class FormEventComponent implements OnInit {
   private fb = inject(FormBuilder);
   private eventService = inject(EventService);
   private formHelperService = inject(FormHelperService);
+  private snackbarService = inject(SnackbarService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -147,10 +149,25 @@ export class FormEventComponent implements OnInit {
       ? this.eventService.update(this.eventId!, formData)
       : this.eventService.create(formData);
 
-    request$.subscribe(() => {
-      this.eventForm.reset();
-      this.description.set('');
-      this.router.navigate(['/eventos']);
+    request$.subscribe({
+      next: () => {
+        const successMessage = this.isEditMode()
+          ? 'Evento atualizado com sucesso!'
+          : 'Evento cadastrado com sucesso!';
+
+        this.snackbarService.success(successMessage);
+        this.eventForm.reset();
+        this.description.set('');
+        this.router.navigate(['/eventos']);
+      },
+      error: (error) => {
+        const errorMessage = this.isEditMode()
+          ? 'Erro ao atualizar evento. Tente novamente.'
+          : 'Erro ao cadastrar evento. Tente novamente.';
+
+        this.snackbarService.error(errorMessage);
+        console.error('Erro ao salvar evento:', error);
+      }
     });
   }
 

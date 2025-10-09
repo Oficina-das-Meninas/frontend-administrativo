@@ -1,0 +1,117 @@
+<app-transparency-accordion [content]="content()">
+    <ng-container documentActions>
+      <button matButton="filled" (click)="openAddDocumentDialog()">
+        <span class="text-sm font-semibold">Adicionar</span>
+      </button>
+    </ng-container>
+    <ng-container collaboratorActions>
+      <button matButton="filled" (click)="openAddCollaboratorDialog()">
+        <span class="text-sm font-semibold">Adicionar</span>
+      </button>
+    </ng-container>
+</app-transparency-accordion>
+
+<ng-template #addDocumentDialog>
+  <app-dialog title="Adicionar Documento">
+    <ng-container dialogContent>
+      <div [formGroup]="documentForm" class="flex flex-col">
+        <mat-form-field appearance="outline">
+          <mat-label>Título</mat-label>
+          <input 
+            matInput
+            formControlName="title" 
+            placeholder="Título do documento" 
+          >
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Data de Efetivação</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            formControlName="effectiveDate"
+            placeholder="dd/mm/aaaa"
+            appMaskDate
+          >
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Documento</mat-label>
+
+          <input
+            matInput
+            type="text"
+            [value]="documentForm.get('file')?.value?.name || ''"
+            placeholder="Selecione um arquivo"
+            readonly
+            (click)="fileInput.click()"
+          />
+
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="fileInput.click()"
+            type="button"
+          >
+            <span class="material-symbols-outlined">
+              attach_file
+            </span>
+          </button>
+        </mat-form-field>
+        <input
+          #fileInput
+          type="file"
+          accept=".pdf,.jpg,.jpeg,.png"
+          (change)="onFileSelected($event)"
+          hidden
+        />
+      </div>
+    </ng-container>
+    <ng-container dialogConfirmButton>
+      <button matButton="filled" (click)="onAddDocument()" [disabled]="!documentForm.valid">
+        <span class="text-lg font-semibold">Adicionar</span>
+      </button>
+    </ng-container>
+  </app-dialog>
+</ng-template>
+
+<ng-template #addCollaboratorDialog>
+  <app-dialog title="Adicionar Colaborador">
+    <ng-container dialogContent>
+      <div [formGroup]="collaboratorForm" class="flex flex-col">
+        <div class="pb-6">
+          <app-upload-profile-image formControlName="image" size="w-40"></app-upload-profile-image>
+        </div>
+        <mat-form-field appearance="outline">
+          <mat-label>Nome</mat-label>
+          <input 
+            matInput
+            formControlName="name" 
+            placeholder="Nome do(a) colaborador(a)" 
+          >
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Cargo</mat-label>
+          <input 
+            matInput
+            formControlName="role" 
+            placeholder="Cargo do(a) colaborador(a)" 
+          >
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Descrição</mat-label>
+          <input 
+            matInput
+            formControlName="description" 
+            placeholder="Descrição do cargo" 
+          >
+        </mat-form-field>
+      </div>  
+    </ng-container>
+    <ng-container dialogConfirmButton>
+      <button matButton="filled" (click)="onAddCollaborator()" [disabled]="!collaboratorForm.valid">
+        <span class="text-lg font-semibold">Adicionar</span>
+      </button>
+    </ng-container>
+  </app-dialog>
+</ng-template>

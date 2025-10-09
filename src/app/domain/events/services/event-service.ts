@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { ImageService } from '../../../shared/services/image-service';
 import { EventPage } from '../models/event-page';
 
 @Injectable({
@@ -10,7 +11,7 @@ import { EventPage } from '../models/event-page';
 export class EventService {
   private readonly API_URL = `${environment.apiUrl}/events`;
   private httpClient = inject(HttpClient);
-  private readonly BUCKET_URL = `${environment.bucketUrl}/`;
+  private imageService = inject(ImageService);
 
   list(page: number, size: number): Observable<EventPage> {
     return this.httpClient
@@ -25,9 +26,7 @@ export class EventService {
           ...eventPage,
           data: eventPage.data.map(ev => ({
             ...ev,
-            previewImageUrl: ev.previewImageUrl
-              ? this.BUCKET_URL + 'pub/' + ev.previewImageUrl
-              : ''
+            previewImageUrl: this.imageService.getPubImage(ev.previewImageUrl)
           }))
         }))
       );
@@ -41,8 +40,8 @@ export class EventService {
     return this.httpClient.get<any>(`${this.API_URL}/${eventId}`).pipe(
       map((event) => ({
         ...event,
-        previewImageUrl: event.previewImageUrl ? this.BUCKET_URL + 'pub/' + event.previewImageUrl : '',
-        partnersImageUrl: event.partnersImageUrl ? this.BUCKET_URL + 'pub/' + event.partnersImageUrl : '',
+        previewImageUrl: this.imageService.getPubImage(event.previewImageUrl),
+        partnersImageUrl: this.imageService.getPubImage(event.partnersImageUrl),
       }))
     );
   }

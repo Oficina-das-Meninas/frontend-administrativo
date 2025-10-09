@@ -25,3 +25,23 @@ body {
 }
 
 html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* resolve conflito da borda do componente
+    mat-form-field appearance="outline" */
+.mdc-notched-outline__notch{
+  border-right: none;
+}
+
+.mat-mdc-fab {
+  @include mat.fab-overrides((
+    container-elevation-shadow: none,
+    hover-container-elevation-shadow: none,
+    focus-container-elevation-shadow: none,
+    pressed-container-elevation-shadow: none,
+    extended-container-elevation-shadow: none,
+    extended-hover-container-elevation-shadow: none,
+    extended-focus-container-elevation-shadow: none,
+    extended-pressed-container-elevation-shadow: none
+  ));
+}

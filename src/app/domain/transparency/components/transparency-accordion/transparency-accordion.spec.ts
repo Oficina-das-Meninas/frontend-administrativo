@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TransparencyAccordionComponent } from './transparency-accordion.component';
+import { TransparencyAccordionComponent } from './transparency-accordion';
 
 describe('TransparencyAccordionComponent', () => {
   let component: TransparencyAccordionComponent;

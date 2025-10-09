@@ -1,17 +1,17 @@
 import { Component, input, signal } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { AccordionContentType } from '../../models/accordion-content-type';
-import { AccordionContent } from '../../models/accordion-content';
 import { MatIconModule } from '@angular/material/icon';
+import { AccordionContent } from '../../models/transparency-accordion/accordion-content';
+import { AccordionContentType } from '../../enums/transparency-accordion/accordion-content-type';
 
 @Component({
   selector: 'app-transparency-accordion',
   imports: [
-    MatExpansionModule, 
-    MatIconModule
+    MatExpansionModule,
+    MatIconModule,
   ],
-  templateUrl: './transparency-accordion.component.html',
-  styleUrl: './transparency-accordion.component.scss'
+  templateUrl: './transparency-accordion.html',
+  styleUrl: './transparency-accordion.scss'
 })
 export class TransparencyAccordionComponent {
 

@@ -5,7 +5,10 @@
     hideToggle
   >
     <mat-expansion-panel-header class="!h-16">
-      <mat-panel-title class="text-xl font-bold">
+      <mat-panel-title class="flex text-xl font-bold gap-2">
+        <span class="material-symbols-outlined opacity-50">
+          drag_indicator
+        </span>
         {{ content()?.categoryName }}
       </mat-panel-title>
 
@@ -21,9 +24,13 @@
         @for (item of content()?.documents; track $index) {
           <a [href]="item.url" target="_blank" class="flex items-center gap-2 py-2">
             <p class="text-lg font-semibold">{{ item.name }}</p>
-            <mat-icon fontSet="material-symbols-rounded">download</mat-icon>
+            <span class="material-symbols-outlined">download</span>
           </a>
         }
+      </section>
+
+      <section class="flex justify-end">
+        <ng-content select="[documentActions]"></ng-content>
       </section>
     }
     @if (content()?.type === accordionContentType.COLLABORATOR) {
@@ -33,7 +40,7 @@
             <img
               [src]="item.imageUrl"
               alt="collaborator-image"
-              class="w-25 rounded-full object-cover"
+              class="size-30 rounded-full object-cover"
             />
             <h1 class="text-lg text-center font-semibold">{{ item.name }}</h1>
             <p class="text-stone-500">{{ item.role }}</p>
@@ -41,7 +48,10 @@
           </div>
         }
       </section>
+      
+      <section class="flex justify-end">
+        <ng-content select="[collaboratorActions]"></ng-content>
+      </section>
     }
   </mat-expansion-panel>
 </mat-accordion>
-

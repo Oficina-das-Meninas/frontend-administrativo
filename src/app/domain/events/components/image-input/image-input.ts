@@ -52,10 +52,6 @@ export class ImageInputComponent implements OnChanges {
     }
   }
 
-  getFileName(previewUrl: string) {
-
-  }
-
   removeImage(index: number) {
     if (this.readonly) return;
     const updatedPreviews = [...this.previewUrls()];

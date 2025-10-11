@@ -18,12 +18,47 @@ export const routes: Routes = [
       {
         path: 'transparencia',
         loadComponent: () =>
-          import(
-            './domain/transparency/containers/transparency/transparency'
-          ).then((m) => m.Transparency),
+          import('./domain/transparency/containers/transparency/transparency').then(
+            (m) => m.Transparency
+          ),
         data: {
           breadcrumb: 'Transparência',
         },
+      },
+      {
+        path: 'eventos',
+        data: {
+          breadcrumb: 'Eventos',
+        },
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./domain/events/containers/events/events').then(
+                (m) => m.Events
+              ),
+          },
+          {
+            path: 'cadastro',
+            loadComponent: () =>
+              import('./domain/events/containers/add-event/form-event').then(
+                (m) => m.FormEventComponent
+              ),
+            data: {
+              breadcrumb: 'Cadastro de Evento',
+            },
+          },
+          {
+            path: 'editar/:id',
+            loadComponent: () =>
+              import('./domain/events/containers/add-event/form-event').then(
+                (m) => m.FormEventComponent
+              ),
+            data: {
+              breadcrumb: 'Edição de Evento',
+            },
+          },
+        ],
       },
     ],
   },

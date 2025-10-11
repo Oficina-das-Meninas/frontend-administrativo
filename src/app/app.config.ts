@@ -8,12 +8,18 @@ import localePt from '@angular/common/locales/pt';
 
 registerLocaleData(localePt);
 
+import { registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
+
+registerLocaleData(localePt);
+
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: LOCALE_ID, useValue: 'pt-BR' },
     { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' },
     provideZonelessChangeDetection(),
     provideRouter(routes),
-    provideHttpClient(withFetch())
+    provideHttpClient(withFetch()),
+    { provide: LOCALE_ID, useValue: 'pt-BR' }
   ]
 };

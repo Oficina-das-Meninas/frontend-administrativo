@@ -3,7 +3,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { Observable } from 'rxjs';
 import { DataTable, TableColumn } from '../../../../shared/components/data-table/data-table';
 import { DateRange } from '../../../../shared/models/date-range';
-import { EventCard } from '../../components/event-card';
+import { EventCard } from '../../components/event-card/event-card';
 import { EventFilters } from '../../models/event-filters';
 import { EventPage } from '../../models/event-page';
 import { EventService } from '../../services/event-service';

@@ -5,6 +5,7 @@ import { EventPage } from '../models/event-page';
 import { environment } from '../../../../environments/environment';
 import { EventFilters } from '../models/event-filters';
 import { toLocalDate } from '../../../shared/components/utils/date-utils';
+import { ImageService } from '../../../shared/services/image-service';
 
 @Injectable({
   providedIn: 'root',

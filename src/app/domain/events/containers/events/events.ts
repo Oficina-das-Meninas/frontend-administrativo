@@ -1,119 +1,81 @@
-import { AsyncPipe, DatePipe } from '@angular/common';
-import { Component, inject, OnInit, OnDestroy, HostListener } from '@angular/core';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatTableModule } from '@angular/material/table';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { Component, inject, OnInit } from '@angular/core';
+import { PageEvent } from '@angular/material/paginator';
+import { Observable } from 'rxjs';
+import { DataTable, TableColumn } from '../../../../shared/components/data-table/data-table';
+import { DateRange } from '../../../../shared/models/date-range';
+import { EventCard } from '../../components/event-card';
+import { EventFilters } from '../../models/event-filters';
 import { EventPage } from '../../models/event-page';
 import { EventService } from '../../services/event-service';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { CalendarFilter } from '../../../../shared/components/calendar-filter/calendar-filter';
-import { DateRange } from '../../../../shared/models/date-range';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @Component({
   selector: 'app-events',
   imports: [
-    MatTableModule,
-    MatIconModule,
-    MatButtonModule,
-    MatCardModule,
-    MatPaginatorModule,
-    AsyncPipe,
-    MatProgressSpinner,
-    DatePipe,
-    MatFormFieldModule,
-    MatInputModule,
-    CalendarFilter,
-    MatTooltipModule,
-    MatButtonToggleModule
+    DataTable,
+    EventCard
   ],
-  templateUrl: './events.html',
-  styleUrl: './events.scss',
+  templateUrl: './events.html'
 })
 export class Events implements OnInit {
   events$: Observable<EventPage> | null = null;
 
-  private eventService = inject(EventService);
+  columns: TableColumn[] = [
+    { key: 'title', header: 'Título', type: 'text' },
+    { key: 'eventDate', header: 'Data', type: 'date' },
+    { key: 'location', header: 'Local', type: 'text' }
+  ];
 
+  searchTerm = '';
+  currentFilters: EventFilters = {};
   pageIndex = 0;
   pageSize = 10;
-  viewMode: 'cards' | 'table' = 'cards';
-  isMobile = false;
 
-  displayedColumns: string[] = ['imagem', 'nome', 'data', 'local', 'acoes'];
-
-  dateRange: DateRange = {
-    start: null,
-    end: null,
-  };
+  private eventService = inject(EventService);
 
   ngOnInit() {
-    this.checkScreenSize();
-    this.setDefaultViewMode();
-    this.refresh();
+    this.loadEventsWithFilters();
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize() {
-    this.checkScreenSize();
-    this.setDefaultViewMode();
+  onSearch(searchTerm: string) {
+    this.searchTerm = searchTerm;
+    this.pageIndex = 0;
+    this.loadEventsWithFilters();
   }
 
-  private checkScreenSize() {
-    this.isMobile = window.innerWidth < 768;
+  onClearSearch() {
+    this.searchTerm = '';
+    this.pageIndex = 0;
+    this.loadEventsWithFilters();
   }
 
-  private setDefaultViewMode() {
-    if (this.isMobile) {
-      this.viewMode = 'cards';
-    } else {
-      this.viewMode = 'table';
-    }
-  }
-
-  onViewModeChange(newViewMode: 'cards' | 'table') {
-    this.viewMode = newViewMode;
-  }
-
-  applyFilter($event: KeyboardEvent) {
-    console.log('Filter applied:', ($event.target as HTMLInputElement).value);
-  }
-
-  refresh(pageEvent: PageEvent = { length: 0, pageIndex: 0, pageSize: 10 }) {
-    this.events$ = this.eventService
-      .list(pageEvent.pageIndex, pageEvent.pageSize)
-      .pipe(
-        tap(() => this.updatePagination(pageEvent)),
-        catchError(() => this.emptyEventPage())
-      );
-  }
-
-  private updatePagination(pageEvent: PageEvent) {
+  onPageChange(pageEvent: PageEvent) {
     this.pageIndex = pageEvent.pageIndex;
     this.pageSize = pageEvent.pageSize;
+    this.loadEventsWithFilters();
   }
 
-  private emptyEventPage() {
-    return of({ data: [], totalElements: 0, totalPages: 0 });
-  }
-
-  applyDateFilter() {
-    if (this.dateRange.start && this.dateRange.end) {
-      this.pageIndex = 0;
-      this.refresh();
-    }
-  }
-
-  clearFilters() {
-    this.dateRange.start = null;
-    this.dateRange.end = null;
+  onDateFilter(dateRange: DateRange) {
+    this.currentFilters.startDate = dateRange.start || undefined;
+    this.currentFilters.endDate = dateRange.end || undefined;
     this.pageIndex = 0;
-    this.refresh();
+    this.loadEventsWithFilters();
+  }
+
+  onClearFilters() {
+    this.searchTerm = '';
+    this.currentFilters = {};
+    this.pageIndex = 0;
+    this.loadEventsWithFilters();
+  }
+
+  private loadEventsWithFilters() {
+    this.currentFilters = {
+      ...this.currentFilters,
+      page: this.pageIndex,
+      pageSize: this.pageSize,
+      searchTerm: this.searchTerm || undefined
+    };
+
+    this.events$ = this.eventService.getFilteredEvents(this.currentFilters);
   }
 }

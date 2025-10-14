@@ -2,19 +2,21 @@
 
 mat-paginator {
   @include mat.paginator-overrides((
-    container-background-color: white
+    container-background-color: #ffffff
   ));
 }
 
 table {
   @include mat.table-overrides((
-    background-color: white
+    background-color: #ffffff,
+    row-item-outline-color: var(--color-gray-300)
   ));
 }
 
 mat-card {
   @include mat.card-overrides((
-    outlined-container-color: white
+    outlined-container-color: #ffffff,
+    outlined-outline-color: var(--color-gray-300)
   ));
 }
 
@@ -23,14 +25,17 @@ mat-card {
     container-elevation-shadow: none,
     hover-container-elevation-shadow: none,
     focus-container-elevation-shadow: none,
-    pressed-container-elevation-shadow: none,
-    extended-container-elevation-shadow: none,
-    extended-hover-container-elevation-shadow: none,
-    extended-focus-container-elevation-shadow: none,
-    extended-pressed-container-elevation-shadow: none
+    pressed-container-elevation-shadow: none
   ));
 }
 
+mat-button-toggle-group {
+  @include mat.button-toggle-overrides((
+    selected-state-text-color: var(--mat-sys-on-primary-fixed-variant)
+  ));
+}
+
+// esconde o toggle de visualização no mobile
 .view-toggle-group {
   @media (max-width: 767px) {
     display: none !important;
@@ -47,4 +52,8 @@ mat-card {
     display: inline-flex !important;
     visibility: visible !important;
   }
+}
+
+mat-card-content{
+  height: 100%;
 }

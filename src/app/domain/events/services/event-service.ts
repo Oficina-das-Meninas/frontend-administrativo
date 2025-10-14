@@ -1,8 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
+import { delay, map, Observable, of } from 'rxjs';
 import { EventPage } from '../models/event-page';
 import { environment } from '../../../../environments/environment';
+import { EventFilters } from '../models/event-filters';
+import { toLocalDate } from '../../../shared/components/utils/date-utils';
 
 @Injectable({
   providedIn: 'root',
@@ -13,13 +15,31 @@ export class EventService {
   private readonly BUCKET_URL = `${environment.bucketUrl}/`;
 
   list(page: number, size: number): Observable<EventPage> {
+    return this.getFilteredEvents({
+      page,
+      pageSize: size
+    });
+  }
+
+  getFilteredEvents(filters: EventFilters): Observable<EventPage> {
+    let params = new HttpParams();
+
+    params = params.set('page', (filters.page ?? 0).toString());
+    params = params.set('pageSize', (filters.pageSize ?? 10).toString());
+
+    if (filters.searchTerm?.trim()) {
+      params = params.set('searchTerm', filters.searchTerm.trim());
+    }
+
+    if (filters.startDate) {
+      params = params.set('startDate', toLocalDate(filters.startDate));
+    }
+    if (filters.endDate) {
+      params = params.set('endDate', toLocalDate(filters.endDate));
+    }
+
     return this.httpClient
-      .get<EventPage>(this.API_URL, {
-        params: {
-          page: page,
-          pageSize: size,
-        },
-      })
+      .get<EventPage>(this.API_URL, { params })
       .pipe(
         map((eventPage: EventPage) => ({
           ...eventPage,

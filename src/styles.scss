@@ -47,3 +47,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     extended-pressed-container-elevation-shadow: none
   ));
 }
+
+.mat-mdc-fab-base{
+  width: 3rem !important;
+  height: 3rem !important;
+}

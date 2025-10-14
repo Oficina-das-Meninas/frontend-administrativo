@@ -12,7 +12,7 @@ import { toLocalDate } from '../../../shared/components/utils/date-utils';
 export class EventService {
   private readonly API_URL = `${environment.apiUrl}/events`;
   private httpClient = inject(HttpClient);
-  private readonly BUCKET_URL = `${environment.bucketUrl}/`;
+  private imageService = inject(ImageService);
 
   list(page: number, size: number): Observable<EventPage> {
     return this.getFilteredEvents({
@@ -45,11 +45,27 @@ export class EventService {
           ...eventPage,
           data: eventPage.data.map(ev => ({
             ...ev,
-            previewImageUrl: ev.previewImageUrl
-              ? this.BUCKET_URL + ev.previewImageUrl
-              : ''
+            previewImageUrl: this.imageService.getPubImage(ev.previewImageUrl)
           }))
         }))
       );
+  }
+
+  create(eventData: FormData): Observable<void> {
+    return this.httpClient.post<void>(this.API_URL, eventData);
+  }
+
+  getById(eventId: string): Observable<any> {
+    return this.httpClient.get<any>(`${this.API_URL}/${eventId}`).pipe(
+      map((event) => ({
+        ...event,
+        previewImageUrl: this.imageService.getPubImage(event.previewImageUrl),
+        partnersImageUrl: this.imageService.getPubImage(event.partnersImageUrl),
+      }))
+    );
+  }
+
+  update(eventId: string, eventData: FormData): Observable<void> {
+    return this.httpClient.put<void>(`${this.API_URL}/${eventId}`, eventData);
   }
 }

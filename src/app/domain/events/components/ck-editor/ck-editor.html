@@ -1,0 +1,13 @@
+<section class="ck-editor">
+  <div class="main-container">
+    <div class="editor-container editor-container_classic-editor editor-container_include-block-toolbar" #editorContainerElement>
+      <div class="editor-container__editor">
+        <div #editorElement>
+          @if(isLayoutReady) {
+          <ckeditor [editor]="Editor" [config]="config" [data]="initialData" (change)="onChange($event)" />
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

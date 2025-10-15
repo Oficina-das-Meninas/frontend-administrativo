@@ -46,6 +46,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   ));
 }
 
+.mat-mdc-fab-base{
+  width: 3rem !important;
+  height: 3rem !important;
+}
+
 .snackbar-success {
   --mdc-snackbar-container-color: #4caf50 !important;
   --mat-snack-bar-button-color: #fff !important;

@@ -41,7 +41,7 @@ export const routes: Routes = [
           {
             path: 'cadastro',
             loadComponent: () =>
-              import('./domain/events/containers/add-event/form-event').then(
+              import('./domain/events/containers/form-event/form-event').then(
                 (m) => m.FormEventComponent
               ),
             data: {
@@ -51,7 +51,7 @@ export const routes: Routes = [
           {
             path: 'editar/:id',
             loadComponent: () =>
-              import('./domain/events/containers/add-event/form-event').then(
+              import('./domain/events/containers/form-event/form-event').then(
                 (m) => m.FormEventComponent
               ),
             data: {

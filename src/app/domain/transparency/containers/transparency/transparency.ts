@@ -15,6 +15,8 @@ import { TransparencyCategory } from '../../models/transparency/transparency-cat
 import { Observable, tap } from 'rxjs';
 import { TransparencyContent } from "../transparency-content/transparency-content";
 import { MatCardModule } from '@angular/material/card';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-transparency',
@@ -31,7 +33,9 @@ import { MatCardModule } from '@angular/material/card';
     ReactiveFormsModule,
     TransparencyContent,
     MatCardModule,
-  ],
+    MatIcon,
+    MatTooltipModule
+],
   templateUrl: './transparency.html',
   styleUrl: './transparency.scss'
 })
@@ -61,6 +65,7 @@ export class Transparency implements OnInit {
 
   drop(event: CdkDragDrop<AccordionContent[]>) {
     moveItemInArray(this.accordionContentList, event.previousIndex, event.currentIndex);
+    console.log(this.accordionContentList);
   }
 
   openAddCategoryDialog() {

@@ -8,11 +8,6 @@ import localePt from '@angular/common/locales/pt';
 
 registerLocaleData(localePt);
 
-import { registerLocaleData } from '@angular/common';
-import localePt from '@angular/common/locales/pt';
-
-registerLocaleData(localePt);
-
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: LOCALE_ID, useValue: 'pt-BR' },

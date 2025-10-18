@@ -18,6 +18,10 @@ export class TransparencyService {
   createCategory(data: TransparencyCategory): Observable<TransparencyCategory> {
     return this.httpClient.post<TransparencyCategory>(`${this.API_URL}/categories`, data);
   }
+  
+  updateCategory(id: string, data: TransparencyCategory): Observable<TransparencyCategory> {
+    return this.httpClient.patch<TransparencyCategory>(`${this.API_URL}/categories/${id}`, data);
+  }
 
   createDocument(data: FormData): Observable<string> {
     return this.httpClient.post(`${this.API_URL}/documents`, data, {
@@ -32,9 +36,9 @@ export class TransparencyService {
   }
 
   list(): Observable<AccordionContent[]> {
-    return this.httpClient.get<CategoriesResponse>(`${this.API_URL}`).pipe(
+    return this.httpClient.get<{ data: CategoriesResponse }>(`${this.API_URL}`).pipe(
       map((response) =>
-        response.categories.map((category) => ({
+        response.data.categories.map((category) => ({
           id: category.id,
           categoryName: category.name,
           type: category.isImage
@@ -42,10 +46,12 @@ export class TransparencyService {
             : AccordionContentType.DOCUMENT,
           priority:category.priority,
           documents: category.documents?.map((doc) => ({
+            id: doc.id,
             name: doc.title,
             url: environment.bucketUrl + doc.previewLink,
           })),
           collaborators: category.collaborators?.map((collab) => ({
+            id: collab.id,
             imageUrl: environment.bucketUrl + collab.previewLink,
             name: collab.name,
             role: collab.role,
@@ -54,6 +60,18 @@ export class TransparencyService {
         }))
       )
     );
+  }
+
+  deleteCategory(id: string): Observable<void>  {
+    return this.httpClient.delete<void>(`${this.API_URL}/categories/${id}`);
+  }
+
+  deleteDocument(id: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.API_URL}/documents/${id}`);
+  }
+
+  deleteCollaborator(id: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.API_URL}/collaborators/${id}`);
   }
 
 }

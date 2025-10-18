@@ -1,4 +1,4 @@
-import { Component, inject, input, output, TemplateRef, ViewChild } from '@angular/core';
+import { Component, inject, input, OnInit, output, TemplateRef, ViewChild } from '@angular/core';
 import { TransparencyAccordionComponent } from "../../components/transparency-accordion/transparency-accordion";
 import { Dialog } from '../../../../shared/components/dialog/dialog';
 import { AccordionContent } from '../../models/transparency-accordion/accordion-content';
@@ -12,6 +12,9 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MaskDate } from '../../../../shared/directives/mask-date';
 import { UploadProfileImage } from "../../components/upload-profile-image/upload-profile-image";
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TransparencyCategory } from '../../models/transparency/transparency-category';
+import { DeleteItem } from '../../models/transparency-accordion/delete-item';
 
 @Component({
   selector: 'app-transparency-content',
@@ -26,21 +29,31 @@ import { UploadProfileImage } from "../../components/upload-profile-image/upload
     MatNativeDateModule,
     ReactiveFormsModule,
     MaskDate,
-    UploadProfileImage
+    UploadProfileImage,
+    MatTooltipModule,
 ],
   templateUrl: './transparency-content.html',
   styleUrl: './transparency-content.scss'
 })
-export class TransparencyContent {
+export class TransparencyContent implements OnInit {
 
   @ViewChild('addDocumentDialog') addDocumentDialog!: TemplateRef<any>;
   @ViewChild('addCollaboratorDialog') addCollaboratorDialog!: TemplateRef<any>;
+  @ViewChild('updateCategoryNameDialog') updateCategoryNameDialog!: TemplateRef<any>;
+  @ViewChild('deleteCategoryDialog') deleteCategoryDialog!: TemplateRef<any>;
+  @ViewChild('deleteItemDialog') deleteItemDialog!: TemplateRef<any>;
 
-  content = input<AccordionContent>();
+  content = input.required<AccordionContent>();
   isUpdated = output();
+
+  deleteItem: DeleteItem = {
+    id: '',
+    name: '',
+  };
 
   documentForm: FormGroup;
   collaboratorForm: FormGroup;
+  categoryForm: FormGroup;
 
   private transparencyService = inject(TransparencyService);
   private dialog = inject(MatDialog);
@@ -59,6 +72,16 @@ export class TransparencyContent {
       description : ['', Validators.required],
       image: ['', Validators.required],
     });
+
+    this.categoryForm = this.formBuilder.group({
+      name: ['', Validators.required],
+    });
+  }
+
+  ngOnInit(): void {
+    this.categoryForm.setValue({
+      name: this.content().categoryName
+    });
   }
 
   openAddDocumentDialog() {
@@ -67,6 +90,19 @@ export class TransparencyContent {
 
   openAddCollaboratorDialog() {
     this.dialog.open(this.addCollaboratorDialog);
+  }
+
+  openUpdateCategoryName() {
+    this.dialog.open(this.updateCategoryNameDialog);
+  }
+
+  openDeleteCategoryDialog() {
+    this.dialog.open(this.deleteCategoryDialog);
+  }
+
+  openDeleteItemDialog(event: DeleteItem) {
+    this.deleteItem = event;
+    this.dialog.open(this.deleteItemDialog);
   }
 
   onAddDocument() {
@@ -79,7 +115,7 @@ export class TransparencyContent {
       const formattedDate = effectiveDate.toISOString().split('T')[0];
       formData.append('effectiveDate', formattedDate);
       
-      formData.append('categoryId', this.content()?.id ?? '');
+      formData.append('categoryId', this.content().id ?? '');
 
       const file = this.documentForm.value.file;
       if (file) {
@@ -103,8 +139,8 @@ export class TransparencyContent {
       formData.append('role', this.collaboratorForm.value.role);
       formData.append('description', this.collaboratorForm.value.description);
 
-      formData.append('categoryId', this.content()?.id ?? '');
-      formData.append('priority', String(this.content()?.collaborators?.length ?? 0));
+      formData.append('categoryId', this.content().id ?? '');
+      formData.append('priority', String(this.content().collaborators?.length ?? 0));
 
       const image = this.collaboratorForm.value.image;
       if (image) {
@@ -118,6 +154,48 @@ export class TransparencyContent {
         }
       });
     }
+  }
+
+  onUpdateCategoryName() {
+    if (this.categoryForm.valid) {
+      const data: TransparencyCategory = {
+        name: this.categoryForm.value.name,
+        priority: this.content().priority
+      }
+
+      this.transparencyService.updateCategory(this.content().id ?? '', data).subscribe({
+        next: () => {
+          this.isUpdated.emit();
+          this.categoryForm.reset({ 
+            name: this.categoryForm.value.name
+          });
+          this.dialog.closeAll();
+        }
+      });
+    }
+  }
+
+  onDeleteCategoryDialog() {
+    this.transparencyService.deleteCategory(this.content().id ?? '').subscribe({
+      next: () => {
+        this.isUpdated.emit();
+        this.dialog.closeAll();
+      }
+    });
+  }
+
+  onDeleteItemDialog(): void {
+    const { id } = this.deleteItem;
+    const deleteFn = this.content().documents
+      ? this.transparencyService.deleteDocument.bind(this.transparencyService)
+      : this.transparencyService.deleteCollaborator.bind(this.transparencyService);
+
+    deleteFn(id ?? '').subscribe({
+      next: () => {
+        this.isUpdated.emit();
+        this.dialog.closeAll();
+      }
+    });
   }
 
   onFileSelected(event: Event): void {

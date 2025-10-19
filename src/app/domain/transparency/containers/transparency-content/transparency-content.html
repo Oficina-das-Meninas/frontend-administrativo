@@ -40,58 +40,29 @@
 </app-transparency-accordion>
 
 <ng-template #addDocumentDialog>
-  <app-dialog title="Adicionar Documento">
+  <app-dialog title="Adicionar Documento" [formDialog]="documentForm">
     <ng-container dialogContent>
-      <div [formGroup]="documentForm" class="flex flex-col">
-        <mat-form-field appearance="outline">
-          <mat-label>Título</mat-label>
-          <input 
-            matInput
-            formControlName="title" 
-            placeholder="Título do documento" 
-          >
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Data de Efetivação</mat-label>
-          <input
-            matInput
-            [matDatepicker]="picker"
-            formControlName="effectiveDate"
-            placeholder="dd/mm/aaaa"
-            appMaskDate
-          >
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Documento</mat-label>
-
-          <input
-            matInput
-            type="text"
-            [value]="documentForm.get('file')?.value?.name || ''"
-            placeholder="Selecione um arquivo"
-            readonly
-            (click)="fileInput.click()"
-          />
-
-          <button
-            mat-icon-button
-            matSuffix
-            (click)="fileInput.click()"
-            type="button"
-          >
-            <span class="material-symbols-outlined">
-              attach_file
-            </span>
-          </button>
-        </mat-form-field>
-        <input
-          #fileInput
-          type="file"
+      <div [formGroup]="documentForm" class="flex flex-col gap-2">
+        <app-form-input
+          formControlName="title"
+          label="Título*"
+          placeholder="Digite o título do documento"
+          errorMessage="Título do documento inválido"
+        />
+        <app-date-picker
+          formControlName="effectiveDate"
+          label="Data de Efetivação"
+          placeholder="DD/MM/AAAA"
+          errorMessage="Data de efetivação inválida"
+          class="w-full" 
+        />
+        <app-upload-file
+          formControlName="file"
+          label="Documento*"
+          placeholder="Selecione um arquivo"
           accept=".pdf,.jpg,.jpeg,.png"
-          (change)="onFileSelected($event)"
-          hidden
+          icon="attach_file"
+          errorMessage="Documento inválido"
         />
       </div>
     </ng-container>
@@ -103,37 +74,31 @@
   </app-dialog>
 </ng-template>
 
-<ng-template #addCollaboratorDialog>
+<ng-template #addCollaboratorDialog [formDialog]="collaboratorForm">
   <app-dialog title="Adicionar Colaborador">
     <ng-container dialogContent>
-      <div [formGroup]="collaboratorForm" class="flex flex-col">
+      <div [formGroup]="collaboratorForm" class="flex flex-col gap-2">
         <div class="pb-6">
           <app-upload-profile-image formControlName="image" size="w-40"></app-upload-profile-image>
         </div>
-        <mat-form-field appearance="outline">
-          <mat-label>Nome</mat-label>
-          <input 
-            matInput
-            formControlName="name" 
-            placeholder="Nome do(a) colaborador(a)" 
-          >
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Cargo</mat-label>
-          <input 
-            matInput
-            formControlName="role" 
-            placeholder="Cargo do(a) colaborador(a)" 
-          >
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Descrição</mat-label>
-          <input 
-            matInput
-            formControlName="description" 
-            placeholder="Descrição do cargo" 
-          >
-        </mat-form-field>
+        <app-form-input
+          formControlName="name"
+          label="Nome*"
+          placeholder="Digite o nome do(a) colaborador(a)"
+          errorMessage="Nome do(a) colaborador(a) inválido"
+        />
+        <app-form-input
+          formControlName="role"
+          label="Cargo*"
+          placeholder="Digite o cargo do(a) colaborador(a)"
+          errorMessage="Cargo do(a) colaborador(a) inválido"
+        />
+        <app-form-input
+          formControlName="description"
+          label="Descrição*"
+          placeholder="Digite a Descrição do cargo"
+          errorMessage="Descrição do cargo inválida"
+        />
       </div>  
     </ng-container>
     <ng-container dialogConfirmButton>
@@ -144,18 +109,16 @@
   </app-dialog>
 </ng-template>
 
-<ng-template #updateCategoryNameDialog>
+<ng-template #updateCategoryNameDialog [formDialog]="categoryForm">
   <app-dialog title="Editar Categoria">
     <ng-container dialogContent>
       <div [formGroup]="categoryForm" class="flex flex-col">
-        <mat-form-field appearance="outline">
-          <mat-label>Nome</mat-label>
-          <input 
-            matInput
-            formControlName="name"
-            placeholder="Nome da categoria" 
-          >
-        </mat-form-field>
+        <app-form-input
+          formControlName="name"
+          label="Nome*"
+          placeholder="Digite o nome da categoria"
+          errorMessage="Nome de categoria inválido"
+        />
       </div>
     </ng-container>
     <ng-container dialogConfirmButton>
@@ -189,7 +152,7 @@
     <ng-container dialogContent>
       <div>
         <p>
-          Deseja remover este {{ content().documents ? 'documento' : 'colaborador' }}
+          Deseja remover {{ content().documents ? 'o documento' : 'o(a) colaborador(a)' }}
           <span class="font-bold">{{ deleteItem.name }}</span>?
         </p>
       </div>

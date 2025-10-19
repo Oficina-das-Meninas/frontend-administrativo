@@ -1,5 +1,5 @@
 import { Component, inject, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormGroup, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -21,9 +21,13 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 export class Dialog {
 
   title = input<string>('');
+  formDialog = input<FormGroup>();
   dialogRef = inject(MatDialogRef<Dialog>);
 
   onCloseDialog(): void {
+    if (this.formDialog()) {
+      this.formDialog()?.reset();
+    }
     this.dialogRef.close();
   }
   

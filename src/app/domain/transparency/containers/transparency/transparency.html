@@ -46,28 +46,21 @@
 </div>
 
 <ng-template #addCategoryDialog>
-  <app-dialog title="Adicionar Categoria">
+  <app-dialog title="Adicionar Categoria" [formDialog]="categoryForm">
     <ng-container dialogContent>
-      <div [formGroup]="categoryForm" class="flex flex-col">
-        <mat-form-field appearance="outline">
-          <mat-label>Tipo</mat-label>
-          <mat-select formControlName="type">
-            <mat-option [value]="accordionContentType.DOCUMENT">
-              Documentos
-            </mat-option>
-            <mat-option [value]="accordionContentType.COLLABORATOR">
-              Colaboradores
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Nome</mat-label>
-          <input 
-            matInput
-            formControlName="name" 
-            placeholder="Nome da categoria" 
-          >
-        </mat-form-field>
+      <div [formGroup]="categoryForm" class="flex flex-col gap-2">
+        <app-form-select
+          formControlName="type"
+          label="Tipo*"
+          [items]="categoryTypes"
+          errorMessage="Selecione uma opção válida"
+        />
+        <app-form-input
+          formControlName="name"
+          label="Nome*"
+          placeholder="Digite o nome da categoria"
+          errorMessage="Nome de categoria inválido"
+        />
       </div>
     </ng-container>
     <ng-container dialogConfirmButton>

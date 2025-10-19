@@ -17,6 +17,9 @@ import { TransparencyContent } from "../transparency-content/transparency-conten
 import { MatCardModule } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
+import { FormSelect } from "../../../../shared/components/form-select/form-select";
+import { FormSelectItem } from '../../../../shared/models/form-select-item';
 
 @Component({
   selector: 'app-transparency',
@@ -34,7 +37,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     TransparencyContent,
     MatCardModule,
     MatIcon,
-    MatTooltipModule
+    MatTooltipModule,
+    FormInputComponent,
+    FormSelect
 ],
   templateUrl: './transparency.html',
   styleUrl: './transparency.scss'
@@ -47,6 +52,16 @@ export class Transparency implements OnInit {
   accordionContentList: AccordionContent[] = [];
   accordionContentType = AccordionContentType;
   categoryForm: FormGroup;
+  categoryTypes: FormSelectItem<AccordionContentType>[] = [
+    {
+      value: AccordionContentType.DOCUMENT,
+      name: "Documentos"
+    },
+    {
+      value: AccordionContentType.COLLABORATOR,
+      name: "Colaboradores"     
+    }
+  ];
 
   private transparencyService = inject(TransparencyService);
   private dialog = inject(MatDialog);
@@ -54,7 +69,7 @@ export class Transparency implements OnInit {
 
   constructor() {
     this.categoryForm = this.formBuilder.group({
-      type: [AccordionContentType.DOCUMENT, Validators.required],
+      type: ['', Validators.required],
       name: ['', Validators.required],
     });
   }
@@ -65,10 +80,13 @@ export class Transparency implements OnInit {
 
   drop(event: CdkDragDrop<AccordionContent[]>) {
     moveItemInArray(this.accordionContentList, event.previousIndex, event.currentIndex);
-    console.log(this.accordionContentList);
+    this.updateAllPriorities();
   }
 
   openAddCategoryDialog() {
+    this.categoryForm.patchValue({
+      type: AccordionContentType.DOCUMENT 
+    });
     this.dialog.open(this.addCategoryDialog);
   }
 
@@ -97,6 +115,18 @@ export class Transparency implements OnInit {
     this.accordionContentList$ = this.transparencyService.list().pipe(
       tap(response => this.accordionContentList = response)
     );
+  }
+
+  updateAllPriorities(): void {
+    this.accordionContentList.forEach((item, index) => {
+      const data: TransparencyCategory = {
+        name:  item.categoryName, 
+        priority: index
+      }
+      this.transparencyService
+        .updateCategory(item.id ?? '', data)
+        .subscribe();
+    });
   }
 
 }

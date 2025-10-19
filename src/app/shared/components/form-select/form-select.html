@@ -1,0 +1,39 @@
+<mat-form-field appearance="outline" class="w-full app-form-select">
+  <mat-label>{{ label }}</mat-label>
+
+  @if (prefixIcon) {
+    <mat-icon matIconPrefix>{{ prefixIcon }}</mat-icon>
+  }
+
+  @if (prefix) {
+    <span matTextPrefix>{{ prefix }}&nbsp;</span>
+  }
+
+  <mat-select 
+    [formControl]="formControl!"
+    [required]="required"
+  >
+    @for (item of items; track $index) {
+      <mat-option [value]="item.value">
+        {{ item.name }}
+      </mat-option>
+    }
+  </mat-select>
+
+  @if (suffix) {
+    <span matTextSuffix>&nbsp;{{ suffix }}</span>
+  }
+
+  @if (suffixIcon) {
+    <mat-icon matIconSuffix>{{ suffixIcon }}</mat-icon>
+  }
+
+  @if (hint && !shouldShowError) {
+    <mat-hint>{{ hint }}</mat-hint>
+  }
+
+  @if (shouldShowError && errorMessage) {
+    <mat-error>{{ errorMessage }}</mat-error>
+  }
+</mat-form-field>
+

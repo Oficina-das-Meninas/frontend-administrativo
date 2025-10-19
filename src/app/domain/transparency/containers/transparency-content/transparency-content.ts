@@ -10,11 +10,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MaskDate } from '../../../../shared/directives/mask-date';
 import { UploadProfileImage } from "../../components/upload-profile-image/upload-profile-image";
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TransparencyCategory } from '../../models/transparency/transparency-category';
 import { DeleteItem } from '../../models/transparency-accordion/delete-item';
+import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
+import { DatePickerComponent } from '../../../events/components/date-picker/date-picker';
+import { UploadFile } from "../../components/upload-file/upload-file";
 
 @Component({
   selector: 'app-transparency-content',
@@ -28,9 +30,11 @@ import { DeleteItem } from '../../models/transparency-accordion/delete-item';
     MatDatepickerModule,
     MatNativeDateModule,
     ReactiveFormsModule,
-    MaskDate,
     UploadProfileImage,
     MatTooltipModule,
+    FormInputComponent,
+    DatePickerComponent,
+    UploadFile
 ],
   templateUrl: './transparency-content.html',
   styleUrl: './transparency-content.scss'
@@ -196,14 +200,6 @@ export class TransparencyContent implements OnInit {
         this.dialog.closeAll();
       }
     });
-  }
-
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length) return;
-    const file = input.files[0];
-    this.documentForm.patchValue({ file });
-    this.documentForm.get('file')?.updateValueAndValidity();
   }
 
 }

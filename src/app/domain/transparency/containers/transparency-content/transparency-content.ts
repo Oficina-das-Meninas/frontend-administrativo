@@ -29,7 +29,6 @@ import { UploadFile } from "../../components/upload-file/upload-file";
     MatFormFieldModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    ReactiveFormsModule,
     UploadProfileImage,
     MatTooltipModule,
     FormInputComponent,

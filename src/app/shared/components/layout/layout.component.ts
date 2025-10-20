@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
-import { HeaderComponent } from "./header/header.component";
-import { SidenavComponent } from "./sidenav/sidenav.component";
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { RouterOutlet } from '@angular/router';
 import { NavItem } from '../../models/navItem';
 import { Profile } from '../../models/profile';
+import { HeaderComponent } from "./header/header.component";
+import { SidenavComponent } from "./sidenav/sidenav.component";
 
 @Component({
   selector: 'app-layout',
@@ -49,6 +49,11 @@ export class LayoutComponent implements OnInit {
         matIcon: "calendar_month",
         title: "Eventos",
         path: "/eventos"
+      },
+      {
+        matIcon: "business",
+        title: "Parceiros",
+        path: "/parceiros"
       },
     ];
 

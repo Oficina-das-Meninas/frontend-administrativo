@@ -13,11 +13,11 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { CalendarFilter } from '../calendar-filter/calendar-filter';
-import { SearchInput } from '../search-input/search-input';
 import { DateRange } from '../../models/date-range';
+import { CalendarFilter } from '../calendar-filter/calendar-filter';
 import { ConfirmDeleteDialog } from '../confirm-delete-dialog/confirm-delete-dialog';
 import { FlowerSpinner } from '../flower-spinner/flower-spinner';
+import { SearchInput } from '../search-input/search-input';
 
 export interface TableColumn {
   key: string;
@@ -70,6 +70,7 @@ export class DataTable<T extends { id: string }> implements OnInit {
   @Input() deleteService: DeleteService | null = null;
   @Input() cardTemplate: TemplateRef<any> | null = null;
   @Input() titleProperty = 'title';
+  @Input() defaultViewMode: 'cards' | 'table' = 'table';
 
   @Output() search = new EventEmitter<string>();
   @Output() clearSearch = new EventEmitter<void>();
@@ -114,7 +115,7 @@ export class DataTable<T extends { id: string }> implements OnInit {
     if (this.isMobile) {
       this.viewMode = this.enableCardsView ? 'cards' : 'table';
     } else {
-      this.viewMode = 'table';
+      this.viewMode = this.defaultViewMode;
     }
   }
 

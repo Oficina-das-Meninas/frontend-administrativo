@@ -1,18 +1,18 @@
 <div class="relative w-full max-w-sm max-h-[18rem] aspect-[4/3] overflow-hidden
   rounded-lg bg-white shadow hover:scale-[1.02] transition duration-300 cursor-pointer"
-  [routerLink]="['/eventos', eventId]"
+  [routerLink]="[basePath, itemId]"
   >
-  <img [src]="imageUrl" class="h-full object-cover" [alt]="eventTitle" />
+  <img [src]="imageUrl" class="h-full object-cover" [alt]="itemTitle" />
   <div class="absolute right-0 top-0 z-30 p-4">
     <button matIconButton
-            [matMenuTriggerFor]="eventCardMenu"
+            [matMenuTriggerFor]="itemCardMenu"
             class="bg-gray-200/40! text-gray-800! shadow-sm"
             aria-label="Ações"
             matTooltip="Ver ações"
             (click)="$event.preventDefault(); $event.stopPropagation()">
       <mat-icon>more_vert</mat-icon>
     </button>
-    <mat-menu #eventCardMenu="matMenu">
+    <mat-menu #itemCardMenu="matMenu">
       <button mat-menu-item (click)="onEdit($event)">
         <mat-icon>edit</mat-icon>
         <span>Editar</span>
@@ -25,14 +25,18 @@
   </div>
   <div class="absolute inset-0 z-10 bg-gradient-to-t from-black"></div>
   <div class="absolute inset-x-0 bottom-0 z-20 p-4">
-    <p class="mb-1 text-sm text-gray-300 w-fit">
-      <time>{{ date | date:"dd 'de' MMMM 'de' yyyy" }}</time>
-    </p>
-    <h3 class="text-xl font-bold text-white truncate" [matTooltip]="eventTitle">{{ eventTitle }}</h3>
-    <p class="text-md mt-1 text-gray-200 ml-[0.2rem] w-fit line-clamp-2 text-ellipsis"
-    [matTooltip]="getTooltipText()"
-    >
-      {{ getTooltipText() }}
-    </p>
+    @if (date) {
+      <p class="mb-1 text-sm text-gray-300 w-fit">
+        <time>{{ date | date:"dd 'de' MMMM 'de' yyyy" }}</time>
+      </p>
+    }
+    <h3 class="text-xl font-bold text-white truncate" [matTooltip]="itemTitle">{{ itemTitle }}</h3>
+    @if (description) {
+      <p class="text-md mt-1 text-gray-200 ml-[0.2rem] w-fit line-clamp-2 text-ellipsis"
+      [matTooltip]="getTooltipText()"
+      >
+        {{ getTooltipText() }}
+      </p>
+    }
   </div>
 </div>

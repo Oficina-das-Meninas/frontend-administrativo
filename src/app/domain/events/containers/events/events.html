@@ -14,14 +14,15 @@
 </app-data-table>
 
 <ng-template #eventCardTemplate let-event let-editFn="editFn" let-deleteFn="deleteFn">
-  <app-event-card
-    [eventId]="event.id"
-    [eventTitle]="event.title"
+  <app-item-card
+    [itemId]="event.id"
+    [itemTitle]="event.title"
     [description]="event.location ?? 'Local não informado'"
     [imageUrl]="event.previewImageUrl"
     [date]="event.eventDate"
+    basePath="/eventos"
     (edit)="editFn(event.id)"
     (delete)="deleteFn(event)"
     class="w-full">
-  </app-event-card>
+  </app-item-card>
 </ng-template>

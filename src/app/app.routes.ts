@@ -60,6 +60,21 @@ export const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'parceiros',
+        data: {
+          breadcrumb: 'Parceiros',
+        },
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./domain/partners/containers/partners/partners').then(
+                (m) => m.Partners
+              ),
+          },
+        ],
+      },
     ],
   },
 ];

@@ -66,20 +66,6 @@ export class FormSelect {
     this.disabled = isDisabled;
   }
 
-  onInput(event: Event): void {
-    const input = event.target as HTMLInputElement | HTMLTextAreaElement;
-    let inputValue = input.value;
-
-    const trimmedValue = inputValue.trimStart();
-    if (trimmedValue !== inputValue) {
-      inputValue = trimmedValue;
-      input.value = inputValue;
-    }
-
-    this.value = inputValue;
-    this.onChange(this.value);
-  }
-
   onBlur(): void {
     this.onTouched();
   }

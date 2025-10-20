@@ -44,7 +44,7 @@ export class TransparencyService {
           type: category.isImage
             ? AccordionContentType.COLLABORATOR
             : AccordionContentType.DOCUMENT,
-          priority:category.priority,
+          priority: category.priority,
           documents: category.documents?.map((doc) => ({
             id: doc.id,
             name: doc.title,

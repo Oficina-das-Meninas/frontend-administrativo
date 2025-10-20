@@ -73,7 +73,7 @@ export class TransparencyContent implements OnInit {
     this.collaboratorForm = this.formBuilder.group({
       name: ['', Validators.required],
       role: ['', Validators.required],
-      description : ['', Validators.required],
+      description: ['', Validators.required],
       image: ['', Validators.required],
     });
 

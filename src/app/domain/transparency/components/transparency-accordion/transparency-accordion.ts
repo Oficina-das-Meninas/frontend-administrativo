@@ -3,7 +3,6 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { AccordionContent } from '../../models/transparency-accordion/accordion-content';
 import { AccordionContentType } from '../../enums/transparency-accordion/accordion-content-type';
-import { connect } from 'rxjs';
 import { AccordionDocument } from '../../models/transparency-accordion/accordion-document';
 import { AccordionCollaborator } from '../../models/transparency-accordion/accordion-collaborator';
 import { DeleteItem } from '../../models/transparency-accordion/delete-item';

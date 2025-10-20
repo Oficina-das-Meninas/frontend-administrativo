@@ -74,8 +74,8 @@
   </app-dialog>
 </ng-template>
 
-<ng-template #addCollaboratorDialog [formDialog]="collaboratorForm">
-  <app-dialog title="Adicionar Colaborador">
+<ng-template #addCollaboratorDialog>
+  <app-dialog title="Adicionar Colaborador" [formDialog]="collaboratorForm">
     <ng-container dialogContent>
       <div [formGroup]="collaboratorForm" class="flex flex-col gap-2">
         <div class="pb-6">

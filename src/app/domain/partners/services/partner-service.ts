@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ImageService } from '../../../shared/services/image-service';
 import { Partner } from '../models/partner';
@@ -20,24 +20,6 @@ export class PartnerService {
   private httpClient = inject(HttpClient);
   private imageService = inject(ImageService);
 
-  private mockPartners: Partner[] = [
-    {
-      id: '1',
-      name: 'Tech Solutions',
-      logoUrl: 'https://via.placeholder.com/300x200?text=Tech+Solutions'
-    },
-    {
-      id: '2',
-      name: 'Green Energy Co',
-      logoUrl: 'https://via.placeholder.com/300x200?text=Green+Energy'
-    },
-    {
-      id: '3',
-      name: 'Digital Innovation',
-      logoUrl: 'https://via.placeholder.com/300x200?text=Digital+Innovation'
-    }
-  ];
-
   list(page: number, size: number): Observable<PartnerPage> {
     return this.getFilteredPartners({
       page,
@@ -46,17 +28,13 @@ export class PartnerService {
   }
 
   getFilteredPartners(filters: PartnerFilters): Observable<PartnerPage> {
-    // Uncomment the line below to use mock data for testing
-    return this.getMockPartners(filters);
-
-    /* Uncomment below to use real API
     let params = new HttpParams();
 
     params = params.set('page', (filters.page ?? 0).toString());
     params = params.set('pageSize', (filters.pageSize ?? 10).toString());
 
     if (filters.searchTerm?.trim()) {
-      params = params.set('searchTerm', filters.searchTerm.trim());
+      params = params.set('searchTerm', filters.searchTerm!.trim());
     }
 
     return this.httpClient
@@ -66,34 +44,10 @@ export class PartnerService {
           ...partnerPage,
           data: partnerPage.data.map(partner => ({
             ...partner,
-            logoUrl: this.imageService.getPubImage(partner.logoUrl)
+            logoUrl: this.imageService.getPubImage(partner.previewImageUrl)
           }))
         }))
       );
-    */
-  }
-
-  private getMockPartners(filters: PartnerFilters): Observable<PartnerPage> {
-    const page = filters.page ?? 0;
-    const pageSize = filters.pageSize ?? 10;
-    const searchTerm = filters.searchTerm?.toLowerCase() ?? '';
-
-    let filtered = this.mockPartners;
-
-    if (searchTerm) {
-      filtered = filtered.filter(partner =>
-        partner.name.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    const startIndex = page * pageSize;
-    const paginatedData = filtered.slice(startIndex, startIndex + pageSize);
-
-    return of({
-      data: paginatedData,
-      totalElements: filtered.length,
-      totalPages: Math.ceil(filtered.length / pageSize)
-    });
   }
 
   create(partnerData: FormData): Observable<void> {
@@ -104,7 +58,7 @@ export class PartnerService {
     return this.httpClient.get<Partner>(`${this.API_URL}/${partnerId}`).pipe(
       map((partner) => ({
         ...partner,
-        logoUrl: this.imageService.getPubImage(partner.logoUrl),
+        logoUrl: this.imageService.getPubImage(partner.previewImageUrl),
       }))
     );
   }

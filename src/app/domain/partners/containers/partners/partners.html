@@ -6,7 +6,6 @@
   [cardTemplate]="partnerCardTemplate"
   titleProperty="name"
   basePath="/parceiros"
-  defaultViewMode="cards"
   (search)="onSearch($event)"
   (clearSearch)="onClearSearch()"
   (pageChange)="onPageChange($event)"
@@ -21,6 +20,6 @@
     basePath="/parceiros"
     (edit)="editFn(partner.id)"
     (delete)="deleteFn(partner)"
-    class="w-full">
-  </app-item-card>
+    class="w-full flex justify-center items-center"
+   />
 </ng-template>

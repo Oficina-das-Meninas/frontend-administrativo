@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
@@ -44,6 +45,7 @@ export interface DeleteService {
     MatMenuModule,
     MatCardModule,
     MatPaginatorModule,
+    MatProgressSpinnerModule,
     AsyncPipe,
     DatePipe,
     MatFormFieldModule,
@@ -83,6 +85,8 @@ export class DataTable<T extends { id: string }> implements OnInit {
   viewMode: 'cards' | 'table' = 'cards';
   isMobile = false;
   itemToDelete: T | null = null;
+  imageLoadingState = new Map<string, boolean>();
+  imageErrorState = new Map<string, boolean>();
 
   dateRange: DateRange = {
     start: null,
@@ -188,5 +192,23 @@ export class DataTable<T extends { id: string }> implements OnInit {
 
   getCellValue(item: any, column: TableColumn): any {
     return item[column.key];
+  }
+
+  isImageLoading(itemId: string): boolean {
+    return this.imageLoadingState.get(itemId) ?? true;
+  }
+
+  isImageError(itemId: string): boolean {
+    return this.imageErrorState.get(itemId) ?? false;
+  }
+
+  onImageLoad(itemId: string) {
+    this.imageLoadingState.set(itemId, false);
+    this.imageErrorState.set(itemId, false);
+  }
+
+  onImageError(itemId: string) {
+    this.imageLoadingState.set(itemId, false);
+    this.imageErrorState.set(itemId, true);
   }
 }

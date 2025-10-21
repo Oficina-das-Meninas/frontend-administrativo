@@ -4,6 +4,7 @@ import { Component, EventEmitter, Input, LOCALE_ID, Output } from '@angular/core
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
 import { marked } from 'marked';
@@ -18,7 +19,8 @@ registerLocaleData(localePt);
     RouterLink,
     MatButtonModule,
     MatIconModule,
-    MatMenuModule
+    MatMenuModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './item-card.html',
   styleUrl: './item-card.scss',
@@ -36,6 +38,19 @@ export class ItemCard {
 
   @Output() edit = new EventEmitter<string>();
   @Output() delete = new EventEmitter<void>();
+
+  imageLoading = true;
+  imageError = false;
+
+  onImageLoad() {
+    this.imageLoading = false;
+    this.imageError = false;
+  }
+
+  onImageError() {
+    this.imageLoading = false;
+    this.imageError = true;
+  }
 
   getTooltipText(): string {
     if (!this.description) return '';

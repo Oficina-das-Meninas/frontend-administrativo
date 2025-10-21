@@ -17,7 +17,7 @@ export class Partners implements OnInit {
 
   columns: TableColumn[] = [
     { key: 'name', header: 'Nome', type: 'text' },
-    { key: 'logoUrl', header: 'Logo', type: 'text' }
+    { key: 'logoUrl', header: 'Logo', type: 'image' }
   ];
 
   searchTerm = '';

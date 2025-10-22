@@ -16,8 +16,6 @@ import { CdkDropList, CdkDrag, CdkDragPlaceholder, CdkDragDrop, moveItemInArray 
     CdkDragPlaceholder,
     MatExpansionModule,
     MatIconModule,
-    CdkDropList,
-    CdkDrag
 ],
   templateUrl: './transparency-accordion.html',
   styleUrl: './transparency-accordion.scss'

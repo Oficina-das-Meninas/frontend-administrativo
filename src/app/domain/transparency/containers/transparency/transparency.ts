@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { CdkDragDrop, CdkDropList, CdkDrag, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDropList, CdkDrag, moveItemInArray, CdkDragPlaceholder } from '@angular/cdk/drag-drop';
 import { TransparencyService } from '../../services/transparency.service';
 import { AsyncPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -26,6 +26,7 @@ import { FormSelectItem } from '../../../../shared/models/form-select-item';
   imports: [
     CdkDropList,
     CdkDrag,
+    CdkDragPlaceholder,
     AsyncPipe,
     MatButtonModule,
     MatInputModule,
@@ -39,7 +40,7 @@ import { FormSelectItem } from '../../../../shared/models/form-select-item';
     MatIcon,
     MatTooltipModule,
     FormInputComponent,
-    FormSelect
+    FormSelect,
 ],
   templateUrl: './transparency.html',
   styleUrl: './transparency.scss'

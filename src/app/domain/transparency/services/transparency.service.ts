@@ -19,8 +19,12 @@ export class TransparencyService {
     return this.httpClient.post<TransparencyCategory>(`${this.API_URL}/categories`, data);
   }
   
-  updateCategory(id: string, data: TransparencyCategory): Observable<TransparencyCategory> {
-    return this.httpClient.patch<TransparencyCategory>(`${this.API_URL}/categories/${id}`, data);
+  updateCategory(id: string, data: TransparencyCategory): Observable<void> {
+    return this.httpClient.patch<void>(`${this.API_URL}/categories/${id}`, data);
+  }
+
+  updateCollaborator(id: string, data: TransparencyCategory): Observable<void> {
+    return this.httpClient.patch<void>(`${this.API_URL}/collaborators/${id}`, data);
   }
 
   createDocument(data: FormData): Observable<string> {

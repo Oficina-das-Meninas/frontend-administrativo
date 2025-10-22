@@ -17,6 +17,7 @@ import { DeleteItem } from '../../models/transparency-accordion/delete-item';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
 import { DatePickerComponent } from '../../../events/components/date-picker/date-picker';
 import { UploadFile } from "../../components/upload-file/upload-file";
+import { AccordionCollaborator } from '../../models/transparency-accordion/accordion-collaborator';
 
 @Component({
   selector: 'app-transparency-content',
@@ -176,6 +177,17 @@ export class TransparencyContent implements OnInit {
         }
       });
     }
+  }
+
+  onUpdateAllCollaborators(event: AccordionCollaborator[]) {
+    event.forEach((item, index) => {
+      const data: TransparencyCategory = {
+        priority: index
+      }
+      this.transparencyService
+        .updateCollaborator(item.id ?? '', data)
+        .subscribe();
+    });
   }
 
   onDeleteCategoryDialog() {

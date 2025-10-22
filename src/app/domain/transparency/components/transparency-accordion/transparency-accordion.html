@@ -5,7 +5,7 @@
     hideToggle
   >
     <mat-expansion-panel-header class="!h-16">
-      <mat-panel-title class="flex text-xl font-bold gap-2">
+      <mat-panel-title class="flex text-md sm:text-xl font-bold gap-2">
         <span class="material-symbols-outlined text-gray-500">
           drag_indicator
         </span>
@@ -69,11 +69,12 @@
       </section>
     }
     @if (content()?.type === accordionContentType.COLLABORATOR) {
-      <section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 py-4">
+      <section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 py-4 cdk-list" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="drop($event)">
         @for (item of content()?.collaborators; track $index) {
-          <section class="flex flex-col items-center gap-4 py-2 group">
+          <section class="flex flex-col items-center gap-4 py-2 group cdk-box" cdkDrag>
+            <div class="cdk-placeholder" *cdkDragPlaceholder></div>
             <div class="flex flex-col justify-start items-center gap-1">
-              <img
+              <img 
                 [src]="item.imageUrl"
                 alt="collaborator-image"
                 class="size-30 rounded-full object-cover"

@@ -1,4 +1,8 @@
-<app-transparency-accordion [content]="content()" (isDeleteItem)="openDeleteItemDialog($event)">
+<app-transparency-accordion 
+  [content]="content()" 
+  (isDeleteItem)="openDeleteItemDialog($event)"
+  (isCollaboratorChanges)="onUpdateAllCollaborators($event)"
+>
     <ng-container categoryActions>
       <span 
         class="material-symbols-outlined hover:text-[#bf1469] cursor-pointer" 
@@ -14,24 +18,24 @@
       </span>
     </ng-container>
     <ng-container documentActions>
-      <div class="flex gap-2">
+      <div class="w-fit">
         <button 
           mat-fab
           (click)="openAddDocumentDialog()"
           matTooltip="Adicionar Documento"
-          class="md:w-auto! md:px-4!"
+          class="w-auto! px-4!"
         >
-          <span class="text-sm font-semibold">Adicionar</span>
-        </button> 
+          <span class="text-base font-semibold">Adicionar</span>
+        </button>
       </div>
     </ng-container>
     <ng-container collaboratorActions>
-      <div class="flex gap-2">
+      <div class="w-fit">
         <button 
           mat-fab 
           (click)="openAddCollaboratorDialog()"
           matTooltip="Adicionar Colaborador"
-          class="md:w-auto! md:px-4!"
+          class="w-auto! px-4!"
         >
           <span class="text-sm font-semibold">Adicionar</span>
         </button>
@@ -109,8 +113,8 @@
   </app-dialog>
 </ng-template>
 
-<ng-template #updateCategoryNameDialog [formDialog]="categoryForm">
-  <app-dialog title="Editar Categoria">
+<ng-template #updateCategoryNameDialog>
+  <app-dialog title="Editar Categoria" [formDialog]="categoryForm">
     <ng-container dialogContent>
       <div [formGroup]="categoryForm" class="flex flex-col">
         <app-form-input

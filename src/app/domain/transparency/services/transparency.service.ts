@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, TransferState } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment.development';
@@ -19,8 +19,12 @@ export class TransparencyService {
     return this.httpClient.post<TransparencyCategory>(`${this.API_URL}/categories`, data);
   }
   
-  updateCategory(id: string, data: TransparencyCategory): Observable<TransparencyCategory> {
-    return this.httpClient.patch<TransparencyCategory>(`${this.API_URL}/categories/${id}`, data);
+  updateCategory(id: string, data: TransparencyCategory): Observable<void> {
+    return this.httpClient.patch<void>(`${this.API_URL}/categories/${id}`, data);
+  }
+
+  updateCollaborator(id: string, data: TransparencyCategory): Observable<void> {
+    return this.httpClient.patch<void>(`${this.API_URL}/collaborators/${id}`, data);
   }
 
   createDocument(data: FormData): Observable<string> {

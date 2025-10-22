@@ -1,4 +1,4 @@
-import { inject, Injectable, TransferState } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment.development';

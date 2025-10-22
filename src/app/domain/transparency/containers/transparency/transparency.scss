@@ -1,0 +1,7 @@
+@use '@angular/material' as mat;
+
+mat-card {
+  @include mat.card-overrides((
+    outlined-container-color: white
+  ));
+}

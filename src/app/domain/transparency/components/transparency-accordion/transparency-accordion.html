@@ -1,0 +1,112 @@
+<mat-accordion>
+  <mat-expansion-panel
+    (opened)="panelOpenState.set(true)"
+    (closed)="panelOpenState.set(false)"
+    hideToggle
+  >
+    <mat-expansion-panel-header class="!h-16">
+      <mat-panel-title class="flex text-xl font-bold gap-2">
+        <span class="material-symbols-outlined text-gray-500">
+          drag_indicator
+        </span>
+        {{ content()?.categoryName }}
+      </mat-panel-title>
+
+      <div class="flex gap-2 items-center text-gray-500 text-lg">
+        <div class="flex gap-2 w-fit h-fit" (click)="$event.stopPropagation()">
+          <ng-content select="[categoryActions]"></ng-content>
+        </div>
+
+        @if (!panelOpenState()) {
+          <!-- <img src="/svg/plus-circle.svg" alt="plus-circle" class="w-10" />  -->
+          <span class="material-symbols-outlined text-black">
+            keyboard_arrow_down
+          </span>
+        } @else {
+          <!-- <img src="/svg/minus-circle.svg" alt="minus-circle" class="w-10" /> -->
+          <span class="material-symbols-outlined text-black">
+            keyboard_arrow_up
+          </span>
+        }
+      </div>
+    </mat-expansion-panel-header>
+
+    @if (content()?.type === accordionContentType.DOCUMENT) {
+      <section class="py-4">
+        @for (item of content()?.documents; track $index) {
+          <section class="flex flex-row items-center gap-4 py-2 group">
+            <a
+              [href]="item.url"
+              target="_blank"
+              class="flex items-center gap-2 w-fit"
+            >
+              <p class="text-lg font-semibold">{{ item.name }}</p>
+              <span class="material-symbols-outlined">download</span>
+            </a>
+            <div class="
+              flex 
+              items-center 
+              opacity-0 
+              group-hover:opacity-100 
+              transition-opacity 
+              duration-200"
+            >
+              <span
+                class="material-symbols-outlined 
+                text-gray-500 hover:text-[#bf1469] 
+                cursor-pointer"
+                (click)="onDeleteItem(item)"
+              >
+                delete
+              </span>
+            </div>
+          </section>
+        }
+      </section>
+
+      <section class="flex justify-end">
+        <ng-content select="[documentActions]"></ng-content>
+      </section>
+    }
+    @if (content()?.type === accordionContentType.COLLABORATOR) {
+      <section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 py-4">
+        @for (item of content()?.collaborators; track $index) {
+          <section class="flex flex-col items-center gap-4 py-2 group">
+            <div class="flex flex-col justify-start items-center gap-1">
+              <img
+                [src]="item.imageUrl"
+                alt="collaborator-image"
+                class="size-30 rounded-full object-cover"
+              />
+              <h1 class="text-lg text-center font-semibold">{{ item.name }}</h1>
+              <p class="text-stone-500">{{ item.role }}</p>
+              <p class="text-stone-500">{{ item.description }}</p>
+            </div>
+            <div class="
+              flex 
+              items-center 
+              opacity-0 
+              group-hover:opacity-100 
+              transition-opacity 
+              duration-200"
+            >
+              <span
+                class="material-symbols-outlined 
+                text-gray-500 hover:text-[#bf1469] 
+                cursor-pointer"
+                (click)="onDeleteItem(item)"
+              >
+                delete
+              </span>
+            </div>
+          </section>
+          
+        }
+      </section>
+      
+      <section class="flex justify-end">
+        <ng-content select="[collaboratorActions]"></ng-content>
+      </section>
+    }
+  </mat-expansion-panel>
+</mat-accordion>

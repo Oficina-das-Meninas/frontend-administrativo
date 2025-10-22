@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { MatMenuModule, MatMenuTrigger } from "@angular/material/menu";
 import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
-import { NavItem } from '../../../models/navItem';
+import { NavItem } from '../../../models/nav-item';
 import { RouterLink } from '@angular/router';
 import { Profile } from '../../../models/profile';
 

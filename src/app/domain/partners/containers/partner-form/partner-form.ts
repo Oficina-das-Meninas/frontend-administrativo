@@ -48,13 +48,25 @@ export class PartnerForm implements OnInit {
     previewImage: [[] as File[], [Validators.required]],
   });
 
+  private updateImageValidator(): void {
+    const imageControl = this.partnerForm.get('previewImage');
+    if (!imageControl) return;
+
+    if (this.isEditMode() && this.existingPreviewImageUrl()?.trim()) {
+      imageControl.clearAsyncValidators();
+      imageControl.setValidators([]);
+    } else {
+      imageControl.setValidators([Validators.required]);
+    }
+    imageControl.updateValueAndValidity();
+  }
+
   ngOnInit(): void {
     this.existingPreviewImageUrl.set('');
     this.route.paramMap.subscribe(params => {
       this.partnerId = params.get('id');
       if (this.partnerId) {
         this.isEditMode.set(true);
-        // Os dados já vêm resolvidos pela rota
         this.route.data.subscribe(data => {
           if (data['partner']) {
             this.loadPartnerData(data['partner']);
@@ -65,14 +77,29 @@ export class PartnerForm implements OnInit {
   }
 
   private loadPartnerData(partner: Partner): void {
-    // Se a imagem existe na URL (foi validada pelo resolver), usa ela
     if (partner.previewImageUrl?.trim()) {
       this.existingPreviewImageUrl.set(partner.previewImageUrl);
+      // Converte a URL para File para poder enviar quando não houver nova seleção
+      this.urlToFile(partner.previewImageUrl).then(file => {
+        this.partnerForm.patchValue({
+          previewImage: [file],
+        });
+      });
     }
 
     this.partnerForm.patchValue({
       name: partner.name,
     });
+
+    this.updateImageValidator();
+  }
+
+  private async urlToFile(url: string): Promise<File> {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const filename = url.substring(url.lastIndexOf('/') + 1);
+    const mimeType = blob.type || 'image/jpeg';
+    return new File([blob], filename, { type: mimeType });
   }
 
   onSubmit() {

@@ -85,6 +85,30 @@ export class FormEventComponent implements OnInit {
     previewImage: [[] as File[], [Validators.required, EventValidators.imageValidator]],
   });
 
+  private updateImageValidators(): void {
+    const previewControl = this.eventForm.get('previewImage');
+    const partnersControl = this.eventForm.get('partnersImage');
+
+    if (!previewControl || !partnersControl) return;
+
+    if (this.isEditMode()) {
+      if (this.existingPreviewImageUrl()?.trim()) {
+        previewControl.setValidators([EventValidators.imageValidator]);
+      } else {
+        previewControl.setValidators([Validators.required, EventValidators.imageValidator]);
+      }
+
+      if (this.existingPartnersImageUrl()?.trim()) {
+        partnersControl.setValidators([EventValidators.imageValidator]);
+      } else {
+        partnersControl.setValidators([Validators.required, EventValidators.imageValidator]);
+      }
+    }
+
+    previewControl.updateValueAndValidity();
+    partnersControl.updateValueAndValidity();
+  }
+
   ngOnInit(): void {
     this.route.data.subscribe(data => {
       if (data['event']) {
@@ -115,6 +139,28 @@ export class FormEventComponent implements OnInit {
     });
 
     this.description.set(event.description);
+
+    if (event.previewImageUrl?.trim()) {
+      this.urlToFile(event.previewImageUrl).then(file => {
+        this.eventForm.patchValue({ previewImage: [file] });
+      });
+    }
+
+    if (event.partnersImageUrl?.trim()) {
+      this.urlToFile(event.partnersImageUrl).then(file => {
+        this.eventForm.patchValue({ partnersImage: [file] });
+      });
+    }
+
+    this.updateImageValidators();
+  }
+
+  private async urlToFile(url: string): Promise<File> {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const filename = url.substring(url.lastIndexOf('/') + 1);
+    const mimeType = blob.type || 'image/jpeg';
+    return new File([blob], filename, { type: mimeType });
   }
 
   onSubmit() {

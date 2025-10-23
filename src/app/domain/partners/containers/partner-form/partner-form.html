@@ -1,0 +1,81 @@
+<div class="partner-form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        {{ form.get('id')?.value ? 'Editar Parceiro' : 'Novo Parceiro' }}
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-fields">
+          <!-- Campo Nome -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nome do Parceiro</mat-label>
+            <input
+              matInput
+              formControlName="name"
+              placeholder="Digite o nome do parceiro"
+              required
+            />
+            <mat-icon matPrefix>business</mat-icon>
+            <mat-error *ngIf="form.get('name')?.hasError('required')">
+              Nome é obrigatório
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Campo Preview Image URL -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>URL da Imagem</mat-label>
+            <input
+              matInput
+              formControlName="previewImage"
+              placeholder="https://exemplo.com/imagem.jpg"
+              type="url"
+              required
+            />
+            <mat-icon matPrefix>image</mat-icon>
+            <mat-error *ngIf="form.get('previewImage')?.hasError('required')">
+              URL da imagem é obrigatória
+            </mat-error>
+            <mat-error *ngIf="form.get('previewImage')?.hasError('url')">
+              URL inválida
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Preview da Imagem -->
+          <div class="image-preview" *ngIf="form.get('previewImage')?.value">
+            <mat-label class="preview-label">Preview da Imagem:</mat-label>
+            <img
+              [src]="form.get('previewImage')?.value"
+              alt="Preview"
+              (error)="form.get('previewImage')?.setErrors({ invalid: true })"
+            />
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <mat-card-actions align="end">
+          <button
+            mat-button
+            type="button"
+            (click)="onCancel()"
+            color="accent"
+          >
+            <mat-icon>cancel</mat-icon>
+            Cancelar
+          </button>
+          <button
+            mat-raised-button
+            type="submit"
+            color="primary"
+            [disabled]="!form.valid"
+          >
+            <mat-icon>save</mat-icon>
+            Salvar
+          </button>
+        </mat-card-actions>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

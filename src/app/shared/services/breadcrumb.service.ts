@@ -29,7 +29,7 @@ export class BreadcrumbService {
       url += `/${path}`;
     }
 
-    if (label) {
+    if (label && (path || route.routeConfig?.path !== '')) {
       breadcrumbs.push({ label, url });
     }
 

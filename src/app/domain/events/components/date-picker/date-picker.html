@@ -1,0 +1,17 @@
+<mat-form-field appearance="outline" class="w-full custom-form-field">
+  <mat-label>{{ label }}</mat-label>
+  <input
+    matInput
+    [matDatepicker]="picker"
+    [placeholder]="placeholder"
+    [formControl]="formControl!"
+    (input)="onInput($event)"
+    (blur)="onBlur()"
+    (dateChange)="onDateChange($event.value)"
+    maxlength="10">
+  <mat-datepicker-toggle class="mr-2" matIconSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-datepicker #picker></mat-datepicker>
+  @if (shouldShowError) {
+    <mat-error>{{ displayError }}</mat-error>
+  }
+</mat-form-field>

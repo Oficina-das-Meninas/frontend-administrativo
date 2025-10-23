@@ -1,0 +1,16 @@
+@use '@angular/material' as mat;
+
+mat-card {
+  @include mat.card-overrides((
+    outlined-container-color: white,
+    outlined-outline-color: var(--color-gray-300),
+  ));
+}
+
+.back-button {
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateX(-2px);
+  }
+}

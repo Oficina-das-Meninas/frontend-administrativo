@@ -1,1 +1,26 @@
-<p>partners works!</p>
+<app-data-table
+  dataTitle="Parceiros"
+  [data$]="partners$"
+  [columns]="columns"
+  [enableDateFilter]="false"
+  [deleteService]="partnerService"
+  [cardTemplate]="partnerCardTemplate"
+  titleProperty="name"
+  basePath="/parceiros"
+  (search)="onSearch($event)"
+  (clearSearch)="onClearSearch()"
+  (pageChange)="onPageChange($event)"
+  (clearFilters)="onClearFilters()">
+</app-data-table>
+
+<ng-template #partnerCardTemplate let-partner let-editFn="editFn" let-deleteFn="deleteFn">
+  <app-item-card
+    [itemId]="partner.id"
+    [itemTitle]="partner.name"
+    [imageUrl]="partner.logoUrl"
+    basePath="/parceiros"
+    (edit)="editFn(partner.id)"
+    (delete)="deleteFn(partner)"
+    class="w-full flex justify-center items-center"
+   />
+</ng-template>

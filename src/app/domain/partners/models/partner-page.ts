@@ -1,4 +1,4 @@
-import { Partner } from './partner';
+import { Partner } from "./partner";
 
 export interface PartnerPage {
   data: Partner[];

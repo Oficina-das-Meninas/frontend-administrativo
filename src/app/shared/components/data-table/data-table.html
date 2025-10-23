@@ -1,0 +1,197 @@
+<mat-card class="w-full" appearance="outlined">
+
+  <mat-card-header>
+    <mat-card-title>{{ dataTitle }}</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+
+    <div class="flex items-center justify-between mt-4 gap-2 sm:gap-4 w-full">
+
+      <div class="flex items-center gap-2 flex-1 min-w-0">
+
+        <app-search-input
+          class="flex-1 min-w-0 max-w-none sm:max-w-md"
+          placeholder="Buscar por título, local..."
+          [debounceTime]="500"
+          (search)="onSearch($event)">
+        </app-search-input>
+
+        @if (enableDateFilter) {
+          <app-calendar-filter
+            [(dateRange)]="dateRange"
+            (apply)="applyDateFilter()"
+            (clear)="clearAllFilters()"
+            tooltipText="Filtrar por data"
+            class="flex-shrink-0"
+          />
+        }
+
+      </div>
+
+      <div class="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+
+        @if (enableCardsView) {
+          <mat-button-toggle-group
+              name="view"
+              aria-label="Visualização"
+              class="hidden sm:inline-flex view-toggle-group"
+              [value]="viewMode"
+              (change)="onViewModeChange($event.value)">
+            <mat-button-toggle value="cards">
+              <mat-icon>grid_view</mat-icon>
+            </mat-button-toggle>
+            <mat-button-toggle value="table">
+              <mat-icon>format_align_justify</mat-icon>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        }
+
+        @if (enableCreateButton) {
+          <button
+            matFab
+            matTooltip="Criar novo"
+            class="h-12 w-12 sm:h-auto sm:w-auto transition-all duration-200"
+            (click)="navigateToCreate()">
+            <mat-icon>add</mat-icon>
+          </button>
+        }
+
+      </div>
+
+    </div>
+
+    @if (data$ | async; as dataPage) {
+      @if (dataPage.data.length > 0) {
+        @if (viewMode === 'table' || !enableCardsView) {
+
+          <div class="mat-elevation-z8 w-full mt-5 flex-1 flex flex-col justify-between">
+            <div class="overflow-x-auto w-full">
+              <table mat-table [dataSource]="dataPage.data" class="w-full min-w-[600px] border-collapse md:text-sm">
+
+                @for (column of columns; track column.key) {
+                  <ng-container [matColumnDef]="column.key">
+                    <th mat-header-cell *matHeaderCellDef> {{ column.header }} </th>
+                    <td mat-cell *matCellDef="let element">
+                      @switch (column.type) {
+                        @case ('date') {
+                          {{ getCellValue(element, column) | date }}
+                        }
+                        @case ('image') {
+                          <div class="size-24 flex items-center justify-center relative rounded-lg overflow-hidden bg-gray-200 m-2">
+                            @if (isImageLoading(element.id) && !isImageError(element.id)) {
+                              <mat-spinner [diameter]="30" [strokeWidth]="2"></mat-spinner>
+                            }
+                            @if (isImageError(element.id)) {
+                              <div class="flex flex-col items-center justify-center w-full h-full bg-gray-300 text-gray-600 text-xs px-2">
+                                <mat-icon class="text-lg">image_not_supported</mat-icon>
+                                <span class="mt-1 text-center">Imagem não encontrada</span>
+                              </div>
+                            }
+                            <img class="m-1 object-contain rounded-lg"
+                                 [src]="getCellValue(element, column)"
+                                 (load)="onImageLoad(element.id)"
+                                 (error)="onImageError(element.id)"
+                                 [hidden]="isImageError(element.id) || isImageLoading(element.id)"/>
+                          </div>
+                        }
+                        @default {
+                          {{ getCellValue(element, column) }}
+                        }
+                      }
+                    </td>
+                  </ng-container>
+                }
+
+                <ng-container matColumnDef="acoes">
+                  <th mat-header-cell *matHeaderCellDef> &nbsp;</th>
+                  <td mat-cell *matCellDef="let element">
+
+                    <button matIconButton [matMenuTriggerFor]="menu" aria-label="Ações" matTooltip="Ver ações">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                      <button mat-menu-item (click)="navigateToEdit(element.id)">
+                        <mat-icon>edit</mat-icon>
+                        <span>Editar</span>
+                      </button>
+                      <button mat-menu-item (click)="confirmDelete(element)">
+                        <mat-icon>delete</mat-icon>
+                        <span>Excluir</span>
+                      </button>
+                    </mat-menu>
+
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              </table>
+            </div>
+
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageIndex" [pageSize]="pageSize"
+              [length]="dataPage.totalElements" (page)="refresh($event)" showFirstLastButtons
+              aria-label="Selecione a página"
+              class="relative z-10"></mat-paginator>
+          </div>
+        } @else {
+          <div class="flex-1 flex flex-col justify-between">
+          <div class="grid auto-cols-max gap-4 sm:gap-6 mt-6 px-2 sm:px-0 place-content-evenly" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+            @for (item of dataPage.data; track item.id) {
+              @if (cardTemplate) {
+                <ng-container [ngTemplateOutlet]="cardTemplate" [ngTemplateOutletContext]="{
+                  $implicit: item,
+                  item: item,
+                  editFn: navigateToEdit.bind(this),
+                  deleteFn: confirmDelete.bind(this)
+                }"></ng-container>
+              } @else {
+                <mat-card class="w-full relative">
+                  <button matIconButton
+                          [matMenuTriggerFor]="cardMenu"
+                          class="absolute top-2 right-2 z-10 bg-white/80 hover:bg-white shadow-sm"
+                          aria-label="Ações"
+                          matTooltip="Ver ações">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #cardMenu="matMenu">
+                    <button mat-menu-item (click)="navigateToEdit(item.id)">
+                      <mat-icon>edit</mat-icon>
+                      <span>Editar</span>
+                    </button>
+                    <button mat-menu-item (click)="confirmDelete(item)">
+                      <mat-icon>delete</mat-icon>
+                      <span>Excluir</span>
+                    </button>
+                  </mat-menu>
+
+                  <mat-card-content>
+                    @for (column of columns.slice(0, 3); track column.key) {
+                      <p><strong>{{ column.header }}:</strong> {{ getCellValue(item, column) }}</p>
+                    }
+                  </mat-card-content>
+                </mat-card>
+              }
+
+            }
+            </div>
+          </div>
+
+          <mat-paginator [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageIndex" [pageSize]="pageSize"
+            [length]="dataPage.totalElements" (page)="refresh($event)" showFirstLastButtons
+            aria-label="Selecione a página"
+            class="relative z-10 mt-6"></mat-paginator>
+        }
+      } @else {
+      <div class="flex flex-col items-center gap-4 text-white">
+        <mat-icon>event_busy</mat-icon>
+        <span class="font-medium text-lg">Nenhum item encontrado</span>
+      </div>
+      }
+    } @else {
+      <div class="w-full min-h-[40vh] flex items-center justify-center">
+        <app-flower-spinner target="{{dataTitle.toLowerCase()}}"></app-flower-spinner>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

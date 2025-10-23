@@ -1,0 +1,28 @@
+<app-data-table
+  dataTitle="Eventos"
+  [data$]="events$"
+  [columns]="columns"
+  [enableDateFilter]="true"
+  [cardTemplate]="eventCardTemplate"
+  titleProperty="title"
+  basePath="/eventos"
+  (search)="onSearch($event)"
+  (clearSearch)="onClearSearch()"
+  (pageChange)="onPageChange($event)"
+  (dateFilter)="onDateFilter($event)"
+  (clearFilters)="onClearFilters()">
+</app-data-table>
+
+<ng-template #eventCardTemplate let-event let-editFn="editFn" let-deleteFn="deleteFn">
+  <app-item-card
+    [itemId]="event.id"
+    [itemTitle]="event.title"
+    [description]="event.location ?? 'Local não informado'"
+    [imageUrl]="event.previewImageUrl"
+    [date]="event.eventDate"
+    basePath="/eventos"
+    (edit)="editFn(event.id)"
+    (delete)="deleteFn(event)"
+    class="w-full flex justify-center items-center">
+  </app-item-card>
+</ng-template>

@@ -1,0 +1,76 @@
+@use '@angular/material' as mat;
+
+mat-paginator {
+  @include mat.paginator-overrides(
+    (
+      container-background-color: #ffffff,
+    )
+  );
+}
+
+table {
+  @include mat.table-overrides(
+    (
+      background-color: #ffffff,
+      row-item-outline-color: var(--color-gray-300),
+    )
+  );
+}
+
+mat-card {
+  @include mat.card-overrides(
+    (
+      outlined-container-color: #ffffff,
+      outlined-outline-color: var(--color-gray-300),
+    )
+  );
+
+  height: 100%;
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.mat-mdc-fab {
+  @include mat.fab-overrides(
+    (
+      container-elevation-shadow: none,
+      hover-container-elevation-shadow: none,
+      focus-container-elevation-shadow: none,
+      pressed-container-elevation-shadow: none,
+    )
+  );
+}
+
+mat-button-toggle-group {
+  @include mat.button-toggle-overrides(
+    (
+      selected-state-text-color: var(--mat-sys-on-primary-fixed-variant),
+    )
+  );
+}
+
+// esconde o toggle de visualização no mobile
+.view-toggle-group {
+  @media (max-width: 767px) {
+    display: none !important;
+    visibility: hidden !important;
+    border: none !important;
+
+    .mat-button-toggle {
+      border: none !important;
+      outline: none !important;
+    }
+  }
+
+  @media (min-width: 768px) {
+    display: inline-flex !important;
+    visibility: visible !important;
+  }
+}
+
+mat-card-content {
+  height: 100%;
+}

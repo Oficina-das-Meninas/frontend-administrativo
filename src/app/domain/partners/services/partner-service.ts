@@ -1,47 +1,73 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { first } from 'rxjs';
+import { map, Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+import { ImageService } from '../../../shared/services/image-service';
 import { Partner } from '../models/partner';
 import { PartnerPage } from '../models/partner-page';
+
+export interface PartnerFilters {
+  page?: number;
+  pageSize?: number;
+  searchTerm?: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class PartnerService {
-  // private readonly API_URL = `${environment.apiUrl}/events`;
-  private readonly API_URL = `https://api-dev.apollomusic.com.br/api/events`;
+  private readonly API_URL = `${environment.apiUrl}/partners`;
   private httpClient = inject(HttpClient);
+  private imageService = inject(ImageService);
 
-  list(page = 0, pageSize = 10) {
-    return this.httpClient
-      .get<PartnerPage>(this.API_URL, {
-        params: {
-          page: page,
-          pageSize: pageSize,
-        },
-      })
-      .pipe(first());
+  list(page: number, size: number): Observable<PartnerPage> {
+    return this.getFilteredPartners({
+      page,
+      pageSize: size
+    });
   }
 
-  loadById(id: string) {
-    return this.httpClient.get<Partner>(`${this.API_URL}/${id}`);
-  }
+  getFilteredPartners(filters: PartnerFilters): Observable<PartnerPage> {
+    let params = new HttpParams();
 
-  save(partner: Partner) {
-    if (partner.id) {
-      return this.update(partner);
+    params = params.set('page', (filters.page ?? 0).toString());
+    params = params.set('pageSize', (filters.pageSize ?? 10).toString());
+
+    if (filters.searchTerm?.trim()) {
+      params = params.set('searchTerm', filters.searchTerm!.trim());
     }
-    return this.create(partner);
+
+    return this.httpClient
+      .get<PartnerPage>(this.API_URL, { params })
+      .pipe(
+        map((partnerPage: PartnerPage) => ({
+          ...partnerPage,
+          data: partnerPage.data.map(partner => ({
+            ...partner,
+            logoUrl: this.imageService.getPubImage(partner.previewImageUrl)
+          }))
+        }))
+      );
   }
 
-  private create(partner: Partner) {
-    return this.httpClient.post<Partner>(this.API_URL, partner);
+  create(partnerData: FormData): Observable<void> {
+    return this.httpClient.post<void>(this.API_URL, partnerData);
   }
 
-  private update(partner: Partner) {
-    return this.httpClient.put<Partner>(
-      `${this.API_URL}/${partner.id}`,
-      partner
+  getById(partnerId: string): Observable<Partner> {
+    return this.httpClient.get<Partner>(`${this.API_URL}/${partnerId}`).pipe(
+      map((partner) => ({
+        ...partner,
+        logoUrl: this.imageService.getPubImage(partner.previewImageUrl),
+      }))
     );
+  }
+
+  update(partnerId: string, partnerData: FormData): Observable<void> {
+    return this.httpClient.put<void>(`${this.API_URL}/${partnerId}`, partnerData);
+  }
+
+  delete(partnerId: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.API_URL}/${partnerId}`);
   }
 }

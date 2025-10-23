@@ -65,7 +65,7 @@
       @if (dataPage.data.length > 0) {
         @if (viewMode === 'table' || !enableCardsView) {
 
-          <div class="mat-elevation-z8 w-full mt-5">
+          <div class="mat-elevation-z8 w-full mt-5 flex-1 flex flex-col justify-between">
             <div class="overflow-x-auto w-full">
               <table mat-table [dataSource]="dataPage.data" class="w-full min-w-[600px] border-collapse md:text-sm">
 
@@ -78,8 +78,21 @@
                           {{ getCellValue(element, column) | date }}
                         }
                         @case ('image') {
-                          <div class="size-24 flex items-center justify-center">
-                            <img class="m-1 object-contain" [src]="getCellValue(element, column)"/>
+                          <div class="size-24 flex items-center justify-center relative rounded-lg overflow-hidden bg-gray-200 m-2">
+                            @if (isImageLoading(element.id) && !isImageError(element.id)) {
+                              <mat-spinner [diameter]="30" [strokeWidth]="2"></mat-spinner>
+                            }
+                            @if (isImageError(element.id)) {
+                              <div class="flex flex-col items-center justify-center w-full h-full bg-gray-300 text-gray-600 text-xs px-2">
+                                <mat-icon class="text-lg">image_not_supported</mat-icon>
+                                <span class="mt-1 text-center">Imagem não encontrada</span>
+                              </div>
+                            }
+                            <img class="m-1 object-contain rounded-lg"
+                                 [src]="getCellValue(element, column)"
+                                 (load)="onImageLoad(element.id)"
+                                 (error)="onImageError(element.id)"
+                                 [hidden]="isImageError(element.id) || isImageLoading(element.id)"/>
                           </div>
                         }
                         @default {
@@ -122,8 +135,8 @@
               class="relative z-10"></mat-paginator>
           </div>
         } @else {
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mt-6 px-2 sm:px-0">
+          <div class="flex-1 flex flex-col justify-between">
+          <div class="grid auto-cols-max gap-4 sm:gap-6 mt-6 px-2 sm:px-0 place-content-evenly" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
             @for (item of dataPage.data; track item.id) {
               @if (cardTemplate) {
                 <ng-container [ngTemplateOutlet]="cardTemplate" [ngTemplateOutletContext]="{
@@ -159,7 +172,9 @@
                   </mat-card-content>
                 </mat-card>
               }
+
             }
+            </div>
           </div>
 
           <mat-paginator [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageIndex" [pageSize]="pageSize"

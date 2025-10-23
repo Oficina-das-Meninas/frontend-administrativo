@@ -3,12 +3,12 @@
   [routerLink]="[basePath, itemId]"
   >
   @if (imageLoading && !imageError) {
-    <div class="absolute inset-0 z-40 flex items-center justify-center bg-gray-200">
+    <div class="absolute inset-0 z-10 flex items-center justify-center bg-gray-200">
       <mat-spinner [diameter]="40" [strokeWidth]="3"></mat-spinner>
     </div>
   }
   @if (imageError) {
-    <div class="absolute inset-0 z-40 flex flex-col items-center justify-center bg-gray-300">
+    <div class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-300">
       <mat-icon class="text-5xl text-gray-600">image_not_supported</mat-icon>
       <p class="text-gray-600 text-sm mt-2">Imagem não encontrada</p>
     </div>

@@ -12,10 +12,18 @@ export const partnerResolver: ResolveFn<Partner> = (route, state) => {
   if (route.params && route.params['id']) {
     return partnerService.getById(route.params['id']).pipe(
       switchMap(async partner => {
-        const validatedPartner = await imageService.validateImages({
-          previewImageUrl: partner.previewImageUrl,
-        });
-        return { ...partner, ...validatedPartner };
+        let previewImageUrl = partner.previewImageUrl;
+
+        // A URL já é completa do partner-service, só valida
+        if (previewImageUrl?.trim()) {
+          const isValid = await imageService.isImageValid(previewImageUrl);
+          if (!isValid) {
+            previewImageUrl = '';
+            console.warn('Imagem inválida removida:', partner.previewImageUrl);
+          }
+        }
+
+        return { ...partner, previewImageUrl };
       })
     );
   }

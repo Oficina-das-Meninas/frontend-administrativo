@@ -25,7 +25,7 @@ export class Partners implements OnInit {
   pageIndex = 0;
   pageSize = 10;
 
-  private partnerService = inject(PartnerService);
+  partnerService = inject(PartnerService);
 
   ngOnInit() {
     this.loadPartnersWithFilters();

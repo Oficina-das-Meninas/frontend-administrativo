@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { eventResolver } from './domain/events/guards/event-resolver';
+import { partnerResolver } from './domain/partners/guards/partner-resolver';
 
 export const routes: Routes = [
   {
@@ -74,6 +75,29 @@ export const routes: Routes = [
               import('./domain/partners/containers/partners/partners').then(
                 (m) => m.Partners
               ),
+          },
+          {
+            path: 'cadastro',
+            loadComponent: () =>
+              import('./domain/partners/containers/partner-form/partner-form').then(
+                (m) => m.PartnerForm
+              ),
+            data: {
+              breadcrumb: 'Cadastro de Parceiro',
+            },
+          },
+          {
+            path: 'editar/:id',
+            resolve: {
+              partner: partnerResolver,
+            },
+            loadComponent: () =>
+              import('./domain/partners/containers/partner-form/partner-form').then(
+                (m) => m.PartnerForm
+              ),
+            data: {
+              breadcrumb: 'Edição de Parceiro',
+            },
           },
         ],
       },

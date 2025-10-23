@@ -6,9 +6,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
+import { ImageInputComponent } from '../../../../shared/components/image-input/image-input';
 import { FormHelperService } from '../../../../shared/services/form/form-helps';
 import { SnackbarService } from '../../../../shared/services/snackbar-service';
-import { ImageInputComponent } from '../../../events/components/image-input/image-input';
 import { Partner } from '../../models/partner';
 import { PartnerService } from '../../services/partner-service';
 
@@ -79,7 +79,6 @@ export class PartnerForm implements OnInit {
   private loadPartnerData(partner: Partner): void {
     if (partner.previewImageUrl?.trim()) {
       this.existingPreviewImageUrl.set(partner.previewImageUrl);
-      // Converte a URL para File para poder enviar quando não houver nova seleção
       this.urlToFile(partner.previewImageUrl).then(file => {
         this.partnerForm.patchValue({
           previewImage: [file],

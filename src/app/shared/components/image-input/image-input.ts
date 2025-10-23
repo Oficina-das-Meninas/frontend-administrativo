@@ -34,8 +34,14 @@ export class ImageInputComponent implements OnChanges {
   onFileSelected(event: any) {
     if (this.readonly) return;
     const files: FileList = event.target.files;
-    this.addFiles(Array.from(files));
+    this.replaceFiles(Array.from(files));
     event.target.value = '';
+  }
+
+  replaceFiles(files: File[]) {
+    this.previewUrls.set([]);
+    this.selectedFiles = [];
+    this.addFiles(files);
   }
 
   addFiles(files: File[]) {
@@ -79,12 +85,20 @@ export class ImageInputComponent implements OnChanges {
     if (this.readonly) return;
     event.preventDefault();
     event.stopPropagation();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+      event.dataTransfer.effectAllowed = 'copy';
+    }
   }
 
   onDragEnter(event: DragEvent) {
     if (this.readonly) return;
     event.preventDefault();
     event.stopPropagation();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+      event.dataTransfer.effectAllowed = 'copy';
+    }
     this.dragCounter++;
     this.isDragging = true;
   }
@@ -110,7 +124,7 @@ export class ImageInputComponent implements OnChanges {
     if (files && files.length > 0) {
       const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
       if (imageFiles.length > 0) {
-        this.addFiles(imageFiles);
+        this.replaceFiles(imageFiles);
       }
     }
   }

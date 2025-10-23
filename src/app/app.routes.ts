@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { partnerResolver } from './domain/partners/guards/partner-resolver';
+import { eventResolver } from './domain/events/guards/event-resolver';
 
 export const routes: Routes = [
   {
@@ -49,6 +49,9 @@ export const routes: Routes = [
           },
           {
             path: 'editar/:id',
+            resolve: {
+              event: eventResolver,
+            },
             loadComponent: () =>
               import('./domain/events/containers/form-event/form-event').then(
                 (m) => m.FormEventComponent

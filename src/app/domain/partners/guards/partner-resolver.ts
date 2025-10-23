@@ -8,7 +8,7 @@ export const partnerResolver: ResolveFn<Partner> = (route, state) => {
   const partnerService = inject(PartnerService);
 
   if (route.params && route.params['id']) {
-    return partnerService.loadById(route.params['id']);
+    return partnerService.getById(route.params['id']);
   }
   return of({ id: '', name: '', previewImageUrl: '' });
 };

@@ -1,0 +1,88 @@
+name: Deploy Frontend Angular na VM
+
+on:
+  workflow_dispatch:
+    inputs:
+      ENVIRONMENT:
+        description: 'Selecione o ambiente'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+          - development
+          - production
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Baixa o código do repositório
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      # 2. Configura Node.js LTS
+      - name: Configurar Node.js (LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      # 3. Instala as dependências
+      - name: Instalar dependências
+        run: npm ci
+
+      # 4. Build do Angular (usando configuration conforme input)
+      - name: Build Angular
+        run: |
+          echo "🏗️ Buildando para ${{ github.event.inputs.ENVIRONMENT }}..."
+          npm run build --configuration=${{ github.event.inputs.ENVIRONMENT }}
+
+      # 5. Publica o build como artefato para ser usado no job deploy
+      - name: Upload build como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/angular-app/browser/
+
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      # 1. Baixa o artefato gerado no job build
+      - name: Baixar artefato da build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/angular-app/browser
+
+      # 2. Configura acesso SSH (com a chave armazenada no secret)
+      - name: Configurar SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VM_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ vars.VM_HOST }} >> ~/.ssh/known_hosts
+
+      # 3. Apenas para debug (lista arquivos do build)
+      - name: Debug arquivos do build
+        run: ls -R dist/angular-app/browser/
+
+      # 4. Copia os arquivos do build para a VM
+      - name: Enviar arquivos para VM
+        run: |
+          if [[ "${{ github.event.inputs.ENVIRONMENT }}" == "development" ]]; then
+            DEST_DIR="${{ vars.VM_DIR_DEV }}"
+          else
+            DEST_DIR="${{ vars.VM_DIR_PRD }}"
+          fi
+
+          VM_USER="${{ vars.VM_USER }}"
+          VM_HOST="${{ vars.VM_HOST }}"
+
+          echo "📤 Enviando arquivos para $VM_USER@$VM_HOST:$DEST_DIR ..."
+          rsync -avz --delete dist/angular-app/browser/ $VM_USER@$VM_HOST:$DEST_DIR/

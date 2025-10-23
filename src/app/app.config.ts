@@ -3,7 +3,7 @@ import { ApplicationConfig, LOCALE_ID, provideZonelessChangeDetection } from '@a
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
 
@@ -26,6 +26,8 @@ function configureMatPaginatorIntl() {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    { provide: LOCALE_ID, useValue: 'pt-BR' },
+    { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' },
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(withFetch()),

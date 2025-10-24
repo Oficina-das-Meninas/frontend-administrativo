@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-dist
-          path: dist/frontend-administrativo/
+          path: dist/frontend-administrativo/browser
 
 
   deploy:
@@ -58,7 +58,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: frontend-dist
-          path: dist/frontend-administrativo/
+          path: dist/frontend-administrativo/browser
 
       # 2. Configura acesso SSH (com a chave armazenada no secret)
       - name: Configurar SSH
@@ -70,7 +70,7 @@ jobs:
 
       # 3. Apenas para debug (lista arquivos do build)
       - name: Debug arquivos do build
-        run: ls -R dist/frontend-administrativo/
+        run: ls -R dist/frontend-administrativo/browser
 
       # 4. Copia os arquivos do build para a VM
       - name: Enviar arquivos para VM
@@ -85,4 +85,4 @@ jobs:
           VM_HOST="${{ vars.VM_HOST }}"
 
           echo "📤 Enviando arquivos para $VM_USER@$VM_HOST:$DEST_DIR ..."
-          rsync -avz --delete dist/frontend-administrativo/ $VM_USER@$VM_HOST:$DEST_DIR/
+          rsync -avz --delete dist/frontend-administrativo/browser $VM_USER@$VM_HOST:$DEST_DIR/

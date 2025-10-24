@@ -55,7 +55,7 @@ export class ItemCard {
   getTooltipText(): string {
     if (!this.description) return '';
     const html = marked(this.description) as string;
-    return html.replace(/<[^>]*>/g, '').trim();
+    return html.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ');
   }
 
   onEdit(event: Event): void {

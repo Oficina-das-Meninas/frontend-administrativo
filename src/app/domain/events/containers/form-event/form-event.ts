@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -9,11 +9,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
+import { ImageInputComponent } from '../../../../shared/components/image-input/image-input';
+import { CanComponentDeactivate } from '../../../../shared/guards/unsaved-changes.guard';
 import { FormHelperService } from '../../../../shared/services/form/form-helps';
 import { SnackbarService } from '../../../../shared/services/snackbar-service';
 import { CKEditorComponent } from '../../components/ck-editor/ck-editor';
 import { DatePickerComponent } from "../../components/date-picker/date-picker";
-import { ImageInputComponent } from '../../components/image-input/image-input';
 import { TimePickerComponent } from '../../components/time-picker/time-picker';
 import { EventService } from '../../services/event-service';
 import { DateTimeUtils } from '../../utils/date-time';
@@ -57,7 +58,7 @@ const ERROR_MESSAGES: Record<string, Record<string, string>> = {
   templateUrl: './form-event.html',
   styleUrl: './form-event.scss',
 })
-export class FormEventComponent implements OnInit {
+export class FormEventComponent implements OnInit, CanComponentDeactivate {
   private fb = inject(FormBuilder);
   private eventService = inject(EventService);
   private formHelperService = inject(FormHelperService);
@@ -85,40 +86,74 @@ export class FormEventComponent implements OnInit {
     previewImage: [[] as File[], [Validators.required, EventValidators.imageValidator]],
   });
 
+  private updateImageValidators(): void {
+    const previewControl = this.eventForm.get('previewImage');
+    const partnersControl = this.eventForm.get('partnersImage');
+
+    if (!previewControl || !partnersControl) return;
+
+    if (this.isEditMode()) {
+      if (this.existingPreviewImageUrl()?.trim()) {
+        previewControl.setValidators([EventValidators.imageValidator]);
+      } else {
+        previewControl.setValidators([Validators.required, EventValidators.imageValidator]);
+      }
+
+      if (this.existingPartnersImageUrl()?.trim()) {
+        partnersControl.setValidators([EventValidators.imageValidator]);
+      } else {
+        partnersControl.setValidators([Validators.required, EventValidators.imageValidator]);
+      }
+    }
+
+    previewControl.updateValueAndValidity();
+    partnersControl.updateValueAndValidity();
+  }
+
   ngOnInit(): void {
+    this.route.data.subscribe(data => {
+      if (data['event']) {
+        this.isEditMode.set(true);
+        this.loadEventData(data['event']);
+      }
+    });
+
     this.route.paramMap.subscribe(params => {
       this.eventId = params.get('id');
-      if (this.eventId) {
-        this.isEditMode.set(true);
-        this.loadEventData(this.eventId);
-      }
     });
   }
 
-  private loadEventData(eventId: string): void {
-    this.eventService.getById(eventId).subscribe(async event => {
-      const eventDate = new Date(event.eventDate);
-      const eventTime = eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  private loadEventData(event: any): void {
+    const eventDate = new Date(event.eventDate);
+    const eventTime = eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-      const previewFile = event.previewImageUrl ? await this.urlToFile(event.previewImageUrl) : null;
-      const partnersFile = event.partnersImageUrl ? await this.urlToFile(event.partnersImageUrl) : null;
+    this.existingPreviewImageUrl.set(event.previewImageUrl || '');
+    this.existingPartnersImageUrl.set(event.partnersImageUrl || '');
 
-      this.existingPreviewImageUrl.set(event.previewImageUrl || '');
-      this.existingPartnersImageUrl.set(event.partnersImageUrl || '');
-
-      this.eventForm.patchValue({
-        title: event.title,
-        description: event.description,
-        eventDate: eventDate,
-        eventTime: eventTime,
-        location: event.location,
-        urlToPlatform: UrlUtils.removeHttpPrefix(event.urlToPlatform),
-        previewImage: previewFile ? [previewFile] : [],
-        partnersImage: partnersFile ? [partnersFile] : [],
-      });
-
-      this.description.set(event.description);
+    this.eventForm.patchValue({
+      title: event.title,
+      description: event.description,
+      eventDate: eventDate,
+      eventTime: eventTime,
+      location: event.location,
+      urlToPlatform: UrlUtils.removeHttpPrefix(event.urlToPlatform || ''),
     });
+
+    this.description.set(event.description);
+
+    if (event.previewImageUrl?.trim()) {
+      this.urlToFile(event.previewImageUrl).then(file => {
+        this.eventForm.patchValue({ previewImage: [file] });
+      });
+    }
+
+    if (event.partnersImageUrl?.trim()) {
+      this.urlToFile(event.partnersImageUrl).then(file => {
+        this.eventForm.patchValue({ partnersImage: [file] });
+      });
+    }
+
+    this.updateImageValidators();
   }
 
   private async urlToFile(url: string): Promise<File> {
@@ -194,8 +229,7 @@ export class FormEventComponent implements OnInit {
   }
 
   onDataChange(data: string) {
-    this.description.set(data);
-    this.eventForm.get('description')?.setValue(data);
+    this.eventForm.get('description')?.setValue(data, { emitEvent: false });
   }
 
   onImageSelected(fieldName: string, files: File[]) {
@@ -244,5 +278,17 @@ export class FormEventComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/eventos']);
+  }
+
+  canDeactivate(): boolean {
+    return !this.eventForm.dirty;
+  }
+
+  getForm(): FormGroup | null {
+    return this.eventForm;
+  }
+
+  getFormName(): string {
+    return 'evento';
   }
 }

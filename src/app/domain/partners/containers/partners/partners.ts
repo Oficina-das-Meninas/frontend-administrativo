@@ -2,13 +2,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Observable } from 'rxjs';
 import { DataTable, TableColumn } from '../../../../shared/components/data-table/data-table';
-import { ItemCard } from '../../../../shared/components/item-card/item-card';
 import { PartnerPage } from '../../models/partner-page';
 import { PartnerFilters, PartnerService } from '../../services/partner-service';
 
 @Component({
   selector: 'app-partners',
-  imports: [DataTable, ItemCard],
+  imports: [DataTable],
   templateUrl: './partners.html',
   styleUrl: './partners.scss'
 })

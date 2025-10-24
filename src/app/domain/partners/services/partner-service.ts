@@ -58,6 +58,7 @@ export class PartnerService {
     return this.httpClient.get<Partner>(`${this.API_URL}/${partnerId}`).pipe(
       map((partner) => ({
         ...partner,
+        previewImageUrl: this.imageService.getPubImage(partner.previewImageUrl),
         logoUrl: this.imageService.getPubImage(partner.previewImageUrl),
       }))
     );

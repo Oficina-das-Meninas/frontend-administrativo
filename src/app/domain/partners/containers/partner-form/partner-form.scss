@@ -1,81 +1,17 @@
-.partner-form-container {
-  padding: 24px;
-  max-width: 800px;
-  margin: 0 auto;
+@use '@angular/material' as mat;
 
-  mat-card {
-    mat-card-header {
-      margin-bottom: 24px;
+mat-card {
+  @include mat.card-overrides((
+    outlined-container-color: white,
+    outlined-outline-color: var(--color-gray-300),
+  ));
+}
 
-      mat-card-title {
-        font-size: 24px;
-        font-weight: 500;
-      }
-    }
+.back-button {
+  transition: all 0.2s ease-in-out;
 
-    mat-card-content {
-      .form-fields {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-
-        .full-width {
-          width: 100%;
-        }
-
-        .image-preview {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          padding: 16px;
-          border: 1px solid #e0e0e0;
-          border-radius: 4px;
-          background-color: #fafafa;
-
-          .preview-label {
-            font-size: 14px;
-            font-weight: 500;
-            color: rgba(0, 0, 0, 0.6);
-          }
-
-          img {
-            max-width: 100%;
-            max-height: 300px;
-            object-fit: contain;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-          }
-        }
-      }
-    }
-
-    mat-card-actions {
-      padding: 16px 0 0;
-      display: flex;
-      gap: 8px;
-
-      button {
-        mat-icon {
-          margin-right: 4px;
-        }
-      }
-    }
+  &:hover {
+    transform: translateX(-2px);
   }
 }
 
-// Responsividade
-@media (max-width: 600px) {
-  .partner-form-container {
-    padding: 16px;
-
-    mat-card {
-      mat-card-actions {
-        flex-direction: column-reverse;
-
-        button {
-          width: 100%;
-        }
-      }
-    }
-  }
-}

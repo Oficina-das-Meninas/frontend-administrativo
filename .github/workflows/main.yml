@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-dist
-          path: dist/angular-app/browser/
+          path: dist/frontend-administrativo/
 
 
   deploy:

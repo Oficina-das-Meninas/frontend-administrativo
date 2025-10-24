@@ -229,8 +229,7 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
   }
 
   onDataChange(data: string) {
-    this.description.set(data);
-    this.eventForm.get('description')?.setValue(data);
+    this.eventForm.get('description')?.setValue(data, { emitEvent: false });
   }
 
   onImageSelected(fieldName: string, files: File[]) {

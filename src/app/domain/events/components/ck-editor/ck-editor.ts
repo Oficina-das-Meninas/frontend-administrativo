@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, forwardRef, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import {
   Alignment,
@@ -43,17 +44,36 @@ const LICENSE_KEY = 'GPL';
   templateUrl: './ck-editor.html',
   styleUrl: './ck-editor.scss',
   encapsulation: ViewEncapsulation.None,
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => CKEditorComponent),
+      multi: true
+    }
+  ]
 })
-export class CKEditorComponent {
+export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAccessor {
   @Input() initialData: string = '';
   @Output() dataChange = new EventEmitter<string>();
-
-  constructor(private changeDetector: ChangeDetectorRef) {}
 
   public isLayoutReady = false;
   public Editor = ClassicEditor;
   public config: EditorConfig = {};
-  public ngAfterViewInit(): void {
+  public editorData: string = '';
+  private editor: any = null;
+  private isInitializingFromParent = false;
+
+  private onChangeCallback: ((value: string) => void) | null = null;
+  private onTouched: (() => void) | null = null;
+
+  constructor(private changeDetector: ChangeDetectorRef) {}
+
+  ngOnInit(): void {
+    this.editorData = this.initialData;
+    this.isInitializingFromParent = true;
+  }
+
+  ngAfterViewInit(): void {
     this.config = {
       toolbar: {
         items: [
@@ -119,6 +139,7 @@ export class CKEditorComponent {
         TableToolbar,
         Underline,
       ],
+      initialData: this.editorData,
       balloonToolbar: ['bold', 'italic', '|', 'link', '|', 'bulletedList', 'numberedList'],
       fontFamily: {
         supportAllValues: true,
@@ -198,7 +219,44 @@ export class CKEditorComponent {
     this.changeDetector.detectChanges();
   }
 
-  onChange(event: any) {
-    this.dataChange.emit(event.editor.getData());
+  onEditorReady(editor: any): void {
+    this.editor = editor;
+    if (this.editorData && this.isInitializingFromParent) {
+      editor.setData(this.editorData);
+      this.isInitializingFromParent = false;
+    }
+  }
+
+  onEditorChange(event: any): void {
+    if (!this.editor) return;
+
+    const data = this.editor.getData();
+    this.editorData = data;
+    this.dataChange.emit(data);
+
+    if (this.onChangeCallback) {
+      this.onChangeCallback(data);
+    }
+  }
+
+  writeValue(value: string): void {
+    if (value !== undefined && value !== null && this.editor && value !== this.editorData) {
+      this.editorData = value;
+      this.editor.setData(value);
+    }
+  }
+
+  registerOnChange(fn: (value: string) => void): void {
+    this.onChangeCallback = fn;
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    if (this.editor) {
+      this.editor.isReadOnly = isDisabled;
+    }
   }
 }

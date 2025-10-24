@@ -78,7 +78,9 @@
                           {{ getCellValue(element, column) | date }}
                         }
                         @case ('image') {
-                          <div class="size-24 flex items-center justify-center relative rounded-lg overflow-hidden bg-gray-200 m-2">
+                          <div class="size-24 flex items-center justify-center relative rounded-lg overflow-hidden m-2"
+                            [class.bg-gray-300]="isImageLoading(element.id) || isImageError(element.id)"
+                          >
                             @if (isImageLoading(element.id) && !isImageError(element.id)) {
                               <mat-spinner [diameter]="30" [strokeWidth]="2"></mat-spinner>
                             }

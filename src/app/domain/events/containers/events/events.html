@@ -13,13 +13,14 @@
   (clearFilters)="onClearFilters()">
 </app-data-table>
 
-<ng-template #eventCardTemplate let-event let-editFn="editFn" let-deleteFn="deleteFn">
+<ng-template #eventCardTemplate let-event let-editFn="editFn" let-deleteFn="deleteFn" let-isLoadingFn="isLoadingFn">
   <app-item-card
     [itemId]="event.id"
     [itemTitle]="event.title"
     [description]="event.location ?? 'Local não informado'"
     [imageUrl]="event.previewImageUrl"
     [date]="event.eventDate"
+    [isExternalLoading]="isLoadingFn(event.id)"
     basePath="/eventos"
     (edit)="editFn(event.id)"
     (delete)="deleteFn(event)"

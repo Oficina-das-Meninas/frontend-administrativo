@@ -1,8 +1,13 @@
 <div class="relative w-full max-w-sm max-h-[18rem] aspect-[4/3] overflow-hidden
   rounded-lg bg-white shadow hover:scale-[1.02] transition duration-300 cursor-pointer"
-  [routerLink]="[basePath, itemId]"
+  [attr.aria-busy]="isLoadingState()"
   >
-  @if (imageLoading && !imageError) {
+  @if (isLoadingState()) {
+    <div class="absolute inset-0 z-40 flex items-center justify-center bg-gray-900/60">
+      <mat-spinner [diameter]="60" [strokeWidth]="3"></mat-spinner>
+    </div>
+  }
+  @if (imageLoading && !imageError && !isLoadingState()) {
     <div class="absolute inset-0 z-10 flex items-center justify-center bg-gray-200">
       <mat-spinner [diameter]="40" [strokeWidth]="3"></mat-spinner>
     </div>
@@ -15,7 +20,7 @@
   }
   <img [src]="imageUrl"
        class="h-full object-cover"
-       [alt]="itemTitle"
+       [attr.alt]="itemTitle"
        (load)="onImageLoad()"
        (error)="onImageError()"
        [hidden]="imageError" />
@@ -25,15 +30,16 @@
             class="bg-gray-200/40! text-gray-800! shadow-sm"
             aria-label="Ações"
             matTooltip="Ver ações"
+            [disabled]="isLoadingState()"
             (click)="$event.preventDefault(); $event.stopPropagation()">
       <mat-icon>more_vert</mat-icon>
     </button>
     <mat-menu #itemCardMenu="matMenu">
-      <button mat-menu-item (click)="onEdit($event)">
+      <button mat-menu-item (click)="onEdit($event)" [disabled]="isLoadingState()">
         <mat-icon>edit</mat-icon>
         <span>Editar</span>
       </button>
-      <button mat-menu-item (click)="onDelete($event)">
+      <button mat-menu-item (click)="onDelete($event)" [disabled]="isLoadingState()">
         <mat-icon>delete</mat-icon>
         <span>Excluir</span>
       </button>

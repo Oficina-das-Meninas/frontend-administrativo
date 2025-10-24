@@ -87,6 +87,7 @@ export class DataTable<T extends { id: string }> implements OnInit {
   itemToDelete: T | null = null;
   imageLoadingState = new Map<string, boolean>();
   imageErrorState = new Map<string, boolean>();
+  itemLoadingState = new Map<string, boolean>();
 
   dateRange: DateRange = {
     start: null,
@@ -158,7 +159,12 @@ export class DataTable<T extends { id: string }> implements OnInit {
   }
 
   navigateToEdit(id: string) {
+    this.itemLoadingState.set(id, true);
     this.router.navigate([`${this.basePath}/editar`, id]);
+  }
+
+  isItemLoading(itemId: string): boolean {
+    return this.itemLoadingState.get(itemId) ?? false;
   }
 
   confirmDelete(item: T) {

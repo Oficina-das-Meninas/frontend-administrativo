@@ -1,10 +1,11 @@
 import { Component, EventEmitter, inject, Input, NgZone, OnChanges, Output, signal, SimpleChanges, WritableSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-image-input',
-  imports: [MatButtonModule, MatIconModule, ],
+  imports: [MatButtonModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './image-input.html',
   styleUrl: './image-input.scss'
 })
@@ -24,10 +25,46 @@ export class ImageInputComponent implements OnChanges {
   selectedFiles: File[] = [];
   isDragging = false;
   private dragCounter = 0;
+  isLoadingInitialImages = signal<boolean>(false);
+  private loadingCounter = signal<number>(0);
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['initialUrls']) {
-      this.previewUrls.set([...this.initialUrls]);
+      if (this.initialUrls.length > 0) {
+        this.isLoadingInitialImages.set(true);
+        this.loadingCounter.set(this.initialUrls.length);
+
+        for (const url of this.initialUrls) {
+          this.loadImage(url);
+        }
+      } else {
+        this.previewUrls.set([]);
+        this.isLoadingInitialImages.set(false);
+      }
+    }
+  }
+
+  private loadImage(url: string): void {
+    const img = new Image();
+    img.onload = () => {
+      this.zone.run(() => {
+        this.previewUrls.set([...this.previewUrls(), url]);
+        this.decreaseLoadingCounter();
+      });
+    };
+    img.onerror = () => {
+      this.zone.run(() => {
+        this.decreaseLoadingCounter();
+      });
+    };
+    img.src = url;
+  }
+
+  private decreaseLoadingCounter(): void {
+    const current = this.loadingCounter() - 1;
+    this.loadingCounter.set(current);
+    if (current <= 0) {
+      this.isLoadingInitialImages.set(false);
     }
   }
 

@@ -1,12 +1,11 @@
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
-import { Component, EventEmitter, Input, LOCALE_ID, Output } from '@angular/core';
+import { Component, EventEmitter, Input, LOCALE_ID, Output, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RouterLink } from '@angular/router';
 import { marked } from 'marked';
 
 registerLocaleData(localePt);
@@ -16,7 +15,6 @@ registerLocaleData(localePt);
   imports: [
     DatePipe,
     MatTooltipModule,
-    RouterLink,
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
@@ -35,10 +33,12 @@ export class ItemCard {
   @Input() description?: string;
   @Input() date?: Date;
   @Input() basePath: string = '/';
+  @Input() isExternalLoading: boolean = false;
 
   @Output() edit = new EventEmitter<string>();
   @Output() delete = new EventEmitter<void>();
 
+  isLoading = signal<boolean>(false);
   imageLoading = true;
   imageError = false;
 
@@ -61,6 +61,7 @@ export class ItemCard {
   onEdit(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
+    this.isLoading.set(true);
     this.edit.emit(this.itemId);
   }
 
@@ -68,5 +69,9 @@ export class ItemCard {
     event.preventDefault();
     event.stopPropagation();
     this.delete.emit();
+  }
+
+  isLoadingState(): boolean {
+    return this.isLoading() || this.isExternalLoading;
   }
 }

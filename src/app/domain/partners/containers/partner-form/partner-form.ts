@@ -95,11 +95,20 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
   }
 
   private async urlToFile(url: string): Promise<File> {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    const filename = url.substring(url.lastIndexOf('/') + 1);
-    const mimeType = blob.type || 'image/jpeg';
-    return new File([blob], filename, { type: mimeType });
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const blob = await response.blob();
+      const filename = url.substring(url.lastIndexOf('/') + 1);
+      const mimeType = blob.type || 'image/jpeg';
+      return new File([blob], filename, { type: mimeType });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao carregar a imagem';
+      this.snackbarService.error(`Falha ao processar imagem: ${errorMessage}`);
+      throw error;
+    }
   }
 
   onSubmit() {
@@ -150,6 +159,14 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
   onImageSelected(files: File[]): void {
     this.partnerForm.get('previewImage')?.setValue(files);
     this.partnerForm.get('previewImage')?.markAsTouched();
+
+    if (this.isEditMode() && files.length === 0) {
+      const imageControl = this.partnerForm.get('previewImage');
+      if (imageControl) {
+        imageControl.setValidators([Validators.required]);
+        imageControl.updateValueAndValidity();
+      }
+    }
   }
 
   getErrorMessage(fieldName: string): string {

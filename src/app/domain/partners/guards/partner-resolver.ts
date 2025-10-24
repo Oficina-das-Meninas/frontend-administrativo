@@ -14,7 +14,6 @@ export const partnerResolver: ResolveFn<Partner> = (route, state) => {
       switchMap(async partner => {
         let previewImageUrl = partner.previewImageUrl;
 
-        // A URL já é completa do partner-service, só valida
         if (previewImageUrl?.trim()) {
           const isValid = await imageService.isImageValid(previewImageUrl);
           if (!isValid) {

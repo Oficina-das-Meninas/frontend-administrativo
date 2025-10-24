@@ -240,7 +240,7 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
   }
 
   writeValue(value: string): void {
-    if (value !== undefined && value !== null && this.editor && value !== this.editorData) {
+    if (value != null && this.editor && value !== this.editorData) {
       this.editorData = value;
       this.editor.setData(value);
     }

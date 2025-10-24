@@ -23,10 +23,6 @@ export class UnsavedChangesGuard {
       return true;
     }
 
-    if (!form.dirty && !form.touched) {
-      return true;
-    }
-
     return new Promise((resolve) => {
       const formName = component.getFormName();
       const title = 'Mudanças não salvas';

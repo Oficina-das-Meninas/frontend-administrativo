@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,6 +7,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
 import { ImageInputComponent } from '../../../../shared/components/image-input/image-input';
+import { CanComponentDeactivate } from '../../../../shared/guards/unsaved-changes.guard';
 import { FormHelperService } from '../../../../shared/services/form/form-helps';
 import { SnackbarService } from '../../../../shared/services/snackbar-service';
 import { Partner } from '../../models/partner';
@@ -31,7 +32,7 @@ interface PartnerFormValue {
   templateUrl: './partner-form.html',
   styleUrl: './partner-form.scss',
 })
-export class PartnerForm implements OnInit {
+export class PartnerForm implements OnInit, CanComponentDeactivate {
   private fb = inject(FormBuilder);
   private partnerService = inject(PartnerService);
   private formHelperService = inject(FormHelperService);
@@ -167,5 +168,17 @@ export class PartnerForm implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/parceiros']);
+  }
+
+  canDeactivate(): boolean {
+    return !this.partnerForm.dirty;
+  }
+
+  getForm(): FormGroup | null {
+    return this.partnerForm;
+  }
+
+  getFormName(): string {
+    return 'parceiro';
   }
 }

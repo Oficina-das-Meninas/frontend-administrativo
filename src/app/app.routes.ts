@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { eventResolver } from './domain/events/guards/event-resolver';
 import { partnerResolver } from './domain/partners/guards/partner-resolver';
+import { unsavedChangesGuard } from './shared/guards/unsaved-changes.guard';
 
 export const routes: Routes = [
   {
@@ -44,6 +45,7 @@ export const routes: Routes = [
               import('./domain/events/containers/form-event/form-event').then(
                 (m) => m.FormEventComponent
               ),
+            canDeactivate: [unsavedChangesGuard],
             data: {
               breadcrumb: 'Cadastro de Evento',
             },
@@ -57,6 +59,7 @@ export const routes: Routes = [
               import('./domain/events/containers/form-event/form-event').then(
                 (m) => m.FormEventComponent
               ),
+            canDeactivate: [unsavedChangesGuard],
             data: {
               breadcrumb: 'Edição de Evento',
             },
@@ -82,6 +85,7 @@ export const routes: Routes = [
               import('./domain/partners/containers/partner-form/partner-form').then(
                 (m) => m.PartnerForm
               ),
+            canDeactivate: [unsavedChangesGuard],
             data: {
               breadcrumb: 'Cadastro de Parceiro',
             },
@@ -95,6 +99,7 @@ export const routes: Routes = [
               import('./domain/partners/containers/partner-form/partner-form').then(
                 (m) => m.PartnerForm
               ),
+            canDeactivate: [unsavedChangesGuard],
             data: {
               breadcrumb: 'Edição de Parceiro',
             },

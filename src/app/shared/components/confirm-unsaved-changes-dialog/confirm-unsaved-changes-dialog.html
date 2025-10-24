@@ -1,0 +1,10 @@
+<div mat-dialog-container>
+  <h1 mat-dialog-title>{{ data.title }}</h1>
+  <mat-dialog-content>
+    {{ data.message }}
+  </mat-dialog-content>
+  <mat-dialog-actions align="end" class="flex gap-2 w-full flex-nowrap">
+    <button mat-button (click)="onCancel()">Não, continuar editando</button>
+    <button mat-flat-button color="warn" (click)="onConfirm()">Sim, sair sem salvar</button>
+  </mat-dialog-actions>
+</div>

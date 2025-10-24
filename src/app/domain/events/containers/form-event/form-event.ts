@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -10,6 +10,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
 import { ImageInputComponent } from '../../../../shared/components/image-input/image-input';
+import { CanComponentDeactivate } from '../../../../shared/guards/unsaved-changes.guard';
 import { FormHelperService } from '../../../../shared/services/form/form-helps';
 import { SnackbarService } from '../../../../shared/services/snackbar-service';
 import { CKEditorComponent } from '../../components/ck-editor/ck-editor';
@@ -57,7 +58,7 @@ const ERROR_MESSAGES: Record<string, Record<string, string>> = {
   templateUrl: './form-event.html',
   styleUrl: './form-event.scss',
 })
-export class FormEventComponent implements OnInit {
+export class FormEventComponent implements OnInit, CanComponentDeactivate {
   private fb = inject(FormBuilder);
   private eventService = inject(EventService);
   private formHelperService = inject(FormHelperService);
@@ -278,5 +279,17 @@ export class FormEventComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/eventos']);
+  }
+
+  canDeactivate(): boolean {
+    return !this.eventForm.dirty;
+  }
+
+  getForm(): FormGroup | null {
+    return this.eventForm;
+  }
+
+  getFormName(): string {
+    return 'evento';
   }
 }

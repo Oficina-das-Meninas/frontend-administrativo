@@ -85,4 +85,4 @@ jobs:
           VM_HOST="${{ vars.VM_HOST }}"
 
           echo "📤 Enviando arquivos para $VM_USER@$VM_HOST:$DEST_DIR ..."
-          rsync -avz --delete dist/angular-app/browser/ $VM_USER@$VM_HOST:$DEST_DIR/
+          rsync -avz --delete dist/frontend-administrativo/ $VM_USER@$VM_HOST:$DEST_DIR/

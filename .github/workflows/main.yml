@@ -58,7 +58,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: frontend-dist
-          path: dist/angular-app/browser
+          path: dist/frontend-administrativo/
 
       # 2. Configura acesso SSH (com a chave armazenada no secret)
       - name: Configurar SSH
@@ -70,7 +70,7 @@ jobs:
 
       # 3. Apenas para debug (lista arquivos do build)
       - name: Debug arquivos do build
-        run: ls -R dist/angular-app/browser/
+        run: ls -R dist/frontend-administrativo/
 
       # 4. Copia os arquivos do build para a VM
       - name: Enviar arquivos para VM

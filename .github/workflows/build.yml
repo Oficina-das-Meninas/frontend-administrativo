@@ -38,7 +38,13 @@ jobs:
       - name: Build Angular
         run: |
           echo "🏗️ Buildando para ${{ github.event.inputs.ENVIRONMENT }}..."
-          npm run build --configuration=${{ github.event.inputs.ENVIRONMENT }}
+
+          if [ "${{ github.event.inputs.ENVIRONMENT }}" = "development" ]; then
+            npm run build:dev
+          else
+            npm run build
+          fi
+
 
       # 5. Publica o build como artefato para ser usado no job deploy
       - name: Upload build como artefato

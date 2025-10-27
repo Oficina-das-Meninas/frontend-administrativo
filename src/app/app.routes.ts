@@ -5,6 +5,13 @@ import { unsavedChangesGuard } from './shared/guards/unsaved-changes.guard';
 
 export const routes: Routes = [
   {
+    path: 'login',
+    loadComponent: () =>
+      import('./domain/login/containers/login/login').then(
+        (m) => m.Login
+      )
+  },
+  {
     path: '',
     loadComponent: () =>
       import('./shared/components/layout/layout.component').then(

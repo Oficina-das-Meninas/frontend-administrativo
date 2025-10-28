@@ -7,6 +7,7 @@ import { AccordionDocument } from '../../models/transparency-accordion/accordion
 import { AccordionCollaborator } from '../../models/transparency-accordion/accordion-collaborator';
 import { DeleteItem } from '../../models/transparency-accordion/delete-item';
 import { CdkDropList, CdkDrag, CdkDragPlaceholder, CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-transparency-accordion',
@@ -16,6 +17,7 @@ import { CdkDropList, CdkDrag, CdkDragPlaceholder, CdkDragDrop, moveItemInArray 
     CdkDragPlaceholder,
     MatExpansionModule,
     MatIconModule,
+    DatePipe
 ],
   templateUrl: './transparency-accordion.html',
   styleUrl: './transparency-accordion.scss'

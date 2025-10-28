@@ -38,9 +38,9 @@
             </div>
           }
         </div>
-      </div>    
+      </div>
 
-    </mat-card-content>    
+    </mat-card-content>
 
   </mat-card>
 
@@ -60,6 +60,7 @@
           formControlName="name"
           label="Nome*"
           placeholder="Digite o nome da categoria"
+          [maxLength]="100"
           errorMessage="Nome de categoria inválido"
         />
       </div>

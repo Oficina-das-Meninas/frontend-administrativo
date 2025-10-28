@@ -65,20 +65,20 @@ export class TransparencyContent implements OnInit {
 
   constructor() {
     this.documentForm = this.formBuilder.group({
-      title: ['', Validators.required],
+      title: ['', [Validators.required, Validators.maxLength(200)]],
       effectiveDate: ['', Validators.required],
       file: ['', Validators.required],
     });
 
     this.collaboratorForm = this.formBuilder.group({
-      name: ['', Validators.required],
-      role: ['', Validators.required],
-      description: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(100)]],
+      role: ['', [Validators.required, Validators.maxLength(100)]],
+      description: ['', [Validators.required, Validators.maxLength(500)]],
       image: ['', Validators.required],
     });
 
     this.categoryForm = this.formBuilder.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(100)]],
     });
   }
 

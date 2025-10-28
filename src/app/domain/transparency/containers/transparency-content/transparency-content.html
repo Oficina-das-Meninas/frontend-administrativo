@@ -51,6 +51,7 @@
           formControlName="title"
           label="Título*"
           placeholder="Digite o título do documento"
+          [maxLength]="200"
           errorMessage="Título do documento inválido"
         />
         <app-date-picker
@@ -89,18 +90,21 @@
           formControlName="name"
           label="Nome*"
           placeholder="Digite o nome do(a) colaborador(a)"
+          [maxLength]="100"
           errorMessage="Nome do(a) colaborador(a) inválido"
         />
         <app-form-input
           formControlName="role"
           label="Cargo*"
           placeholder="Digite o cargo do(a) colaborador(a)"
+          [maxLength]="100"
           errorMessage="Cargo do(a) colaborador(a) inválido"
         />
         <app-form-input
           formControlName="description"
           label="Descrição*"
           placeholder="Digite a Descrição do cargo"
+          [maxLength]="500"
           errorMessage="Descrição do cargo inválida"
         />
       </div>  
@@ -121,6 +125,7 @@
           formControlName="name"
           label="Nome*"
           placeholder="Digite o nome da categoria"
+          [maxLength]="100"
           errorMessage="Nome de categoria inválido"
         />
       </div>

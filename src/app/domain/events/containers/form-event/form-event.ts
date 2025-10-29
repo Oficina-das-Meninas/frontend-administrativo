@@ -6,6 +6,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
@@ -54,6 +55,7 @@ const ERROR_MESSAGES: Record<string, Record<string, string>> = {
     MatInputModule,
     MatNativeDateModule,
     DatePickerComponent,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './form-event.html',
   styleUrl: './form-event.scss',
@@ -68,6 +70,7 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
 
   public description = signal<string>('');
   public isEditMode = signal<boolean>(false);
+  public isLoading = signal<boolean>(false);
   public eventId: string | null = null;
   public existingPreviewImageUrl = signal<string>('');
   public existingPartnersImageUrl = signal<string>('');
@@ -226,23 +229,29 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
 
     const formData = this.buildFormData(finalData, formValue);
 
+    this.isLoading.set(true);
     const request$ = this.isEditMode() ? this.eventService.update(this.eventId!, formData) : this.eventService.create(formData);
 
     request$.subscribe({
       next: () => {
         const successMessage = this.isEditMode() ? 'Evento atualizado com sucesso!' : 'Evento cadastrado com sucesso!';
-
         this.snackbarService.success(successMessage);
+        // Reseta o formulário e atualiza o estado inicial para um formulário vazio
         this.eventForm.reset();
         this.description.set('');
-        this.router.navigate(['/eventos']);
+        this.existingPreviewImageUrl.set('');
+        this.existingPartnersImageUrl.set('');
+        // Após resetar, captura o estado vazio como inicial
+        this.initialFormValue = this.normalizeValue(this.eventForm.getRawValue());
+        this.router.navigate(['/eventos'], { replaceUrl: true });
       },
       error: error => {
         const errorMessage = this.isEditMode() ? 'Erro ao atualizar evento. Tente novamente.' : 'Erro ao cadastrar evento. Tente novamente.';
 
         this.snackbarService.error(errorMessage);
         console.error('Erro ao salvar evento:', error);
-      },
+        this.isLoading.set(false);
+      }
     });
   }
 
@@ -322,6 +331,7 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
     // initial snapshot. This handles the case where the user types and then
     // reverts the input to its original value.
     if (!this.eventForm) return true;
+    if (this.isLoading()) return true; // Permite navegação se estiver carregando (acabou de salvar)
     return this.isFormEqualToInitial();
   }
 

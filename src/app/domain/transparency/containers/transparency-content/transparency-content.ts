@@ -1,23 +1,23 @@
 import { Component, inject, input, OnInit, output, TemplateRef, ViewChild } from '@angular/core';
-import { TransparencyAccordionComponent } from "../../components/transparency-accordion/transparency-accordion";
-import { Dialog } from '../../../../shared/components/dialog/dialog';
-import { AccordionContent } from '../../models/transparency-accordion/accordion-content';
-import { TransparencyService } from '../../services/transparency.service';
-import { MatDialog } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { UploadProfileImage } from "../../components/upload-profile-image/upload-profile-image";
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TransparencyCategory } from '../../models/transparency/transparency-category';
-import { DeleteItem } from '../../models/transparency-accordion/delete-item';
+import { Dialog } from '../../../../shared/components/dialog/dialog';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
 import { DatePickerComponent } from '../../../events/components/date-picker/date-picker';
+import { TransparencyAccordionComponent } from "../../components/transparency-accordion/transparency-accordion";
 import { UploadFile } from "../../components/upload-file/upload-file";
+import { UploadProfileImage } from "../../components/upload-profile-image/upload-profile-image";
 import { AccordionCollaborator } from '../../models/transparency-accordion/accordion-collaborator';
+import { AccordionContent } from '../../models/transparency-accordion/accordion-content';
+import { DeleteItem } from '../../models/transparency-accordion/delete-item';
+import { TransparencyCategory } from '../../models/transparency/transparency-category';
+import { TransparencyService } from '../../services/transparency.service';
 
 @Component({
   selector: 'app-transparency-content',
@@ -65,27 +65,24 @@ export class TransparencyContent implements OnInit {
 
   constructor() {
     this.documentForm = this.formBuilder.group({
-      title: ['', Validators.required],
+      title: ['', [Validators.required, Validators.maxLength(200)]],
       effectiveDate: ['', Validators.required],
       file: ['', Validators.required],
     });
 
     this.collaboratorForm = this.formBuilder.group({
-      name: ['', Validators.required],
-      role: ['', Validators.required],
-      description: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(100)]],
+      role: ['', [Validators.required, Validators.maxLength(100)]],
+      description: ['', [Validators.required, Validators.maxLength(500)]],
       image: ['', Validators.required],
     });
 
     this.categoryForm = this.formBuilder.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(100)]],
     });
   }
 
   ngOnInit(): void {
-    this.categoryForm.setValue({
-      name: this.content().categoryName
-    });
   }
 
   openAddDocumentDialog() {
@@ -97,6 +94,9 @@ export class TransparencyContent implements OnInit {
   }
 
   openUpdateCategoryName() {
+    this.categoryForm.setValue({
+      name: this.content().categoryName
+    });
     this.dialog.open(this.updateCategoryNameDialog);
   }
 
@@ -118,7 +118,7 @@ export class TransparencyContent implements OnInit {
       const effectiveDate: Date = this.documentForm.get('effectiveDate')?.value;
       const formattedDate = effectiveDate.toISOString().split('T')[0];
       formData.append('effectiveDate', formattedDate);
-      
+
       formData.append('categoryId', this.content().id ?? '');
 
       const file = this.documentForm.value.file;
@@ -170,9 +170,7 @@ export class TransparencyContent implements OnInit {
       this.transparencyService.updateCategory(this.content().id ?? '', data).subscribe({
         next: () => {
           this.isUpdated.emit();
-          this.categoryForm.reset({ 
-            name: this.categoryForm.value.name
-          });
+          this.categoryForm.reset();
           this.dialog.closeAll();
         }
       });

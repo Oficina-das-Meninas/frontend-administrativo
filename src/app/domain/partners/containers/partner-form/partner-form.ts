@@ -49,6 +49,9 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
     previewImage: [[] as File[], [Validators.required]],
   });
 
+  // Snapshot of the initial normalized form value used to detect real changes
+  private initialFormValue: any = null;
+
   private updateImageValidator(): void {
     const imageControl = this.partnerForm.get('previewImage');
     if (!imageControl) return;
@@ -75,6 +78,8 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
         });
       }
     });
+    // capture snapshot for create-mode; will be overridden in edit-mode when data loads
+    this.captureInitialForm?.();
   }
 
   private loadPartnerData(partner: Partner): void {
@@ -84,12 +89,16 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
         this.partnerForm.patchValue({
           previewImage: [file],
         });
+        this.captureInitialForm();
       });
     }
 
     this.partnerForm.patchValue({
       name: partner.name,
     });
+
+    // capture snapshot after basic values patched
+    this.captureInitialForm();
 
     this.updateImageValidator();
   }
@@ -108,6 +117,43 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
       const errorMessage = error instanceof Error ? error.message : 'Erro ao carregar a imagem';
       this.snackbarService.error(`Falha ao processar imagem: ${errorMessage}`);
       throw error;
+    }
+  }
+
+  private normalizeValue(value: any): any {
+    if (value === null || value === undefined) return null;
+    if (value instanceof Date) return value.getTime();
+    if (Array.isArray(value)) return value.map(v => this.normalizeValue(v));
+    try {
+      if (typeof File !== 'undefined' && value instanceof File) {
+        return { name: value.name, size: value.size, type: value.type };
+      }
+    } catch (err) {}
+    if (typeof value === 'object') {
+      const keys = Object.keys(value).sort();
+      const out: any = {};
+      keys.forEach(k => out[k] = this.normalizeValue((value as any)[k]));
+      return out;
+    }
+    return value;
+  }
+
+  private captureInitialForm(): void {
+    try {
+      this.initialFormValue = this.normalizeValue(this.partnerForm.getRawValue());
+    } catch (err) {
+      console.error('Erro ao capturar snapshot inicial do formulário:', err);
+      this.initialFormValue = null;
+    }
+  }
+
+  private isFormEqualToInitial(): boolean {
+    try {
+      const current = this.normalizeValue(this.partnerForm.getRawValue());
+      return JSON.stringify(current) === JSON.stringify(this.initialFormValue);
+    } catch (err) {
+      console.error('Erro ao comparar formulário com snapshot inicial:', err);
+      return false;
     }
   }
 
@@ -188,7 +234,8 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
   }
 
   canDeactivate(): boolean {
-    return !this.partnerForm.dirty;
+    if (!this.partnerForm) return true;
+    return this.isFormEqualToInitial();
   }
 
   getForm(): FormGroup | null {

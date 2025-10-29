@@ -52,6 +52,7 @@ export class TransparencyService {
           documents: category.documents?.map((doc) => ({
             id: doc.id,
             name: doc.title,
+            effectiveDate: doc.effectiveDate,
             url: environment.bucketUrl + doc.previewLink,
           })),
           collaborators: category.collaborators?.map((collab) => ({

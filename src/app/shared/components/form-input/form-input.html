@@ -54,6 +54,10 @@
     <mat-hint>{{ hint }}</mat-hint>
   }
 
+  @if (maxLength && !shouldShowError) {
+    <mat-hint align="end">{{ currentLength }} / {{ maxLength }}</mat-hint>
+  }
+
   @if (shouldShowError && errorMessage) {
     <mat-error>{{ errorMessage }}</mat-error>
   }

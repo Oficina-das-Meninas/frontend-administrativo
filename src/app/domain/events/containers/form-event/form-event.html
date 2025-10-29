@@ -42,6 +42,7 @@
               label="Localização*"
               placeholder="Digite a localização"
               prefixIcon="location_on"
+              [maxLength]="150"
               [errorMessage]="getErrorMessage('location')"></app-form-input>
           </div>
         </div>
@@ -53,6 +54,7 @@
           placeholder="exemplo.com"
           prefix="https://"
           hint="Coloque o url para a inscrição do evento na plataforma externa."
+          [maxLength]="300"
           (input)="onUrlInput($event)"
           [errorMessage]="getErrorMessage('urlToPlatform')"></app-form-input>
 

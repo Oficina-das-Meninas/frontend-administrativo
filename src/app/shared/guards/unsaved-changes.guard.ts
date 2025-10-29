@@ -18,13 +18,17 @@ export class UnsavedChangesGuard {
   private router = inject(Router);
 
   canDeactivate(component: CanComponentDeactivate): boolean | Promise<boolean> {
-    const form = component.getForm();
-    if (!form || !form.dirty) {
-      return true;
+    try {
+      const componentCan = component.canDeactivate ? component.canDeactivate() : true;
+      if (componentCan) {
+        return true;
+      }
+    } catch (err) {
+      console.error('Error calling component.canDeactivate():', err);
     }
 
     return new Promise((resolve) => {
-      const formName = component.getFormName();
+      const formName = component.getFormName ? component.getFormName() : 'formulário';
       const title = 'Mudanças não salvas';
       const message = `Você tem mudanças não salvas no formulário de ${formName}. Tem certeza que deseja sair sem salvar?`;
 

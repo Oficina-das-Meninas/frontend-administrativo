@@ -1,17 +1,17 @@
-<app-transparency-accordion 
-  [content]="content()" 
+<app-transparency-accordion
+  [content]="content()"
   (isDeleteItem)="openDeleteItemDialog($event)"
   (isCollaboratorChanges)="onUpdateAllCollaborators($event)"
 >
     <ng-container categoryActions>
-      <span 
-        class="material-symbols-outlined hover:text-[#bf1469] cursor-pointer" 
+      <span
+        class="material-symbols-outlined hover:text-[#bf1469] cursor-pointer"
         (click)="openDeleteCategoryDialog()"
       >
         delete
       </span>
-      <span 
-        class="material-symbols-outlined hover:text-[#bf1469] cursor-pointer" 
+      <span
+        class="material-symbols-outlined hover:text-[#bf1469] cursor-pointer"
         (click)="openUpdateCategoryName()"
       >
         edit_square
@@ -19,7 +19,7 @@
     </ng-container>
     <ng-container documentActions>
       <div class="w-fit">
-        <button 
+        <button
           mat-fab
           (click)="openAddDocumentDialog()"
           matTooltip="Adicionar Documento"
@@ -31,8 +31,8 @@
     </ng-container>
     <ng-container collaboratorActions>
       <div class="w-fit">
-        <button 
-          mat-fab 
+        <button
+          mat-fab
           (click)="openAddCollaboratorDialog()"
           matTooltip="Adicionar Colaborador"
           class="w-auto! px-4!"
@@ -51,6 +51,7 @@
           formControlName="title"
           label="Título*"
           placeholder="Digite o título do documento"
+          [maxLength]="200"
           errorMessage="Título do documento inválido"
         />
         <app-date-picker
@@ -58,7 +59,7 @@
           label="Data de Efetivação"
           placeholder="DD/MM/AAAA"
           errorMessage="Data de efetivação inválida"
-          class="w-full" 
+          class="w-full"
         />
         <app-upload-file
           formControlName="file"
@@ -89,21 +90,24 @@
           formControlName="name"
           label="Nome*"
           placeholder="Digite o nome do(a) colaborador(a)"
+          [maxLength]="100"
           errorMessage="Nome do(a) colaborador(a) inválido"
         />
         <app-form-input
           formControlName="role"
           label="Cargo*"
           placeholder="Digite o cargo do(a) colaborador(a)"
+          [maxLength]="100"
           errorMessage="Cargo do(a) colaborador(a) inválido"
         />
         <app-form-input
           formControlName="description"
           label="Descrição*"
           placeholder="Digite a Descrição do cargo"
+          [maxLength]="200"
           errorMessage="Descrição do cargo inválida"
         />
-      </div>  
+      </div>
     </ng-container>
     <ng-container dialogConfirmButton>
       <button matButton="filled" (click)="onAddCollaborator()" [disabled]="!collaboratorForm.valid">
@@ -121,6 +125,7 @@
           formControlName="name"
           label="Nome*"
           placeholder="Digite o nome da categoria"
+          [maxLength]="100"
           errorMessage="Nome de categoria inválido"
         />
       </div>
@@ -138,7 +143,7 @@
     <ng-container dialogContent>
       <div>
         <p>
-          Deseja remover esta categoria 
+          Deseja remover esta categoria
           <span class="font-bold">{{ content().categoryName }}</span>?
         </p>
       </div>

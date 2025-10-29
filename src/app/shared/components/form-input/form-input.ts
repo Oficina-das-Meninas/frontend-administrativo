@@ -58,7 +58,17 @@ export class FormInputComponent implements ControlValueAccessor {
   }
 
   writeValue(value: string): void {
-    this.value = value || '';
+    if (value == null) {
+      this.value = '';
+      return;
+    }
+
+    // ensure stored value respects maxLength if provided
+    let v = value as string;
+    if (this.maxLength && v.length > this.maxLength) {
+      v = v.slice(0, this.maxLength);
+    }
+    this.value = v || '';
   }
 
   registerOnChange(fn: (value: string) => void): void {
@@ -83,8 +93,19 @@ export class FormInputComponent implements ControlValueAccessor {
       input.value = inputValue;
     }
 
+    if (this.maxLength && inputValue.length > this.maxLength) {
+      inputValue = inputValue.slice(0, this.maxLength);
+      input.value = inputValue;
+    }
+
     this.value = inputValue;
     this.onChange(this.value);
+  }
+
+  get currentLength(): number {
+    const controlVal = this.formControl?.value;
+    const val = controlVal != null ? controlVal : this.value;
+    return val ? String(val).length : 0;
   }
 
   onBlur(): void {

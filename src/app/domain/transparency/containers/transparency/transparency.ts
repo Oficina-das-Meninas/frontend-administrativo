@@ -71,7 +71,7 @@ export class Transparency implements OnInit {
   constructor() {
     this.categoryForm = this.formBuilder.group({
       type: ['', Validators.required],
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(100)]],
     });
   }
 

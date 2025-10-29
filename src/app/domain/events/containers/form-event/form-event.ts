@@ -14,7 +14,7 @@ import { CanComponentDeactivate } from '../../../../shared/guards/unsaved-change
 import { FormHelperService } from '../../../../shared/services/form/form-helps';
 import { SnackbarService } from '../../../../shared/services/snackbar-service';
 import { CKEditorComponent } from '../../components/ck-editor/ck-editor';
-import { DatePickerComponent } from "../../components/date-picker/date-picker";
+import { DatePickerComponent } from '../../components/date-picker/date-picker';
 import { TimePickerComponent } from '../../components/time-picker/time-picker';
 import { EventService } from '../../services/event-service';
 import { DateTimeUtils } from '../../utils/date-time';
@@ -53,8 +53,8 @@ const ERROR_MESSAGES: Record<string, Record<string, string>> = {
     MatFormFieldModule,
     MatInputModule,
     MatNativeDateModule,
-    DatePickerComponent
-],
+    DatePickerComponent,
+  ],
   templateUrl: './form-event.html',
   styleUrl: './form-event.scss',
 })
@@ -78,13 +78,16 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
     eventDate: [null as Date | null, [Validators.required]],
     eventTime: ['', [EventValidators.timeValidator]],
     location: ['', [Validators.required]],
-    urlToPlatform: ['', [
-      Validators.required,
-      Validators.pattern(/^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/),
-    ]],
+    urlToPlatform: [
+      '',
+      [Validators.required, Validators.pattern(/^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/)],
+    ],
     partnersImage: [[] as File[], [Validators.required, EventValidators.imageValidator]],
     previewImage: [[] as File[], [Validators.required, EventValidators.imageValidator]],
   });
+
+  // Snapshot of the initial normalized form value used to detect real changes
+  private initialFormValue: any = null;
 
   private updateImageValidators(): void {
     const previewControl = this.eventForm.get('previewImage');
@@ -121,6 +124,7 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
     this.route.paramMap.subscribe(params => {
       this.eventId = params.get('id');
     });
+    this.captureInitialForm?.();
   }
 
   private loadEventData(event: any): void {
@@ -140,16 +144,19 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
     });
 
     this.description.set(event.description);
+    this.captureInitialForm();
 
     if (event.previewImageUrl?.trim()) {
       this.urlToFile(event.previewImageUrl).then(file => {
         this.eventForm.patchValue({ previewImage: [file] });
+        this.captureInitialForm();
       });
     }
 
     if (event.partnersImageUrl?.trim()) {
       this.urlToFile(event.partnersImageUrl).then(file => {
         this.eventForm.patchValue({ partnersImage: [file] });
+        this.captureInitialForm();
       });
     }
 
@@ -162,6 +169,45 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
     const filename = url.substring(url.lastIndexOf('/') + 1);
     const mimeType = blob.type || 'image/jpeg';
     return new File([blob], filename, { type: mimeType });
+  }
+
+  private normalizeValue(value: any): any {
+    if (value === null || value === undefined) return null;
+    if (value instanceof Date) return value.getTime();
+    if (Array.isArray(value)) return value.map(v => this.normalizeValue(v));
+    try {
+      if (typeof File !== 'undefined' && value instanceof File) {
+        return { name: value.name, size: value.size, type: value.type };
+      }
+    } catch (err) {}
+    if (typeof value === 'object') {
+      const keys = Object.keys(value).sort();
+      const out: any = {};
+      keys.forEach(k => {
+        out[k] = this.normalizeValue((value as any)[k]);
+      });
+      return out;
+    }
+    return value;
+  }
+
+  private captureInitialForm(): void {
+    try {
+      this.initialFormValue = this.normalizeValue(this.eventForm.getRawValue());
+    } catch (err) {
+      console.error('Erro ao capturar snapshot inicial do formulário:', err);
+      this.initialFormValue = null;
+    }
+  }
+
+  private isFormEqualToInitial(): boolean {
+    try {
+      const current = this.normalizeValue(this.eventForm.getRawValue());
+      return JSON.stringify(current) === JSON.stringify(this.initialFormValue);
+    } catch (err) {
+      console.error('Erro ao comparar formulário com snapshot inicial:', err);
+      return false;
+    }
   }
 
   onSubmit() {
@@ -180,36 +226,27 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
 
     const formData = this.buildFormData(finalData, formValue);
 
-    const request$ = this.isEditMode()
-      ? this.eventService.update(this.eventId!, formData)
-      : this.eventService.create(formData);
+    const request$ = this.isEditMode() ? this.eventService.update(this.eventId!, formData) : this.eventService.create(formData);
 
     request$.subscribe({
       next: () => {
-        const successMessage = this.isEditMode()
-          ? 'Evento atualizado com sucesso!'
-          : 'Evento cadastrado com sucesso!';
+        const successMessage = this.isEditMode() ? 'Evento atualizado com sucesso!' : 'Evento cadastrado com sucesso!';
 
         this.snackbarService.success(successMessage);
         this.eventForm.reset();
         this.description.set('');
         this.router.navigate(['/eventos']);
       },
-      error: (error) => {
-        const errorMessage = this.isEditMode()
-          ? 'Erro ao atualizar evento. Tente novamente.'
-          : 'Erro ao cadastrar evento. Tente novamente.';
+      error: error => {
+        const errorMessage = this.isEditMode() ? 'Erro ao atualizar evento. Tente novamente.' : 'Erro ao cadastrar evento. Tente novamente.';
 
         this.snackbarService.error(errorMessage);
         console.error('Erro ao salvar evento:', error);
-      }
+      },
     });
   }
 
-  private buildFormData(
-    finalData: Omit<EventFormValue, 'eventTime'> & { eventDate: Date },
-    formValue: EventFormValue
-  ): FormData {
+  private buildFormData(finalData: Omit<EventFormValue, 'eventTime'> & { eventDate: Date }, formValue: EventFormValue): FormData {
     const formData = new FormData();
     formData.append('title', finalData.title);
     formData.append('description', finalData.description);
@@ -281,7 +318,11 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
   }
 
   canDeactivate(): boolean {
-    return !this.eventForm.dirty;
+    // Consider there are no changes if the current normalized value equals the
+    // initial snapshot. This handles the case where the user types and then
+    // reverts the input to its original value.
+    if (!this.eventForm) return true;
+    return this.isFormEqualToInitial();
   }
 
   getForm(): FormGroup | null {

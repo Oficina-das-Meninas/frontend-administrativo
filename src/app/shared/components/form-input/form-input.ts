@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Optional, Output, Self, ViewEncapsulation } from '@angular/core';
+import { Component, Input, Optional, Self, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, FormControl, NgControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';

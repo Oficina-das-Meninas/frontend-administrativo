@@ -24,7 +24,7 @@ export class AuthService {
         this.cookieService.set(
           'token',             
           response.token,      
-          7,                   
+          1,                   
           '/',                
           undefined,                
           false,               

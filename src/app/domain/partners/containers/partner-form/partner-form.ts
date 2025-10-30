@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
@@ -28,6 +29,7 @@ interface PartnerFormValue {
     ImageInputComponent,
     MatTooltip,
     FormInputComponent,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './partner-form.html',
   styleUrl: './partner-form.scss',
@@ -41,6 +43,7 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
   private route = inject(ActivatedRoute);
 
   public isEditMode = signal<boolean>(false);
+  public isLoading = signal<boolean>(false);
   public partnerId: string | null = null;
   public existingPreviewImageUrl = signal<string>('');
 
@@ -49,7 +52,6 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
     previewImage: [[] as File[], [Validators.required]],
   });
 
-  // Snapshot of the initial normalized form value used to detect real changes
   private initialFormValue: any = null;
 
   private updateImageValidator(): void {
@@ -78,7 +80,6 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
         });
       }
     });
-    // capture snapshot for create-mode; will be overridden in edit-mode when data loads
     this.captureInitialForm?.();
   }
 
@@ -97,9 +98,7 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
       name: partner.name,
     });
 
-    // capture snapshot after basic values patched
     this.captureInitialForm();
-
     this.updateImageValidator();
   }
 
@@ -166,6 +165,7 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
     const formValue = this.partnerForm.getRawValue() as unknown as PartnerFormValue;
     const formData = this.buildFormData(formValue);
 
+    this.isLoading.set(true);
     const request$ = this.isEditMode()
       ? this.partnerService.update(this.partnerId!, formData)
       : this.partnerService.create(formData);
@@ -178,7 +178,9 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
 
         this.snackbarService.success(successMessage);
         this.partnerForm.reset();
-        this.router.navigate(['/parceiros']);
+        this.existingPreviewImageUrl.set('');
+        this.initialFormValue = this.normalizeValue(this.partnerForm.getRawValue());
+        this.router.navigate(['/parceiros'], { replaceUrl: true });
       },
       error: (error) => {
         const errorMessage = this.isEditMode()
@@ -187,6 +189,7 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
 
         this.snackbarService.error(errorMessage);
         console.error('Erro ao salvar parceiro:', error);
+        this.isLoading.set(false);
       }
     });
   }
@@ -235,6 +238,7 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
 
   canDeactivate(): boolean {
     if (!this.partnerForm) return true;
+    if (this.isLoading()) return true;
     return this.isFormEqualToInitial();
   }
 

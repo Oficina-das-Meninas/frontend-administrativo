@@ -5,6 +5,7 @@
   [enableDateFilter]="true"
   [cardTemplate]="eventCardTemplate"
   titleProperty="title"
+  [deleteService]="eventService"
   basePath="/eventos"
   (search)="onSearch($event)"
   (clearSearch)="onClearSearch()"

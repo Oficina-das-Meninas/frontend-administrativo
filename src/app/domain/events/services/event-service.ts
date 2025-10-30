@@ -82,4 +82,8 @@ export class EventService {
   update(eventId: string, eventData: FormData): Observable<void> {
     return this.httpClient.put<void>(`${this.API_URL}/${eventId}`, eventData);
   }
+
+  delete(eventId: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.API_URL}/${eventId}`);
+  }
 }

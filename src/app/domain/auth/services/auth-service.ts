@@ -24,7 +24,7 @@ export class AuthService {
         this.cookieService.set(
           'token',             
           response.token,      
-          1,                   
+          1, // 1 day          
           '/',                
           undefined,                
           environment.production,               

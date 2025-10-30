@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { eventResolver } from './domain/events/guards/event-resolver';
 import { partnerResolver } from './domain/partners/guards/partner-resolver';
 import { unsavedChangesGuard } from './shared/guards/unsaved-changes.guard';
-import { authGuard } from './shared/guards/auth/auth-guard-guard';
+import { authGuard } from './shared/guards/auth/auth-guard';
 import { inject } from '@angular/core';
 import { AuthService } from './domain/auth/services/auth-service';
 

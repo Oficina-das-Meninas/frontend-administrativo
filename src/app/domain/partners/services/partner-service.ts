@@ -43,7 +43,7 @@ export class PartnerService {
       .get<{ data: PartnerListResponse }>(this.API_URL, { params })
       .pipe(
         map(response => ({
-          data: response.data.data.map(partner => ({
+          data: response.data.contents.map(partner => ({
             ...partner,
             logoUrl: this.imageService.getPubImage(partner.previewImageUrl)
           })),

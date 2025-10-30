@@ -46,7 +46,7 @@ export class EventService {
       .get<EventListResponse>(this.API_URL, { params })
       .pipe(
         map((eventPage: EventListResponse) => {
-          const items = eventPage.data.data;
+          const items = eventPage.data.contents;
 
           const mappedItems = items.map((ev: any) => ({
             ...ev,

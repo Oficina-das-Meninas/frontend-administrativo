@@ -2,7 +2,7 @@ import { Event } from './event';
 
 export interface EventListResponse {
   data: {
-    data: Event[];
+    contents: Event[];
     totalElements: number;
     totalPages: number;
   };

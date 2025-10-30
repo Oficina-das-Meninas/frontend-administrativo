@@ -12,7 +12,7 @@
   @if (!multiline) {
     <input
       matInput
-      [type]="type"
+      [type]="inputType"
       [placeholder]="placeholder"
       [formControl]="formControl!"
       (input)="onInput($event)"
@@ -42,6 +42,12 @@
 
   @if (suffixIcon) {
     <mat-icon matIconSuffix>{{ suffixIcon }}</mat-icon>
+  }
+
+  @if (type === 'password') {
+    <mat-icon matIconSuffix class="cursor-pointer" (click)="togglePassword()">
+      {{ passwordIcon }}
+    </mat-icon>
   }
 
   @if (hint && !shouldShowError) {

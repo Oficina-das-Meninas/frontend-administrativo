@@ -54,7 +54,7 @@ export class LayoutComponent implements OnInit {
       {
         matIcon: 'logout',
         title: 'Sair',
-        path: '/',
+        path: '/logout',
       },
     ];
 
@@ -63,4 +63,5 @@ export class LayoutComponent implements OnInit {
       role: 'Cargo',
     };
   }
+
 }

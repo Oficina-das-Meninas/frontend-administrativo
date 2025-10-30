@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../../auth/services/auth-service';
 import { LoginRequest } from '../../models/login-request';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',

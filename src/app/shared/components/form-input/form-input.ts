@@ -129,11 +129,7 @@ export class FormInputComponent implements ControlValueAccessor {
   }
 
   togglePassword(): void {
-    if (this.inputTypeForPassword === 'password') {
-      this.inputTypeForPassword = 'text';
-      return;
-    }
-    this.inputTypeForPassword = 'password';
+    this.inputTypeForPassword = this.inputTypeForPassword === 'password' ? 'text' : 'password';
   }
 
 }

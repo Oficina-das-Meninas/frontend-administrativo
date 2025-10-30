@@ -27,7 +27,7 @@ export class AuthService {
           1,                   
           '/',                
           undefined,                
-          false,               
+          environment.production,               
           'Lax'                
         );
         this.router.navigate(['/']);

@@ -4,7 +4,9 @@ import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ImageService } from '../../../shared/services/image-service';
 import { Partner } from '../models/partner';
+import { PartnerListResponse } from '../models/partner-list-response';
 import { PartnerPage } from '../models/partner-page';
+import { PartnerResponse } from '../models/partner-response';
 
 export interface PartnerFilters {
   page?: number;
@@ -38,14 +40,17 @@ export class PartnerService {
     }
 
     return this.httpClient
-      .get<PartnerPage>(this.API_URL, { params })
+      .get<{ data: PartnerListResponse }>(this.API_URL, { params })
       .pipe(
-        map((partnerPage: PartnerPage) => ({
-          ...partnerPage,
-          data: partnerPage.data.map(partner => ({
+        map(response => ({
+          data: response.data.contents.map(partner => ({
             ...partner,
             logoUrl: this.imageService.getPubImage(partner.previewImageUrl)
-          }))
+          })),
+          totalElements: response.data.totalItems,
+          currentPage: response.data.currentPage,
+          totalPages: response.data.totalPages,
+          pageSize: response.data.pageSize
         }))
       );
   }
@@ -55,11 +60,11 @@ export class PartnerService {
   }
 
   getById(partnerId: string): Observable<Partner> {
-    return this.httpClient.get<Partner>(`${this.API_URL}/${partnerId}`).pipe(
-      map((partner) => ({
-        ...partner,
-        previewImageUrl: this.imageService.getPubImage(partner.previewImageUrl),
-        logoUrl: this.imageService.getPubImage(partner.previewImageUrl),
+    return this.httpClient.get<PartnerResponse>(`${this.API_URL}/${partnerId}`).pipe(
+      map((response) => ({
+        ...response.data,
+        previewImageUrl: this.imageService.getPubImage(response.data.previewImageUrl),
+        logoUrl: this.imageService.getPubImage(response.data.previewImageUrl),
       }))
     );
   }

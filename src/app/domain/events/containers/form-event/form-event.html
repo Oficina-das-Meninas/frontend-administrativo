@@ -94,10 +94,15 @@
             color="primary"
             type="submit"
             [matTooltip]="!eventForm.valid ? 'Preencha todos os campos' : ''"
-            [disabled]="!eventForm.valid"
-            [disabledInteractive]="!eventForm.valid"
+            [disabled]="!eventForm.valid || isLoading()"
+            [disabledInteractive]="!eventForm.valid || isLoading()"
             class="!px-16 !py-6 font-semibold text-base rounded-md normal-case tracking-normal">
-            {{ isEditMode() ? 'Atualizar Evento' : 'Criar Evento' }}
+            <div class="flex items-center gap-2">
+              @if (isLoading()) {
+                <mat-spinner diameter="20" color="accent"></mat-spinner>
+              }
+              {{ isEditMode() ? 'Atualizar Evento' : 'Criar Evento' }}
+            </div>
           </button>
         </div>
       </form>

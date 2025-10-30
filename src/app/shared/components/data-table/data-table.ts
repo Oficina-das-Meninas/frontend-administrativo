@@ -179,20 +179,35 @@ export class DataTable<T extends { id: string }> implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && this.deleteService && this.itemToDelete) {
+        // Mark item as loading while being deleted
+        this.itemLoadingState.set(this.itemToDelete.id, true);
+
         this.deleteService.delete(this.itemToDelete.id).subscribe({
           next: () => {
             this.pageChange.emit({
-              pageIndex: this.pageIndex,
+              pageIndex: 0,
               pageSize: this.pageSize,
               length: 0
             });
+
+            this.pageIndex = 0;
           },
           error: (error) => {
             console.error('Erro ao excluir item:', error);
+            if (this.itemToDelete) {
+              this.itemLoadingState.delete(this.itemToDelete.id);
+            }
+          },
+          complete: () => {
+            if (this.itemToDelete) {
+              this.itemLoadingState.delete(this.itemToDelete.id);
+            }
+            this.itemToDelete = null;
           }
         });
+      } else {
+        this.itemToDelete = null;
       }
-      this.itemToDelete = null;
     });
   }
 

@@ -27,7 +27,7 @@ export class Events implements OnInit {
   pageIndex = 0;
   pageSize = 10;
 
-  private eventService = inject(EventService);
+  eventService = inject(EventService);
 
   ngOnInit() {
     this.loadEventsWithFilters();

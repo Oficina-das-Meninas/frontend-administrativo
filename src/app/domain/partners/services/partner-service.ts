@@ -4,9 +4,8 @@ import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ImageService } from '../../../shared/services/image-service';
 import { Partner } from '../models/partner';
-import { PartnerListResponse } from '../models/partner-list-response';
-import { PartnerPage } from '../models/partner-page';
 import { PartnerResponse } from '../models/partner-response';
+import { DataPage } from '../../../shared/models/data-table-helpers';
 
 export interface PartnerFilters {
   page?: number;
@@ -22,14 +21,14 @@ export class PartnerService {
   private httpClient = inject(HttpClient);
   private imageService = inject(ImageService);
 
-  list(page: number, size: number): Observable<PartnerPage> {
+  list(page: number, size: number): Observable<DataPage<Partner>> {
     return this.getFilteredPartners({
       page,
       pageSize: size
     });
   }
 
-  getFilteredPartners(filters: PartnerFilters): Observable<PartnerPage> {
+  getFilteredPartners(filters: PartnerFilters): Observable<DataPage<Partner>> {
     let params = new HttpParams();
 
     params = params.set('page', (filters.page ?? 0).toString());
@@ -40,18 +39,23 @@ export class PartnerService {
     }
 
     return this.httpClient
-      .get<{ data: PartnerListResponse }>(this.API_URL, { params })
+      .get<any>(this.API_URL, { params })
       .pipe(
-        map(response => ({
-          data: response.data.contents.map(partner => ({
+        map((resp: any) => {
+          const page = resp ?? {};
+          const items = Array.isArray(page.data) ? page.data : Array.isArray(page.contents) ? page.contents : [];
+
+          const mapped = items.map((partner: any) => ({
             ...partner,
-            logoUrl: this.imageService.getPubImage(partner.previewImageUrl)
-          })),
-          totalElements: response.data.totalItems,
-          currentPage: response.data.currentPage,
-          totalPages: response.data.totalPages,
-          pageSize: response.data.pageSize
-        }))
+            previewImageUrl: this.imageService.getPubImage(partner.previewImageUrl)
+          }));
+
+          return {
+            data: mapped,
+            totalElements: typeof page.totalElements === 'number' ? page.totalElements : mapped.length,
+            totalPages: typeof page.totalPages === 'number' ? page.totalPages : 0
+          } as DataPage<Partner>;
+        })
       );
   }
 
@@ -63,8 +67,7 @@ export class PartnerService {
     return this.httpClient.get<PartnerResponse>(`${this.API_URL}/${partnerId}`).pipe(
       map((response) => ({
         ...response.data,
-        previewImageUrl: this.imageService.getPubImage(response.data.previewImageUrl),
-        logoUrl: this.imageService.getPubImage(response.data.previewImageUrl),
+        previewImageUrl: this.imageService.getPubImage(response.data.previewImageUrl)
       }))
     );
   }
@@ -77,3 +80,4 @@ export class PartnerService {
     return this.httpClient.delete<void>(`${this.API_URL}/${partnerId}`);
   }
 }
+

@@ -45,7 +45,7 @@ export class EventService {
       .pipe(
         map((resp: any) => {
           const page = resp ?? {};
-          const items = Array.isArray(page.data) ? page.data : Array.isArray(page.contents) ? page.contents : [];
+          const items = Array.isArray(page.data.contents) ? page.data.contents : [];
 
           const mapped = items.map((ev: any) => ({
             ...ev,

@@ -177,7 +177,7 @@
                             }
                           }
                         }
-                        @case ('donation-type-badge') {
+                        @case ('custom') {
                           @if (getCellValue(element, column)) {
                             <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
                               <span>{{ getCellValue(element, column) }}</span>
@@ -295,7 +295,7 @@
                               @case ('currency') {
                                 <span class="inline-block font-semibold text-green-700">{{ getCellValue(item, column) }}</span>
                               }
-                              @case ('donation-type-badge') {
+                              @case ('custom') {
                                 <span class="inline-flex items-center gap-1.5">{{ getCellValue(item, column) }}</span>
                               }
                               @default {

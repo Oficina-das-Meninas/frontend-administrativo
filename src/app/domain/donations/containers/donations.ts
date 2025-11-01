@@ -8,8 +8,7 @@ import { DonationsService } from '../services/donations-service';
 @Component({
   selector: 'app-donations',
   imports: [ DataTable ],
-  templateUrl: './donations.html',
-  styleUrl: './donations.scss'
+  templateUrl: './donations.html'
 })
 export class Donations {
   donations$: Observable<DataPage<Donation>> | null = null;
@@ -18,7 +17,7 @@ export class Donations {
     { key: 'donorName', header: 'Doador', type: 'text' },
     { key: 'value', header: 'Valor', type: 'currency' },
     { key: 'donationAt', header: 'Data', type: 'date' },
-    { key: 'donationType', header: 'Tipo', type: 'donation-type-badge' },
+    { key: 'donationType', header: 'Tipo', type: 'custom' },
     { key: 'status', header: 'Status', type: 'text' }
   ];
 

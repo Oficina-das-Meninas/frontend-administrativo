@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Observable } from 'rxjs';
 import { DataTable } from '../../../../shared/components/data-table/data-table';
@@ -16,6 +16,8 @@ import { Event } from '../../models/event';
 })
 
 export class Events implements OnInit {
+  @ViewChild('eventCardTemplate') eventCardTemplate!: TemplateRef<any>;
+
   events$: Observable<DataPage<Event>> | null = null;
 
   columns: TableColumn[] = [

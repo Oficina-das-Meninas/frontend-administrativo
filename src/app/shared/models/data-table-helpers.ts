@@ -3,7 +3,7 @@ import { Observable } from "rxjs";
 export interface TableColumn {
   key: string;
   header: string;
-  type?: 'text' | 'date' | 'image' | 'currency' | 'badge' | 'donation-type-badge';
+  type?: 'text' | 'date' | 'image' | 'currency' | 'badge' | 'custom';
 }
 
 export interface DataPage<T> {

@@ -1,8 +1,9 @@
+import { TableColumn, DataPage } from './../../../../shared/models/data-table-helpers';
 import { Component, inject, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Observable } from 'rxjs';
-import { DataTable, TableColumn } from '../../../../shared/components/data-table/data-table';
-import { PartnerPage } from '../../models/partner-page';
+import { DataTable } from '../../../../shared/components/data-table/data-table';
+import { Partner } from '../../models/partner';
 import { PartnerFilters, PartnerService } from '../../services/partner-service';
 
 @Component({
@@ -12,11 +13,11 @@ import { PartnerFilters, PartnerService } from '../../services/partner-service';
   styleUrl: './partners.scss'
 })
 export class Partners implements OnInit {
-  partners$: Observable<PartnerPage> | null = null;
+  partners$: Observable<DataPage<Partner>> | null = null;
 
   columns: TableColumn[] = [
     { key: 'name', header: 'Nome', type: 'text' },
-    { key: 'logoUrl', header: 'Logo', type: 'image' }
+    { key: 'previewImageUrl', header: 'Logo', type: 'image' }
   ];
 
   searchTerm = '';

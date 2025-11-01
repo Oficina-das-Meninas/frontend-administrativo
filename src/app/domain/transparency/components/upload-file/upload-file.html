@@ -1,0 +1,40 @@
+<mat-form-field 
+  appearance="outline" 
+  class="w-full form-input"
+  [class.mdc-text-field--invalid]="shouldShowError"
+>
+  <mat-label>{{ label }}</mat-label>
+
+  <input
+    matInput
+    type="text"
+    [value]="fileName"
+    [placeholder]="placeholder"
+    readonly
+    (click)="openFilePicker(fileInput)"
+  />
+
+  <mat-icon 
+    matSuffix 
+    class="cursor-pointer"
+    (click)="openFilePicker(fileInput)"
+  >
+    <span class="material-symbols-outlined">{{ icon }}</span>
+  </mat-icon>
+
+  @if (hint && !shouldShowError) {
+    <mat-hint>{{ hint }}</mat-hint>
+  }
+  
+  @if (shouldShowError && errorMessage) {
+    <mat-hint class="text-[12px] text-[#ba1a1a]">{{ errorMessage }}</mat-hint>
+  }
+</mat-form-field>
+
+<input
+  #fileInput
+  type="file"
+  [accept]="accept"
+  (change)="onFileSelected($event)"
+  hidden
+/>

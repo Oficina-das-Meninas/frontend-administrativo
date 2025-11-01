@@ -1,0 +1,64 @@
+<div class="relative w-full max-w-sm max-h-[18rem] aspect-[4/3] overflow-hidden
+  rounded-lg bg-white shadow hover:scale-[1.02] transition duration-300 cursor-pointer"
+  [attr.aria-busy]="isLoadingState()"
+  >
+  @if (isLoadingState()) {
+    <div class="absolute inset-0 z-40 flex items-center justify-center bg-gray-900/60">
+      <mat-spinner [diameter]="60" [strokeWidth]="3"></mat-spinner>
+    </div>
+  }
+  @if (imageLoading && !imageError && !isLoadingState()) {
+    <div class="absolute inset-0 z-10 flex items-center justify-center bg-gray-200">
+      <mat-spinner [diameter]="40" [strokeWidth]="3"></mat-spinner>
+    </div>
+  }
+  @if (imageError) {
+    <div class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-300">
+      <mat-icon class="text-5xl text-gray-600">image_not_supported</mat-icon>
+      <p class="text-gray-600 text-sm mt-2">Imagem não encontrada</p>
+    </div>
+  }
+  <img [src]="imageUrl"
+       class="h-full object-cover"
+       [attr.alt]="itemTitle"
+       (load)="onImageLoad()"
+       (error)="onImageError()"
+       [hidden]="imageError" />
+  <div class="absolute right-0 top-0 z-30 p-4">
+    <button matIconButton
+            [matMenuTriggerFor]="itemCardMenu"
+            class="bg-gray-200/40! text-gray-800! shadow-sm"
+            aria-label="Ações"
+            matTooltip="Ver ações"
+            [disabled]="isLoadingState()"
+            (click)="$event.preventDefault(); $event.stopPropagation()">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #itemCardMenu="matMenu">
+      <button mat-menu-item (click)="onEdit($event)" [disabled]="isLoadingState()">
+        <mat-icon>edit</mat-icon>
+        <span>Editar</span>
+      </button>
+      <button mat-menu-item (click)="onDelete($event)" [disabled]="isLoadingState()">
+        <mat-icon>delete</mat-icon>
+        <span>Excluir</span>
+      </button>
+    </mat-menu>
+  </div>
+  <div class="absolute inset-0 z-10 bg-gradient-to-t from-black"></div>
+  <div class="absolute inset-x-0 bottom-0 z-20 p-4">
+    @if (date) {
+      <p class="mb-1 text-sm text-gray-300 w-fit">
+        <time>{{ date | date:"dd 'de' MMMM 'de' yyyy" }}</time>
+      </p>
+    }
+    <h3 class="text-xl font-bold text-white truncate" [matTooltip]="itemTitle">{{ itemTitle }}</h3>
+    @if (description) {
+      <p class="text-md mt-1 text-gray-200 ml-[0.2rem] w-fit line-clamp-2 text-ellipsis"
+      [matTooltip]="getTooltipText()"
+      >
+        {{ getTooltipText() }}
+      </p>
+    }
+  </div>
+</div>

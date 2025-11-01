@@ -1,10 +1,10 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { EventFilters } from '../models/event-filters';
 import { toLocalDate } from '../../../shared/components/utils/date-utils';
 import { ImageService } from '../../../shared/services/image-service';
+import { EventFilters } from '../models/event-filters';
 import { DataPage } from '../../../shared/models/data-table-helpers';
 import { Event } from '../models/event';
 
@@ -41,15 +41,23 @@ export class EventService {
     }
 
     return this.httpClient
-      .get<DataPage<Event>>(this.API_URL, { params })
+      .get<any>(this.API_URL, { params })
       .pipe(
-        map((eventPage: DataPage<Event>) => ({
-          ...eventPage,
-          data: eventPage.data.map(ev => ({
+        map((resp: any) => {
+          const page = resp ?? {};
+          const items = Array.isArray(page.data) ? page.data : Array.isArray(page.contents) ? page.contents : [];
+
+          const mapped = items.map((ev: any) => ({
             ...ev,
-            previewImageUrl: this.imageService.getPubImage((ev as any).previewImageUrl)
-          }))
-        }))
+            previewImageUrl: this.imageService.getPubImage(ev.previewImageUrl)
+          }));
+
+          return {
+            data: mapped,
+            totalElements: typeof page.totalElements === 'number' ? page.totalElements : mapped.length,
+            totalPages: typeof page.totalPages === 'number' ? page.totalPages : 0
+          } as DataPage<Event>;
+        })
       );
   }
 
@@ -57,17 +65,24 @@ export class EventService {
     return this.httpClient.post<void>(this.API_URL, eventData);
   }
 
-  getById(eventId: string): Observable<any> {
+  getById(eventId: string): Observable<Event> {
     return this.httpClient.get<any>(`${this.API_URL}/${eventId}`).pipe(
-      map((event) => ({
-        ...event,
-        previewImageUrl: this.imageService.getPubImage((event).previewImageUrl),
-        partnersImageUrl: this.imageService.getPubImage((event).partnersImageUrl),
-      }))
+      map((res: any) => {
+        const event = res.data;
+        return {
+          ...event,
+          previewImageUrl: this.imageService.getPubImage(event?.previewImageUrl),
+          partnersImageUrl: this.imageService.getPubImage(event?.partnersImageUrl),
+        } as Event;
+      })
     );
   }
 
   update(eventId: string, eventData: FormData): Observable<void> {
     return this.httpClient.put<void>(`${this.API_URL}/${eventId}`, eventData);
+  }
+
+  delete(eventId: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.API_URL}/${eventId}`);
   }
 }

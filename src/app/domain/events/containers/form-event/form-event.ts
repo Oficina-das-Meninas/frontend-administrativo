@@ -1,19 +1,21 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
+import { ImageInputComponent } from '../../../../shared/components/image-input/image-input';
+import { CanComponentDeactivate } from '../../../../shared/guards/unsaved-changes.guard';
 import { FormHelperService } from '../../../../shared/services/form/form-helps';
 import { SnackbarService } from '../../../../shared/services/snackbar-service';
 import { CKEditorComponent } from '../../components/ck-editor/ck-editor';
-import { DatePickerComponent } from "../../components/date-picker/date-picker";
-import { ImageInputComponent } from '../../components/image-input/image-input';
+import { DatePickerComponent } from '../../components/date-picker/date-picker';
 import { TimePickerComponent } from '../../components/time-picker/time-picker';
 import { EventService } from '../../services/event-service';
 import { DateTimeUtils } from '../../utils/date-time';
@@ -52,12 +54,13 @@ const ERROR_MESSAGES: Record<string, Record<string, string>> = {
     MatFormFieldModule,
     MatInputModule,
     MatNativeDateModule,
-    DatePickerComponent
-],
+    DatePickerComponent,
+    MatProgressSpinnerModule,
+  ],
   templateUrl: './form-event.html',
   styleUrl: './form-event.scss',
 })
-export class FormEventComponent implements OnInit {
+export class FormEventComponent implements OnInit, CanComponentDeactivate {
   private fb = inject(FormBuilder);
   private eventService = inject(EventService);
   private formHelperService = inject(FormHelperService);
@@ -67,6 +70,7 @@ export class FormEventComponent implements OnInit {
 
   public description = signal<string>('');
   public isEditMode = signal<boolean>(false);
+  public isLoading = signal<boolean>(false);
   public eventId: string | null = null;
   public existingPreviewImageUrl = signal<string>('');
   public existingPartnersImageUrl = signal<string>('');
@@ -77,48 +81,89 @@ export class FormEventComponent implements OnInit {
     eventDate: [null as Date | null, [Validators.required]],
     eventTime: ['', [EventValidators.timeValidator]],
     location: ['', [Validators.required]],
-    urlToPlatform: ['', [
-      Validators.required,
-      Validators.pattern(/^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/),
-    ]],
+    urlToPlatform: [
+      '',
+      [Validators.required, Validators.pattern(/^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/)],
+    ],
     partnersImage: [[] as File[], [Validators.required, EventValidators.imageValidator]],
     previewImage: [[] as File[], [Validators.required, EventValidators.imageValidator]],
   });
 
-  ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      this.eventId = params.get('id');
-      if (this.eventId) {
-        this.isEditMode.set(true);
-        this.loadEventData(this.eventId);
+  // Snapshot of the initial normalized form value used to detect real changes
+  private initialFormValue: any = null;
+
+  private updateImageValidators(): void {
+    const previewControl = this.eventForm.get('previewImage');
+    const partnersControl = this.eventForm.get('partnersImage');
+
+    if (!previewControl || !partnersControl) return;
+
+    if (this.isEditMode()) {
+      if (this.existingPreviewImageUrl()?.trim()) {
+        previewControl.setValidators([EventValidators.imageValidator]);
+      } else {
+        previewControl.setValidators([Validators.required, EventValidators.imageValidator]);
       }
-    });
+
+      if (this.existingPartnersImageUrl()?.trim()) {
+        partnersControl.setValidators([EventValidators.imageValidator]);
+      } else {
+        partnersControl.setValidators([Validators.required, EventValidators.imageValidator]);
+      }
+    }
+
+    previewControl.updateValueAndValidity();
+    partnersControl.updateValueAndValidity();
   }
 
-  private loadEventData(eventId: string): void {
-    this.eventService.getById(eventId).subscribe(async event => {
-      const eventDate = new Date(event.eventDate);
-      const eventTime = eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-      const previewFile = event.previewImageUrl ? await this.urlToFile(event.previewImageUrl) : null;
-      const partnersFile = event.partnersImageUrl ? await this.urlToFile(event.partnersImageUrl) : null;
-
-      this.existingPreviewImageUrl.set(event.previewImageUrl || '');
-      this.existingPartnersImageUrl.set(event.partnersImageUrl || '');
-
-      this.eventForm.patchValue({
-        title: event.title,
-        description: event.description,
-        eventDate: eventDate,
-        eventTime: eventTime,
-        location: event.location,
-        urlToPlatform: UrlUtils.removeHttpPrefix(event.urlToPlatform),
-        previewImage: previewFile ? [previewFile] : [],
-        partnersImage: partnersFile ? [partnersFile] : [],
-      });
-
-      this.description.set(event.description);
+  ngOnInit(): void {
+    this.route.data.subscribe(data => {
+      if (data['event']) {
+        this.isEditMode.set(true);
+        this.loadEventData(data['event']);
+      }
     });
+
+    this.route.paramMap.subscribe(params => {
+      this.eventId = params.get('id');
+    });
+    this.captureInitialForm?.();
+  }
+
+  private loadEventData(event: any): void {
+    const eventDate = new Date(event.eventDate);
+    const eventTime = eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+    this.existingPreviewImageUrl.set(event.previewImageUrl || '');
+    this.existingPartnersImageUrl.set(event.partnersImageUrl || '');
+
+    this.eventForm.patchValue({
+      title: event.title,
+      description: event.description,
+      eventDate: eventDate,
+      eventTime: eventTime,
+      location: event.location,
+      urlToPlatform: UrlUtils.removeHttpPrefix(event.urlToPlatform || ''),
+    });
+
+    this.description.set(event.description);
+    this.captureInitialForm();
+
+    if (event.previewImageUrl?.trim()) {
+      this.urlToFile(event.previewImageUrl).then(file => {
+        this.eventForm.patchValue({ previewImage: [file] });
+        this.captureInitialForm();
+      });
+    }
+
+    if (event.partnersImageUrl?.trim()) {
+      this.urlToFile(event.partnersImageUrl).then(file => {
+        this.eventForm.patchValue({ partnersImage: [file] });
+        this.captureInitialForm();
+      });
+    }
+
+    this.updateImageValidators();
   }
 
   private async urlToFile(url: string): Promise<File> {
@@ -127,6 +172,45 @@ export class FormEventComponent implements OnInit {
     const filename = url.substring(url.lastIndexOf('/') + 1);
     const mimeType = blob.type || 'image/jpeg';
     return new File([blob], filename, { type: mimeType });
+  }
+
+  private normalizeValue(value: any): any {
+    if (value === null || value === undefined) return null;
+    if (value instanceof Date) return value.getTime();
+    if (Array.isArray(value)) return value.map(v => this.normalizeValue(v));
+    try {
+      if (typeof File !== 'undefined' && value instanceof File) {
+        return { name: value.name, size: value.size, type: value.type };
+      }
+    } catch (err) {}
+    if (typeof value === 'object') {
+      const keys = Object.keys(value).sort();
+      const out: any = {};
+      keys.forEach(k => {
+        out[k] = this.normalizeValue((value as any)[k]);
+      });
+      return out;
+    }
+    return value;
+  }
+
+  private captureInitialForm(): void {
+    try {
+      this.initialFormValue = this.normalizeValue(this.eventForm.getRawValue());
+    } catch (err) {
+      console.error('Erro ao capturar snapshot inicial do formulário:', err);
+      this.initialFormValue = null;
+    }
+  }
+
+  private isFormEqualToInitial(): boolean {
+    try {
+      const current = this.normalizeValue(this.eventForm.getRawValue());
+      return JSON.stringify(current) === JSON.stringify(this.initialFormValue);
+    } catch (err) {
+      console.error('Erro ao comparar formulário com snapshot inicial:', err);
+      return false;
+    }
   }
 
   onSubmit() {
@@ -145,36 +229,33 @@ export class FormEventComponent implements OnInit {
 
     const formData = this.buildFormData(finalData, formValue);
 
-    const request$ = this.isEditMode()
-      ? this.eventService.update(this.eventId!, formData)
-      : this.eventService.create(formData);
+    this.isLoading.set(true);
+    const request$ = this.isEditMode() ? this.eventService.update(this.eventId!, formData) : this.eventService.create(formData);
 
     request$.subscribe({
       next: () => {
-        const successMessage = this.isEditMode()
-          ? 'Evento atualizado com sucesso!'
-          : 'Evento cadastrado com sucesso!';
-
+        const successMessage = this.isEditMode() ? 'Evento atualizado com sucesso!' : 'Evento cadastrado com sucesso!';
         this.snackbarService.success(successMessage);
+        // Reseta o formulário e atualiza o estado inicial para um formulário vazio
         this.eventForm.reset();
         this.description.set('');
-        this.router.navigate(['/eventos']);
+        this.existingPreviewImageUrl.set('');
+        this.existingPartnersImageUrl.set('');
+        // Após resetar, captura o estado vazio como inicial
+        this.initialFormValue = this.normalizeValue(this.eventForm.getRawValue());
+        this.router.navigate(['/eventos'], { replaceUrl: true });
       },
-      error: (error) => {
-        const errorMessage = this.isEditMode()
-          ? 'Erro ao atualizar evento. Tente novamente.'
-          : 'Erro ao cadastrar evento. Tente novamente.';
+      error: error => {
+        const errorMessage = this.isEditMode() ? 'Erro ao atualizar evento. Tente novamente.' : 'Erro ao cadastrar evento. Tente novamente.';
 
         this.snackbarService.error(errorMessage);
         console.error('Erro ao salvar evento:', error);
+        this.isLoading.set(false);
       }
     });
   }
 
-  private buildFormData(
-    finalData: Omit<EventFormValue, 'eventTime'> & { eventDate: Date },
-    formValue: EventFormValue
-  ): FormData {
+  private buildFormData(finalData: Omit<EventFormValue, 'eventTime'> & { eventDate: Date }, formValue: EventFormValue): FormData {
     const formData = new FormData();
     formData.append('title', finalData.title);
     formData.append('description', finalData.description);
@@ -194,8 +275,7 @@ export class FormEventComponent implements OnInit {
   }
 
   onDataChange(data: string) {
-    this.description.set(data);
-    this.eventForm.get('description')?.setValue(data);
+    this.eventForm.get('description')?.setValue(data, { emitEvent: false });
   }
 
   onImageSelected(fieldName: string, files: File[]) {
@@ -244,5 +324,22 @@ export class FormEventComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/eventos']);
+  }
+
+  canDeactivate(): boolean {
+    // Consider there are no changes if the current normalized value equals the
+    // initial snapshot. This handles the case where the user types and then
+    // reverts the input to its original value.
+    if (!this.eventForm) return true;
+    if (this.isLoading()) return true; // Permite navegação se estiver carregando (acabou de salvar)
+    return this.isFormEqualToInitial();
+  }
+
+  getForm(): FormGroup | null {
+    return this.eventForm;
+  }
+
+  getFormName(): string {
+    return 'evento';
   }
 }

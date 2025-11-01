@@ -1,64 +1,48 @@
 <mat-card class="w-full" appearance="outlined">
-
   <mat-card-header>
     <mat-card-title>{{ dataTitle }}</mat-card-title>
   </mat-card-header>
 
   <mat-card-content>
-
     <div class="flex items-center justify-between mt-4 gap-2 sm:gap-4 w-full">
-
       <div class="flex items-center gap-2 flex-1 min-w-0">
-
         <app-search-input
           class="flex-1 min-w-0 max-w-none sm:max-w-md"
           placeholder="{{ searchPlaceholder }}"
           [debounceTime]="500"
-          (search)="onSearch($event)">
-        </app-search-input>
+          (search)="onSearch($event)"></app-search-input>
 
         @if (enableDateFilter) {
-          <app-calendar-filter
-            [(dateRange)]="dateRange"
-            (apply)="applyDateFilter()"
-            (clear)="clearAllFilters()"
-            tooltipText="Filtrar por data"
-            class="flex-shrink-0"
-          />
+        <app-calendar-filter
+          [(dateRange)]="dateRange"
+          (apply)="applyDateFilter()"
+          (clear)="clearAllFilters()"
+          tooltipText="Filtrar por data"
+          class="flex-shrink-0" />
         }
-
       </div>
 
       <div class="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-
         @if (enableCardsView) {
-          <mat-button-toggle-group
-              name="view"
-              aria-label="Visualização"
-              class="hidden sm:inline-flex view-toggle-group"
-              [value]="viewMode"
-              (change)="onViewModeChange($event.value)">
-            <mat-button-toggle value="cards">
-              <mat-icon>grid_view</mat-icon>
-            </mat-button-toggle>
-            <mat-button-toggle value="table">
-              <mat-icon>format_align_justify</mat-icon>
-            </mat-button-toggle>
-          </mat-button-toggle-group>
+        <mat-button-toggle-group
+          name="view"
+          aria-label="Visualização"
+          class="hidden sm:inline-flex view-toggle-group"
+          [value]="viewMode"
+          (change)="onViewModeChange($event.value)">
+          <mat-button-toggle value="cards">
+            <mat-icon>grid_view</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="table">
+            <mat-icon>format_align_justify</mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+        } @if (enableCreateButton) {
+        <button matFab matTooltip="Criar novo" class="h-12 w-12 sm:h-auto sm:w-auto transition-all duration-200" (click)="navigateToCreate()">
+          <mat-icon>add</mat-icon>
+        </button>
         }
-
-        @if (enableCreateButton) {
-          <button
-            matFab
-            matTooltip="Criar novo"
-            class="h-12 w-12 sm:h-auto sm:w-auto transition-all duration-200"
-            (click)="navigateToCreate()">
-            <mat-icon>add</mat-icon>
-          </button>
-        }
-
       </div>
-
     </div>
 
     @if(selectFilters.length){
@@ -242,10 +226,10 @@
                   </ng-container>
                 }
 
-                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-              </table>
-            </div>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
 
             <mat-paginator [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageIndex" [pageSize]="pageSize"
               [length]="dataPage.totalElements" (page)="refresh($event)" showFirstLastButtons
@@ -328,21 +312,24 @@
             }
           </div>
 
-          <mat-paginator [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageIndex" [pageSize]="pageSize"
-            [length]="dataPage.totalElements" (page)="refresh($event)" showFirstLastButtons
-            aria-label="Selecione a página"
-            class="relative z-10 mt-6"></mat-paginator>
-        }
-      } @else {
-      <div class="flex flex-col items-center gap-4 text-white">
-        <mat-icon>event_busy</mat-icon>
-        <span class="font-medium text-lg">Nenhum item encontrado</span>
-      </div>
-      }
-    } @else {
-      <div class="w-full min-h-[40vh] flex items-center justify-center">
-        <app-flower-spinner target="{{dataTitle.toLowerCase()}}"></app-flower-spinner>
-      </div>
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 20]"
+      [pageIndex]="pageIndex"
+      [pageSize]="pageSize"
+      [length]="dataPage.totalElements"
+      (page)="refresh($event)"
+      showFirstLastButtons
+      aria-label="Selecione a página"
+      class="relative z-10 mt-6"></mat-paginator>
+    } } @else {
+    <div class="flex flex-col items-center gap-4 text-white">
+      <mat-icon>event_busy</mat-icon>
+      <span class="font-medium text-lg">Nenhum item encontrado</span>
+    </div>
+    } } @else {
+    <div class="w-full min-h-[40vh] flex items-center justify-center">
+      <app-flower-spinner target="{{dataTitle.toLowerCase()}}"></app-flower-spinner>
+    </div>
     }
   </mat-card-content>
 </mat-card>

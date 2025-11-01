@@ -42,6 +42,7 @@
               label="Localização*"
               placeholder="Digite a localização"
               prefixIcon="location_on"
+              [maxLength]="150"
               [errorMessage]="getErrorMessage('location')"></app-form-input>
           </div>
         </div>
@@ -53,6 +54,7 @@
           placeholder="exemplo.com"
           prefix="https://"
           hint="Coloque o url para a inscrição do evento na plataforma externa."
+          [maxLength]="300"
           (input)="onUrlInput($event)"
           [errorMessage]="getErrorMessage('urlToPlatform')"></app-form-input>
 
@@ -88,14 +90,19 @@
 
         <div class="flex justify-end mt-6">
           <button
-            mat-raised-button
+            matButton="filled"
             color="primary"
             type="submit"
             [matTooltip]="!eventForm.valid ? 'Preencha todos os campos' : ''"
-            [disabled]="!eventForm.valid"
-            [disabledInteractive]="!eventForm.valid"
+            [disabled]="!eventForm.valid || isLoading()"
+            [disabledInteractive]="!eventForm.valid || isLoading()"
             class="!px-16 !py-6 font-semibold text-base rounded-md normal-case tracking-normal">
-            {{ isEditMode() ? 'Atualizar Evento' : 'Criar Evento' }}
+            <div class="flex items-center gap-2">
+              @if (isLoading()) {
+                <mat-spinner diameter="20" color="accent"></mat-spinner>
+              }
+              {{ isEditMode() ? 'Atualizar Evento' : 'Criar Evento' }}
+            </div>
           </button>
         </div>
       </form>

@@ -2,8 +2,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Observable } from 'rxjs';
 import { DataTable } from '../../../../shared/components/data-table/data-table';
+import { ItemCard } from '../../../../shared/components/item-card/item-card';
 import { DateRange } from '../../../../shared/models/date-range';
-import { EventCard } from '../../components/event-card/event-card';
 import { EventFilters } from '../../models/event-filters';
 import { EventService } from '../../services/event-service';
 import { DataPage, TableColumn } from '../../../../shared/models/data-table-helpers';
@@ -11,10 +11,7 @@ import { Event } from '../../models/event';
 
 @Component({
   selector: 'app-events',
-  imports: [
-    DataTable,
-    EventCard
-  ],
+  imports: [DataTable, ItemCard],
   templateUrl: './events.html'
 })
 
@@ -32,7 +29,7 @@ export class Events implements OnInit {
   pageIndex = 0;
   pageSize = 10;
 
-  private eventService = inject(EventService);
+  eventService = inject(EventService);
 
   ngOnInit() {
     this.loadEventsWithFilters();

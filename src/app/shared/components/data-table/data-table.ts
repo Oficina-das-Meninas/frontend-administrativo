@@ -10,14 +10,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { CalendarFilter } from '../calendar-filter/calendar-filter';
-import { SearchInput } from '../search-input/search-input';
 import { DateRange } from '../../models/date-range';
+import { CalendarFilter } from '../calendar-filter/calendar-filter';
 import { ConfirmDeleteDialog } from '../confirm-delete-dialog/confirm-delete-dialog';
 import { FlowerSpinner } from '../flower-spinner/flower-spinner';
 import { DataPage, DeleteService, TableColumn } from '../../models/data-table-helpers';
@@ -32,6 +32,7 @@ import { DataPage, DeleteService, TableColumn } from '../../models/data-table-he
     MatMenuModule,
     MatCardModule,
     MatPaginatorModule,
+    MatProgressSpinnerModule,
     AsyncPipe,
     DatePipe,
     MatFormFieldModule,
@@ -88,6 +89,9 @@ export class DataTable<T extends { id: string }> implements OnInit {
   viewMode: 'cards' | 'table' = 'cards';
   isMobile = false;
   itemToDelete: T | null = null;
+  imageLoadingState = new Map<string, boolean>();
+  imageErrorState = new Map<string, boolean>();
+  itemLoadingState = new Map<string, boolean>();
 
   dateRange: DateRange = {
     start: null,
@@ -124,7 +128,7 @@ export class DataTable<T extends { id: string }> implements OnInit {
     if (this.isMobile) {
       this.viewMode = this.enableCardsView ? 'cards' : 'table';
     } else {
-      this.viewMode = 'table';
+      this.viewMode = this.defaultViewMode;
     }
   }
 
@@ -214,7 +218,12 @@ export class DataTable<T extends { id: string }> implements OnInit {
   }
 
   navigateToEdit(id: string) {
+    this.itemLoadingState.set(id, true);
     this.router.navigate([`${this.basePath}/editar`, id]);
+  }
+
+  isItemLoading(itemId: string): boolean {
+    return this.itemLoadingState.get(itemId) ?? false;
   }
 
   confirmDelete(item: T) {
@@ -229,20 +238,35 @@ export class DataTable<T extends { id: string }> implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && this.deleteService && this.itemToDelete) {
+        // Mark item as loading while being deleted
+        this.itemLoadingState.set(this.itemToDelete.id, true);
+
         this.deleteService.delete(this.itemToDelete.id).subscribe({
           next: () => {
             this.pageChange.emit({
-              pageIndex: this.pageIndex,
+              pageIndex: 0,
               pageSize: this.pageSize,
               length: 0
             });
+
+            this.pageIndex = 0;
           },
           error: (error) => {
             console.error('Erro ao excluir item:', error);
+            if (this.itemToDelete) {
+              this.itemLoadingState.delete(this.itemToDelete.id);
+            }
+          },
+          complete: () => {
+            if (this.itemToDelete) {
+              this.itemLoadingState.delete(this.itemToDelete.id);
+            }
+            this.itemToDelete = null;
           }
         });
+      } else {
+        this.itemToDelete = null;
       }
-      this.itemToDelete = null;
     });
   }
 

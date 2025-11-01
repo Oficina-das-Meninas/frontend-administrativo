@@ -51,6 +51,11 @@ export class LayoutComponent implements OnInit {
         path: "/eventos"
       },
       {
+        matIcon: 'business',
+        title: 'Parceiros',
+        path: '/parceiros',
+      },  
+      {
         matIcon: "volunteer_activism",
         title: "Doações",
         path: "/doacoes"

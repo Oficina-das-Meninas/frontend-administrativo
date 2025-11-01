@@ -44,6 +44,7 @@
   background-color: rgba(186, 0, 92, 0.08) !important;
   border-color: var(--mat-sys-primary, #ba005c) !important;
   border-width: 2px !important;
+  border-radius: 0.7rem !important;
 
   .upload-icon {
     color: var(--mat-sys-primary, #ba005c);
@@ -53,5 +54,12 @@
   .upload-text {
     color: var(--mat-sys-primary, #ba005c);
     font-weight: 600;
+  }
+}
+
+.flex.flex-col.gap-3.dragging {
+  .relative {
+    border-color: var(--mat-sys-primary, #ba005c) !important;
+    background-color: rgba(186, 0, 92, 0.05) !important;
   }
 }

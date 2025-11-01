@@ -6,6 +6,7 @@
   [enableDateFilter]="true"
   [cardTemplate]="eventCardTemplate"
   titleProperty="title"
+  [deleteService]="eventService"
   basePath="/eventos"
   (search)="onSearch($event)"
   (clearSearch)="onClearSearch()"
@@ -14,15 +15,17 @@
   (clearFilters)="onClearFilters()">
 </app-data-table>
 
-<ng-template #eventCardTemplate let-event let-editFn="editFn" let-deleteFn="deleteFn">
-  <app-event-card
-    [eventId]="event.id"
-    [eventTitle]="event.title"
+<ng-template #eventCardTemplate let-event let-editFn="editFn" let-deleteFn="deleteFn" let-isLoadingFn="isLoadingFn">
+  <app-item-card
+    [itemId]="event.id"
+    [itemTitle]="event.title"
     [description]="event.location ?? 'Local não informado'"
     [imageUrl]="event.previewImageUrl"
     [date]="event.eventDate"
+    [isExternalLoading]="isLoadingFn(event.id)"
+    basePath="/eventos"
     (edit)="editFn(event.id)"
     (delete)="deleteFn(event)"
-    class="w-full">
-  </app-event-card>
+    class="w-full flex justify-center items-center">
+  </app-item-card>
 </ng-template>

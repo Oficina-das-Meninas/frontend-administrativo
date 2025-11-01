@@ -5,7 +5,7 @@ import { RouterOutlet } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { HeaderComponent } from "./header/header.component";
 import { SidenavComponent } from "./sidenav/sidenav.component";
-import { NavItem } from '../../models/navItem';
+import { NavItem } from '../../models/nav-item';
 import { Profile } from '../../models/profile';
 
 @Component({
@@ -50,6 +50,11 @@ export class LayoutComponent implements OnInit {
         title: "Eventos",
         path: "/eventos"
       },
+      {
+        matIcon: "volunteer_activism",
+        title: "Doações",
+        path: "/doacoes"
+      }
     ];
 
     this.menuItems = [

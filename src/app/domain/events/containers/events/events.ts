@@ -1,12 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Observable } from 'rxjs';
-import { DataTable, TableColumn } from '../../../../shared/components/data-table/data-table';
+import { DataTable } from '../../../../shared/components/data-table/data-table';
 import { DateRange } from '../../../../shared/models/date-range';
 import { EventCard } from '../../components/event-card/event-card';
 import { EventFilters } from '../../models/event-filters';
-import { EventPage } from '../../models/event-page';
 import { EventService } from '../../services/event-service';
+import { DataPage, TableColumn } from '../../../../shared/models/data-table-helpers';
+import { Event } from '../../models/event';
 
 @Component({
   selector: 'app-events',
@@ -16,8 +17,9 @@ import { EventService } from '../../services/event-service';
   ],
   templateUrl: './events.html'
 })
+
 export class Events implements OnInit {
-  events$: Observable<EventPage> | null = null;
+  events$: Observable<DataPage<Event>> | null = null;
 
   columns: TableColumn[] = [
     { key: 'title', header: 'Título', type: 'text' },

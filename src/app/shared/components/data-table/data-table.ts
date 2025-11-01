@@ -1,55 +1,43 @@
-import { AsyncPipe, DatePipe, NgTemplateOutlet } from '@angular/common';
-import { Component, EventEmitter, HostListener, inject, Input, OnInit, Output, TemplateRef } from '@angular/core';
+import { AsyncPipe, DatePipe, NgTemplateOutlet, CommonModule } from '@angular/common';
+import { Component, EventEmitter, HostListener, inject, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { DateRange } from '../../models/date-range';
 import { CalendarFilter } from '../calendar-filter/calendar-filter';
+import { SearchInput } from '../search-input/search-input';
+import { DateRange } from '../../models/date-range';
 import { ConfirmDeleteDialog } from '../confirm-delete-dialog/confirm-delete-dialog';
 import { FlowerSpinner } from '../flower-spinner/flower-spinner';
-import { SearchInput } from '../search-input/search-input';
-
-export interface TableColumn {
-  key: string;
-  header: string;
-  type?: 'text' | 'date' | 'image';
-}
-
-export interface DataPage<T> {
-  data: T[];
-  totalElements: number;
-  totalPages: number;
-}
-
-export interface DeleteService {
-  delete(id: string): Observable<any>;
-}
+import { DataPage, DeleteService, TableColumn } from '../../models/data-table-helpers';
 
 @Component({
   selector: 'app-data-table',
   imports: [
     MatTableModule,
+    MatSortModule,
     MatIconModule,
     MatButtonModule,
     MatMenuModule,
     MatCardModule,
     MatPaginatorModule,
-    MatProgressSpinnerModule,
     AsyncPipe,
     DatePipe,
     MatFormFieldModule,
+    MatSelectModule,
     MatInputModule,
+    CommonModule,
     CalendarFilter,
     MatTooltipModule,
     MatButtonToggleModule,
@@ -62,7 +50,10 @@ export interface DeleteService {
   styleUrl: './data-table.scss',
 })
 export class DataTable<T extends { id: string }> implements OnInit {
+  @Input() showActions = true;
+  @Input() enableSort = false;
   @Input() dataTitle = '';
+  @Input() searchPlaceholder = 'Buscar...';
   @Input() data$: Observable<DataPage<T>> | null = null;
   @Input() columns: TableColumn[] = [];
   @Input() enableCardsView = true;
@@ -72,7 +63,19 @@ export class DataTable<T extends { id: string }> implements OnInit {
   @Input() deleteService: DeleteService | null = null;
   @Input() cardTemplate: TemplateRef<any> | null = null;
   @Input() titleProperty = 'title';
-  @Input() defaultViewMode: 'cards' | 'table' = 'table';
+
+  @ViewChild(MatSort) sort!: MatSort;
+
+  @Input() selectFilters: Array<{
+    key: string;
+    label: string;
+    options: Array<{ value: any; label: string }>;
+    multiple?: boolean;
+  }> = [];
+
+  @Output() selectFiltersChange = new EventEmitter<Record<string, any>>();
+
+  selectedFilters: Record<string, any> = {};
 
   @Output() search = new EventEmitter<string>();
   @Output() clearSearch = new EventEmitter<void>();
@@ -85,9 +88,6 @@ export class DataTable<T extends { id: string }> implements OnInit {
   viewMode: 'cards' | 'table' = 'cards';
   isMobile = false;
   itemToDelete: T | null = null;
-  imageLoadingState = new Map<string, boolean>();
-  imageErrorState = new Map<string, boolean>();
-  itemLoadingState = new Map<string, boolean>();
 
   dateRange: DateRange = {
     start: null,
@@ -98,7 +98,11 @@ export class DataTable<T extends { id: string }> implements OnInit {
   private dialog = inject(MatDialog);
 
   get displayedColumns(): string[] {
-    return [...this.columns.map(col => col.key), 'acoes'];
+    const cols = [...this.columns.map(col => col.key)];
+    if (this.showActions) {
+      cols.push('acoes');
+    }
+    return cols;
   }
 
   ngOnInit() {
@@ -120,7 +124,7 @@ export class DataTable<T extends { id: string }> implements OnInit {
     if (this.isMobile) {
       this.viewMode = this.enableCardsView ? 'cards' : 'table';
     } else {
-      this.viewMode = this.defaultViewMode;
+      this.viewMode = 'table';
     }
   }
 
@@ -134,6 +138,57 @@ export class DataTable<T extends { id: string }> implements OnInit {
 
   onClearSearch() {
     this.clearSearch.emit();
+  }
+
+  onSelectFilterChange(key: string, value: any) {
+    const filterDef = this.selectFilters.find(f => f.key === key);
+    const isMultiple = filterDef?.multiple === true;
+
+    if (value === undefined || value === null) {
+      delete this.selectedFilters[key];
+    } else if (isMultiple) {
+      if (!this.selectedFilters[key]) {
+        this.selectedFilters[key] = [value];
+      } else {
+        const currentValues = this.selectedFilters[key];
+        const valueIndex = currentValues.indexOf(value);
+
+        if (valueIndex === -1) {
+          this.selectedFilters[key] = [...currentValues, value];
+        } else {
+          this.selectedFilters[key] = currentValues.filter((v: any) => v !== value);
+
+          if (this.selectedFilters[key].length === 0) {
+            delete this.selectedFilters[key];
+          }
+        }
+      }
+    } else {
+      this.selectedFilters[key] = value;
+    }
+
+    this.selectFiltersChange.emit({ ...this.selectedFilters });
+
+    this.pageIndex = 0;
+    try {
+      const evt: PageEvent = { pageIndex: 0, pageSize: this.pageSize, length: 0 };
+      this.refresh(evt);
+    } catch (e) {}
+  }
+
+  clearSelectFilters() {
+    this.selectedFilters = {};
+    this.selectFiltersChange.emit({});
+    this.pageIndex = 0;
+    try {
+      const evt: PageEvent = { pageIndex: 0, pageSize: this.pageSize, length: 0 };
+      this.refresh(evt);
+    } catch (e) {
+    }
+  }
+
+  hasSelectedFilters(): boolean {
+    return Object.keys(this.selectedFilters).length > 0;
   }
 
   refresh(pageEvent: PageEvent) {
@@ -159,12 +214,7 @@ export class DataTable<T extends { id: string }> implements OnInit {
   }
 
   navigateToEdit(id: string) {
-    this.itemLoadingState.set(id, true);
     this.router.navigate([`${this.basePath}/editar`, id]);
-  }
-
-  isItemLoading(itemId: string): boolean {
-    return this.itemLoadingState.get(itemId) ?? false;
   }
 
   confirmDelete(item: T) {
@@ -179,57 +229,37 @@ export class DataTable<T extends { id: string }> implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && this.deleteService && this.itemToDelete) {
-        // Mark item as loading while being deleted
-        this.itemLoadingState.set(this.itemToDelete.id, true);
-
         this.deleteService.delete(this.itemToDelete.id).subscribe({
           next: () => {
             this.pageChange.emit({
-              pageIndex: 0,
+              pageIndex: this.pageIndex,
               pageSize: this.pageSize,
               length: 0
             });
-
-            this.pageIndex = 0;
           },
           error: (error) => {
             console.error('Erro ao excluir item:', error);
-            if (this.itemToDelete) {
-              this.itemLoadingState.delete(this.itemToDelete.id);
-            }
-          },
-          complete: () => {
-            if (this.itemToDelete) {
-              this.itemLoadingState.delete(this.itemToDelete.id);
-            }
-            this.itemToDelete = null;
           }
         });
-      } else {
-        this.itemToDelete = null;
       }
+      this.itemToDelete = null;
     });
   }
 
   getCellValue(item: any, column: TableColumn): any {
-    return item[column.key];
-  }
+    const value = item[column.key];
 
-  isImageLoading(itemId: string): boolean {
-    return this.imageLoadingState.get(itemId) ?? true;
-  }
+    if (column.type === 'currency') {
+      try {
+        const num = typeof value === 'number' ? value : parseFloat(value);
+        if (!isNaN(num)) {
+          return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
+        }
+      } catch (e) {
+        return value;
+      }
+    }
 
-  isImageError(itemId: string): boolean {
-    return this.imageErrorState.get(itemId) ?? false;
-  }
-
-  onImageLoad(itemId: string) {
-    this.imageLoadingState.set(itemId, false);
-    this.imageErrorState.set(itemId, false);
-  }
-
-  onImageError(itemId: string) {
-    this.imageLoadingState.set(itemId, false);
-    this.imageErrorState.set(itemId, true);
+    return value;
   }
 }

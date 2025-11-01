@@ -4,11 +4,9 @@ import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { toLocalDate } from '../../../shared/components/utils/date-utils';
 import { ImageService } from '../../../shared/services/image-service';
-import { Event } from '../models/event';
 import { EventFilters } from '../models/event-filters';
-import { EventListResponse } from '../models/event-list-response';
-import { EventPage } from '../models/event-page';
-import { EventResponse } from '../models/event-response';
+import { DataPage } from '../../../shared/models/data-table-helpers';
+import { Event } from '../models/event';
 
 @Injectable({
   providedIn: 'root',
@@ -18,14 +16,14 @@ export class EventService {
   private httpClient = inject(HttpClient);
   private imageService = inject(ImageService);
 
-  list(page: number, size: number): Observable<EventPage> {
+  list(page: number, size: number): Observable<DataPage<Event>> {
     return this.getFilteredEvents({
       page,
       pageSize: size
     });
   }
 
-  getFilteredEvents(filters: EventFilters): Observable<EventPage> {
+  getFilteredEvents(filters: EventFilters): Observable<DataPage<Event>> {
     let params = new HttpParams();
 
     params = params.set('page', (filters.page ?? 0).toString());
@@ -43,21 +41,22 @@ export class EventService {
     }
 
     return this.httpClient
-      .get<EventListResponse>(this.API_URL, { params })
+      .get<any>(this.API_URL, { params })
       .pipe(
-        map((eventPage: EventListResponse) => {
-          const items = eventPage.data.contents;
+        map((resp: any) => {
+          const page = resp ?? {};
+          const items = Array.isArray(page.data.contents) ? page.data.contents : [];
 
-          const mappedItems = items.map((ev: any) => ({
+          const mapped = items.map((ev: any) => ({
             ...ev,
             previewImageUrl: this.imageService.getPubImage(ev.previewImageUrl)
           }));
 
           return {
-            data: mappedItems,
-            totalElements: eventPage.data.totalElements,
-            totalPages: eventPage.data.totalPages,
-          } as EventPage;
+            data: mapped,
+            totalElements: typeof page.totalElements === 'number' ? page.totalElements : mapped.length,
+            totalPages: typeof page.totalPages === 'number' ? page.totalPages : 0
+          } as DataPage<Event>;
         })
       );
   }
@@ -67,8 +66,8 @@ export class EventService {
   }
 
   getById(eventId: string): Observable<Event> {
-    return this.httpClient.get<EventResponse>(`${this.API_URL}/${eventId}`).pipe(
-      map((res: EventResponse) => {
+    return this.httpClient.get<any>(`${this.API_URL}/${eventId}`).pipe(
+      map((res: any) => {
         const event = res.data;
         return {
           ...event,

@@ -8,9 +8,9 @@ import { Profile } from '../../../models/profile';
 @Component({
   selector: 'app-header',
   imports: [
-    MatMenuModule, 
-    BreadcrumbComponent, 
-    MatMenuTrigger, 
+    MatMenuModule,
+    BreadcrumbComponent,
+    MatMenuTrigger,
     RouterLink
   ],
   templateUrl: './header.component.html',

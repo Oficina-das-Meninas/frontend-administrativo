@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild, TemplateRef, AfterViewInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { DataTable } from '../../../shared/components/data-table/data-table';
 import { DataPage, TableColumn } from '../../../shared/models/data-table-helpers';
 import { Donation } from '../models/donation';
@@ -7,29 +8,67 @@ import { DonationsService } from '../services/donations-service';
 
 @Component({
   selector: 'app-donations',
-  imports: [ DataTable ],
+  imports: [ DataTable, CommonModule ],
   templateUrl: './donations.html'
 })
-export class Donations {
+export class Donations implements AfterViewInit {
+  @ViewChild('donationTypeTemplate') donationTypeTemplate!: TemplateRef<any>;
+
   donations$: Observable<DataPage<Donation>> | null = null;
 
   columns: TableColumn[] = [
-    { key: 'donorName', header: 'Doador', type: 'text' },
-    { key: 'value', header: 'Valor', type: 'currency' },
-    { key: 'donationAt', header: 'Data', type: 'date' },
-    { key: 'donationType', header: 'Tipo', type: 'custom' },
-    { key: 'status', header: 'Status', type: 'text' }
+    { key: 'donorName', header: 'Doador', type: 'text', sortable: true, sortField: 'donorName' },
+    { key: 'value', header: 'Valor', type: 'currency', sortable: true, sortField: 'value' },
+    { key: 'donationAt', header: 'Data', type: 'date', sortable: true, sortField: 'donationAt' },
+    {
+      key: 'donationType',
+      header: 'Tipo',
+      type: 'custom',
+      sortable: true,
+      sortField: 'donationType'
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      type: 'badge',
+      badgeConfig: {
+        'pendente': 'yellow',
+        'concluído': 'green',
+        'cancelado': 'gray'
+      },
+      sortable: true,
+      sortField: 'status'
+    }
   ];
 
   searchTerm = '';
   currentFilters: any = {};
   pageIndex = 0;
   pageSize = 10;
+  currentSortField: string = '';
+  currentSortDirection: 'asc' | 'desc' = 'asc';
 
   private donationService = inject(DonationsService);
 
   ngOnInit() {
     this.loadDonationsWithFilters();
+  }
+
+  ngAfterViewInit() {
+    if (this.donationTypeTemplate) {
+      this.columns[3].cellTemplate = this.donationTypeTemplate;
+    }
+  }
+
+  getBadgeStyles(value: string): { bgColor: string; textColor: string } {
+    const colors: Record<string, { bgColor: string; textColor: string }> = {
+      'ativa': { bgColor: 'bg-green-200', textColor: 'text-green-900' },
+      'inativa': { bgColor: 'bg-gray-200', textColor: 'text-gray-900' },
+      'pendente': { bgColor: 'bg-yellow-200', textColor: 'text-yellow-900' },
+      'concluído': { bgColor: 'bg-green-200', textColor: 'text-green-900' },
+      'cancelado': { bgColor: 'bg-gray-200', textColor: 'text-gray-900' }
+    };
+    return colors[value.toLowerCase()] || { bgColor: 'bg-gray-200', textColor: 'text-gray-900' };
   }
 
   onSearch(searchTerm: string) {
@@ -74,6 +113,15 @@ export class Donations {
         delete this.currentFilters[k];
       }
     });
+    this.pageIndex = 0;
+    this.loadDonationsWithFilters();
+  }
+
+  onSortChange(event: { sortField: string; sortDirection: 'asc' | 'desc' }) {
+    this.currentSortField = event.sortField;
+    this.currentSortDirection = event.sortDirection;
+    this.currentFilters.sortField = event.sortField;
+    this.currentFilters.sortDirection = event.sortDirection;
     this.pageIndex = 0;
     this.loadDonationsWithFilters();
   }

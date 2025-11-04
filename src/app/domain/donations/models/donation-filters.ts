@@ -6,4 +6,6 @@ export interface DonationFilters {
   endDate?: Date;
   status?: string;
   type?: string;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
 }

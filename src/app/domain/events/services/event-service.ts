@@ -44,8 +44,8 @@ export class EventService {
       .get<any>(this.API_URL, { params })
       .pipe(
         map((resp: any) => {
-          const page = resp ?? {};
-          const items = Array.isArray(page.data.contents) ? page.data.contents : [];
+          const page = resp?.data ?? {};
+          const items = Array.isArray(page.contents) ? page.contents : [];
 
           const mapped = items.map((ev: any) => ({
             ...ev,

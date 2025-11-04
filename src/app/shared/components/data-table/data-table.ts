@@ -20,7 +20,7 @@ import { SearchInput } from '../search-input/search-input';
 import { DateRange } from '../../models/date-range';
 import { ConfirmDeleteDialog } from '../confirm-delete-dialog/confirm-delete-dialog';
 import { FlowerSpinner } from '../flower-spinner/flower-spinner';
-import { DataPage, DeleteService, TableColumn } from '../../models/data-table-helpers';
+import { DataPage, DeleteService, TableColumn, BadgeColorConfig } from '../../models/data-table-helpers';
 
 @Component({
   selector: 'app-data-table',
@@ -82,12 +82,16 @@ export class DataTable<T extends { id: string }> implements OnInit {
   @Output() pageChange = new EventEmitter<PageEvent>();
   @Output() dateFilter = new EventEmitter<DateRange>();
   @Output() clearFilters = new EventEmitter<void>();
+  @Output() sortChange = new EventEmitter<{ sortField: string; sortDirection: 'asc' | 'desc' }>();
 
   pageIndex = 0;
   pageSize = 10;
   viewMode: 'cards' | 'table' = 'cards';
   isMobile = false;
   itemToDelete: T | null = null;
+
+  currentSortField: string = '';
+  currentSortDirection: 'asc' | 'desc' = 'asc';
 
   dateRange: DateRange = {
     start: null,
@@ -209,6 +213,33 @@ export class DataTable<T extends { id: string }> implements OnInit {
     this.clearFilters.emit();
   }
 
+  onSortChange(column: TableColumn) {
+    if (!column.sortable) return;
+
+    const sortField = column.sortField || column.key;
+
+    if (this.currentSortField === sortField) {
+      this.currentSortDirection = this.currentSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.currentSortField = sortField;
+      this.currentSortDirection = 'asc';
+    }
+
+    this.sortChange.emit({
+      sortField,
+      sortDirection: this.currentSortDirection
+    });
+
+    this.pageIndex = 0;
+  }
+
+  getSortIndicator(column: TableColumn): string {
+    if (!column.sortable) return '';
+    const sortField = column.sortField || column.key;
+    if (this.currentSortField !== sortField) return '';
+    return this.currentSortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward';
+  }
+
   navigateToCreate() {
     this.router.navigate([`${this.basePath}/cadastro`]);
   }
@@ -247,19 +278,31 @@ export class DataTable<T extends { id: string }> implements OnInit {
   }
 
   getCellValue(item: any, column: TableColumn): any {
-    const value = item[column.key];
+    return item[column.key];
+  }
 
-    if (column.type === 'currency') {
-      try {
-        const num = typeof value === 'number' ? value : parseFloat(value);
-        if (!isNaN(num)) {
-          return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
-        }
-      } catch (e) {
-        return value;
-      }
+  getBadgeStyles(value: any, column: TableColumn | { badgeConfig?: BadgeColorConfig }): { bgColor: string; textColor: string } | null {
+    if (!value || !column.badgeConfig) {
+      return this.getDefaultBadgeStyles();
     }
 
-    return value;
+    const valueKey = value.toLowerCase();
+    const colorName = column.badgeConfig[valueKey];
+
+    if (!colorName) {
+      return this.getDefaultBadgeStyles();
+    }
+
+    const bgColor = `bg-${colorName}-200`;
+    const textColor = `text-${colorName}-900`;
+
+    return { bgColor, textColor };
+  }
+
+  private getDefaultBadgeStyles() {
+    return {
+      bgColor: 'bg-gray-200',
+      textColor: 'text-gray-900'
+    };
   }
 }

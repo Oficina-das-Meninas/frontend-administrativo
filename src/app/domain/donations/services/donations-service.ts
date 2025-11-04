@@ -16,17 +16,18 @@ export class DonationsService {
 
   private readonly STATUS_LABELS: Record<string, string> = {
     PENDING: 'Pendente',
-    PAID: 'Concluído'
+    PAID: 'Concluído',
+    CANCELED: 'Cancelado',
   };
 
   private readonly TYPE_LABELS: Record<string, string> = {
     RECURRING: 'Recorrente',
-    ONE_TIME: 'Única'
+    ONE_TIME: 'Única',
   };
 
   private readonly SPONSOR_STATUS_LABELS: Record<string, string> = {
     ACTIVE: 'Ativa',
-    INACTIVE: 'Inativa'
+    INACTIVE: 'Inativa',
   };
 
   private mapStatusLabel(status?: string): string {
@@ -44,10 +45,14 @@ export class DonationsService {
     return this.SPONSOR_STATUS_LABELS[sponsorStatus] ?? sponsorStatus;
   }
 
+  private formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  }
+
   list(page: number, size: number): Observable<DataPage<Donation>> {
     return this.getFilteredDonations({
       page,
-      pageSize: size
+      pageSize: size,
     });
   }
 
@@ -76,36 +81,41 @@ export class DonationsService {
       params = params.set('donationType', (filters as any).type);
     }
 
-    return this.httpClient
-      .get<any>(this.API_URL, { params })
-      .pipe(
-        map((resp: any) => {
-          const page = resp ?? {};
-          const items = Array.isArray(page.data.contents) ? page.data.contents : [];
+    if (filters.sortField) {
+      params = params.set('sortField', filters.sortField);
+    }
 
-          const mapped = items.map((donation: any) => {
-            const donationTypeRaw = donation.donationType as string | undefined;
-            const typeLabel = donationTypeRaw ? (this.TYPE_LABELS[donationTypeRaw] ?? donationTypeRaw) : '';
-            const sponsorRaw = donation.sponsorStatus ?? null;
-            const sponsorLabel = this.mapSponsorStatusLabel(donation.sponsorStatus);
+    if (filters.sortDirection) {
+      params = params.set('sortDirection', filters.sortDirection);
+    }
 
-            return {
-              ...donation,
-              donorName: this.mapDonorName(donation.donorName),
-              status: this.mapStatusLabel(donation.status),
-              donationType: typeLabel,
-              sponsorStatusLabel: sponsorLabel,
-              sponsorStatusRaw: sponsorRaw
-            } as Donation;
-          });
+    return this.httpClient.get<any>(this.API_URL, { params }).pipe(
+      map((resp: any) => {
+        const page = resp?.data ?? {};
+        const items = Array.isArray(page.contents) ? page.contents : [];
+
+        const mapped = items.map((donation: any) => {
+          const donationTypeRaw = donation.donationType as string | undefined;
+          const typeLabel = donationTypeRaw ? (this.TYPE_LABELS[donationTypeRaw] ?? donationTypeRaw) : '';
+          const sponsorLabel = this.mapSponsorStatusLabel(donation.sponsorStatus);
 
           return {
-            data: mapped,
+            ...donation,
+            donorName: this.mapDonorName(donation.donorName),
+            status: this.mapStatusLabel(donation.status),
+            value: this.formatCurrency(donation.value),
+            donationType: typeLabel,
+            sponsorStatusLabel: sponsorLabel,
+          } as Donation;
+        });
+
+        return {
+          data: mapped,
             totalElements: typeof page.totalElements === 'number' ? page.totalElements : mapped.length,
             totalPages: typeof page.totalPages === 'number' ? page.totalPages : 0
-          } as DataPage<Donation>;
-        })
-      );
+        } as DataPage<Donation>;
+      })
+    );
   }
 
   getById(donationId: string): Observable<any> {

@@ -14,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
   encapsulation: ViewEncapsulation.None,
 })
 export class FormInputComponent implements ControlValueAccessor {
+
   @Input() label: string = '';
   @Input() placeholder: string = '';
   @Input() errorMessage: string = '';
@@ -32,6 +33,7 @@ export class FormInputComponent implements ControlValueAccessor {
 
   value: string = '';
   disabled = false;
+  inputTypeForPassword: 'password' | 'text' = 'password';
 
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};
@@ -55,6 +57,20 @@ export class FormInputComponent implements ControlValueAccessor {
       return '';
     }
     return this.errorMessage;
+  }
+
+  get inputType(): string {
+    if (this.type === 'password') {
+      return this.inputTypeForPassword;
+    }
+    return this.type;
+  }
+
+  get passwordIcon(): string {
+    if (this.inputTypeForPassword === 'password') {
+      return 'visibility_off';
+    }
+    return 'visibility';
   }
 
   writeValue(value: string): void {
@@ -111,4 +127,9 @@ export class FormInputComponent implements ControlValueAccessor {
   onBlur(): void {
     this.onTouched();
   }
+
+  togglePassword(): void {
+    this.inputTypeForPassword = this.inputTypeForPassword === 'password' ? 'text' : 'password';
+  }
+
 }

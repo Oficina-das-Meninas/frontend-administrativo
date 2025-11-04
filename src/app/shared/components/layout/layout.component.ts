@@ -64,9 +64,9 @@ export class LayoutComponent implements OnInit {
 
     this.menuItems = [
       {
-        matIcon: "logout",
-        title: "Sair",
-        path: "/"
+        matIcon: 'logout',
+        title: 'Sair',
+        path: '/logout',
       },
     ];
 

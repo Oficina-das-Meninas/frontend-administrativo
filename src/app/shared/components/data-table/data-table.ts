@@ -1,4 +1,4 @@
-import { AsyncPipe, DatePipe, NgTemplateOutlet, CommonModule } from '@angular/common';
+import { AsyncPipe, NgTemplateOutlet, CommonModule } from '@angular/common';
 import { Component, EventEmitter, HostListener, inject, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -33,7 +33,6 @@ import { DataPage, DeleteService, TableColumn, BadgeColorConfig } from '../../mo
     MatCardModule,
     MatPaginatorModule,
     AsyncPipe,
-    DatePipe,
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
@@ -69,13 +68,13 @@ export class DataTable<T extends { id: string }> implements OnInit {
   @Input() selectFilters: Array<{
     key: string;
     label: string;
-    options: Array<{ value: any; label: string }>;
+    options: Array<{ value: unknown; label: string }>;
     multiple?: boolean;
   }> = [];
 
-  @Output() selectFiltersChange = new EventEmitter<Record<string, any>>();
+  @Output() selectFiltersChange = new EventEmitter<Record<string, unknown>>();
 
-  selectedFilters: Record<string, any> = {};
+  selectedFilters: Record<string, unknown> = {};
 
   @Output() search = new EventEmitter<string>();
   @Output() clearSearch = new EventEmitter<void>();
@@ -144,7 +143,7 @@ export class DataTable<T extends { id: string }> implements OnInit {
     this.clearSearch.emit();
   }
 
-  onSelectFilterChange(key: string, value: any) {
+  onSelectFilterChange(key: string, value: unknown) {
     const filterDef = this.selectFilters.find(f => f.key === key);
     const isMultiple = filterDef?.multiple === true;
 
@@ -154,15 +153,15 @@ export class DataTable<T extends { id: string }> implements OnInit {
       if (!this.selectedFilters[key]) {
         this.selectedFilters[key] = [value];
       } else {
-        const currentValues = this.selectedFilters[key];
+        const currentValues = this.selectedFilters[key] as unknown[];
         const valueIndex = currentValues.indexOf(value);
 
         if (valueIndex === -1) {
           this.selectedFilters[key] = [...currentValues, value];
         } else {
-          this.selectedFilters[key] = currentValues.filter((v: any) => v !== value);
+          this.selectedFilters[key] = currentValues.filter((v: unknown) => v !== value);
 
-          if (this.selectedFilters[key].length === 0) {
+          if ((this.selectedFilters[key] as unknown[]).length === 0) {
             delete this.selectedFilters[key];
           }
         }
@@ -251,7 +250,7 @@ export class DataTable<T extends { id: string }> implements OnInit {
   confirmDelete(item: T) {
     this.itemToDelete = item;
 
-    const itemTitle = (item as any)[this.titleProperty] || 'este item';
+    const itemTitle = String((item as Record<string, unknown>)[this.titleProperty]) || 'este item';
 
     const dialogRef = this.dialog.open(ConfirmDeleteDialog, {
       width: '400px',
@@ -277,16 +276,16 @@ export class DataTable<T extends { id: string }> implements OnInit {
     });
   }
 
-  getCellValue(item: any, column: TableColumn): any {
-    return item[column.key];
+  getCellValue(item: T, column: TableColumn): unknown {
+    return item[column.key as keyof T];
   }
 
-  getBadgeStyles(value: any, column: TableColumn | { badgeConfig?: BadgeColorConfig }): { bgColor: string; textColor: string } | null {
+  getBadgeStyles(value: unknown, column: TableColumn | { badgeConfig?: BadgeColorConfig }): { bgColor: string; textColor: string } | null {
     if (!value || !column.badgeConfig) {
       return this.getDefaultBadgeStyles();
     }
 
-    const valueKey = value.toLowerCase();
+    const valueKey = String(value).toLowerCase();
     const colorName = column.badgeConfig[valueKey];
 
     if (!colorName) {
@@ -304,5 +303,61 @@ export class DataTable<T extends { id: string }> implements OnInit {
       bgColor: 'bg-gray-200',
       textColor: 'text-gray-900'
     };
+  }
+
+  isFilterValueSelected(key: string, value: unknown): boolean {
+    const filter = this.selectedFilters[key];
+    if (Array.isArray(filter)) {
+      return filter.indexOf(value) > -1;
+    }
+    return false;
+  }
+
+  getSelectedFiltersArray(key: string): unknown[] {
+    const filter = this.selectedFilters[key];
+    return Array.isArray(filter) ? filter : [];
+  }
+
+  formatCurrencyValue(value: any): string {
+    if (value === null || value === undefined) return '';
+
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(numValue);
+  }
+
+  formatDateValue(value: unknown): string | null {
+    if (value instanceof Date) {
+      const day = value.getDate().toString().padStart(2, '0');
+      const month = (value.getMonth() + 1).toString().padStart(2, '0');
+      const year = value.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+    if (typeof value === 'string') {
+      try {
+        const date = new Date(value);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      } catch {
+        return null;
+      }
+    }
+    if (typeof value === 'number') {
+      try {
+        const date = new Date(value);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      } catch {
+        return null;
+      }
+    }
+    return null;
   }
 }

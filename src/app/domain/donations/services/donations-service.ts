@@ -6,6 +6,7 @@ import { DataPage } from '../../../shared/models/data-table-helpers';
 import { Donation } from '../models/donation';
 import { toLocalDate } from '../../../shared/components/utils/date-utils';
 import { DonationFilters } from '../models/donation-filters';
+import { ApiPagedResponse } from '../../../shared/models/api-response';
 
 @Injectable({
   providedIn: 'root'
@@ -73,12 +74,12 @@ export class DonationsService {
       params = params.set('endDate', toLocalDate(filters.endDate));
     }
 
-    if ((filters as any).status) {
-      params = params.set('status', (filters as any).status);
+    if ((filters).status) {
+      params = params.set('status', (filters).status);
     }
 
-    if ((filters as any).type) {
-      params = params.set('donationType', (filters as any).type);
+    if ((filters).type) {
+      params = params.set('donationType', (filters).type);
     }
 
     if (filters.sortField) {
@@ -89,40 +90,44 @@ export class DonationsService {
       params = params.set('sortDirection', filters.sortDirection);
     }
 
-    return this.httpClient.get<any>(this.API_URL, { params }).pipe(
-      map((resp: any) => {
-        const page = resp?.data ?? {};
-        const items = Array.isArray(page.contents) ? page.contents : [];
+    return this.httpClient.get<ApiPagedResponse<Donation>>(this.API_URL, { params }).pipe(
+      map((resp) => {
+        const contents = resp.data?.contents ?? [];
 
-        const mapped = items.map((donation: any) => {
-          const donationTypeRaw = donation.donationType as string | undefined;
+        const mapped = contents.map((donation) => {
+          const donationTypeRaw = donation.donationType;
           const typeLabel = donationTypeRaw ? (this.TYPE_LABELS[donationTypeRaw] ?? donationTypeRaw) : '';
-          const sponsorLabel = this.mapSponsorStatusLabel(donation.sponsorStatus);
+          const sponsorLabel = this.mapSponsorStatusLabel(donation.sponsorStatus ?? undefined);
 
           return {
             ...donation,
-            donorName: this.mapDonorName(donation.donorName),
             status: this.mapStatusLabel(donation.status),
-            value: this.formatCurrency(donation.value),
             donationType: typeLabel,
+            donorName: this.mapDonorName(donation.donorName ?? undefined),
             sponsorStatusLabel: sponsorLabel,
           } as Donation;
         });
 
         return {
           data: mapped,
-            totalElements: typeof page.totalElements === 'number' ? page.totalElements : mapped.length,
-            totalPages: typeof page.totalPages === 'number' ? page.totalPages : 0
+          totalElements: resp.data?.totalElements ?? 0,
+          totalPages: resp.data?.totalPages ?? 0
         } as DataPage<Donation>;
       })
     );
   }
 
-  getById(donationId: string): Observable<any> {
-    return this.httpClient.get<any>(`${this.API_URL}/${donationId}`).pipe(
-      map((donation) => ({
-        ...donation
-      }))
+  getById(donationId: string): Observable<Donation> {
+    return this.httpClient.get<ApiPagedResponse<Donation>>(`${this.API_URL}/${donationId}`).pipe(
+      map((resp) => {
+        const donation = resp.data?.contents?.[0] ?? resp.data as unknown as Donation;
+        return {
+          ...donation,
+          status: this.mapStatusLabel(donation.status),
+          donationType: donation.donationType,
+          donorName: this.mapDonorName(donation.donorName ?? undefined),
+        } as Donation;
+      })
     );
   }
 }

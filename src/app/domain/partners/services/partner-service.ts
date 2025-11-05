@@ -6,6 +6,7 @@ import { ImageService } from '../../../shared/services/image-service';
 import { Partner } from '../models/partner';
 import { PartnerResponse } from '../models/partner-response';
 import { DataPage } from '../../../shared/models/data-table-helpers';
+import { ApiPagedResponse } from '../../../shared/models/api-response';
 
 export interface PartnerFilters {
   page?: number;
@@ -39,21 +40,20 @@ export class PartnerService {
     }
 
     return this.httpClient
-      .get<any>(this.API_URL, { params })
+      .get<ApiPagedResponse<Partner>>(this.API_URL, { params })
       .pipe(
-        map((resp: any) => {
-          const page = resp?.data ?? {};
-          const items = Array.isArray(page.contents) ? page.contents : [];
+        map((resp) => {
+          const contents = resp.data?.contents ?? [];
 
-          const mapped = items.map((partner: any) => ({
+          const mapped = contents.map((partner: Partner) => ({
             ...partner,
             previewImageUrl: this.imageService.getPubImage(partner.previewImageUrl)
           }));
 
           return {
             data: mapped,
-            totalElements: typeof page.totalElements === 'number' ? page.totalElements : mapped.length,
-            totalPages: typeof page.totalPages === 'number' ? page.totalPages : 0
+            totalElements: resp.data?.totalElements ?? 0,
+            totalPages: resp.data?.totalPages ?? 0
           } as DataPage<Partner>;
         })
       );

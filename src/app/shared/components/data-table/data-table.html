@@ -67,7 +67,7 @@
                         mat-menu-item
                         class="flex items-center text-sm h-10"
                         (click)="onSelectFilterChange(sf.key, opt.value)">
-                        @if (selectedFilters[sf.key] && selectedFilters[sf.key].indexOf && selectedFilters[sf.key].indexOf(opt.value) > -1) {
+                        @if (isFilterValueSelected(sf.key, opt.value)) {
                           <mat-icon [style.color]="'var(--mat-button-toggle-selected-state-text-color, var(--mat-sys-on-secondary-container))'" class="mr-2 text-lg w-4 h-4">check</mat-icon>
                         }
                         {{ opt.label }}
@@ -115,7 +115,7 @@
                     }
                   }
                 } @else {
-                  @for (val of selectedFilters[sf.key]; track val) {
+                  @for (val of getSelectedFiltersArray(sf.key); track val) {
                     @for (opt of sf.options; track $index) {
                       @if (opt.value === val) {
                         <div [style.backgroundColor]="'var(--mat-button-toggle-selected-state-background-color, var(--mat-sys-secondary-container))'" [style.color]="'var(--mat-button-toggle-selected-state-text-color, var(--mat-sys-on-secondary-container))'" class="inline-flex items-center h-8 px-3 rounded-full text-sm">
@@ -166,7 +166,10 @@
                       } @else {
                         @switch (column.type) {
                           @case ('date') {
-                            {{ getCellValue(element, column) | date }}
+                            {{ formatDateValue(getCellValue(element, column)) }}
+                          }
+                          @case ('currency') {
+                            {{ formatCurrencyValue(getCellValue(element, column)) }}
                           }
                           @case ('image') {
                             <div class="size-24 flex items-center justify-center">
@@ -284,10 +287,10 @@
                             } @else {
                               @switch (column.type) {
                                 @case ('date') {
-                                  <span class="inline-block">{{ getCellValue(item, column) | date:'dd/MM/yyyy' }}</span>
+                                  <span class="inline-block">{{ formatDateValue(getCellValue(item, column)) }}</span>
                                 }
                                 @case ('currency') {
-                                  <span class="inline-block">{{ getCellValue(item, column) }}</span>
+                                  <span class="inline-block">{{ formatCurrencyValue(getCellValue(item, column)) }}</span>
                                 }
                                 @case ('badge') {
                                   @if (getCellValue(item, column)) {
@@ -323,9 +326,11 @@
       aria-label="Selecione a página"
       class="relative z-10 mt-6"></mat-paginator>
     } } @else {
-    <div class="flex flex-col items-center gap-4 text-white">
-      <mat-icon>event_busy</mat-icon>
-      <span class="font-medium text-lg">Nenhum item encontrado</span>
+    <div class="flex flex-col items-center justify-center gap-4 py-12 text-gray-500">
+      <mat-icon class="text-5xl">event_busy</mat-icon>
+      <div class="text-center">
+        <span class="font-medium text-lg block mb-1">Nenhum item encontrado</span>
+      </div>
     </div>
     } } @else {
     <div class="w-full min-h-[40vh] flex items-center justify-center">

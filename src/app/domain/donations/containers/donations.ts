@@ -5,6 +5,8 @@ import { DataPage, TableColumn } from '../../../shared/models/data-table-helpers
 import { Donation } from '../models/donation';
 import { Observable } from 'rxjs';
 import { DonationsService } from '../services/donations-service';
+import { DateRange } from '../../../shared/models/date-range';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-donations',
@@ -42,7 +44,7 @@ export class Donations implements AfterViewInit {
   ];
 
   searchTerm = '';
-  currentFilters: any = {};
+  currentFilters: Record<string, unknown> = {};
   pageIndex = 0;
   pageSize = 10;
   currentSortField: string = '';
@@ -83,15 +85,15 @@ export class Donations implements AfterViewInit {
     this.loadDonationsWithFilters();
   }
 
-  onPageChange(pageEvent: any) {
+  onPageChange(pageEvent: PageEvent) {
     this.pageIndex = pageEvent.pageIndex;
     this.pageSize = pageEvent.pageSize;
     this.loadDonationsWithFilters();
   }
 
-  onDateFilter(dateRange: any) {
-    this.currentFilters.startDate = dateRange.start || undefined;
-    this.currentFilters.endDate = dateRange.end || undefined;
+  onDateFilter(dateRange: DateRange) {
+    this.currentFilters['startDate'] = dateRange.start || undefined;
+    this.currentFilters['endDate'] = dateRange.end || undefined;
     this.pageIndex = 0;
     this.loadDonationsWithFilters();
   }
@@ -103,8 +105,8 @@ export class Donations implements AfterViewInit {
     this.loadDonationsWithFilters();
   }
 
-  onSelectFiltersChange(selected: Record<string, any>) {
-    const { status, type, ...otherFilters } = this.currentFilters;
+  onSelectFiltersChange(selected: Record<string, unknown>) {
+    const { status, type, ...otherFilters } = this.currentFilters as Record<string, unknown>;
 
     this.currentFilters = { ...otherFilters, ...selected };
 
@@ -120,8 +122,8 @@ export class Donations implements AfterViewInit {
   onSortChange(event: { sortField: string; sortDirection: 'asc' | 'desc' }) {
     this.currentSortField = event.sortField;
     this.currentSortDirection = event.sortDirection;
-    this.currentFilters.sortField = event.sortField;
-    this.currentFilters.sortDirection = event.sortDirection;
+    this.currentFilters['sortField'] = event.sortField;
+    this.currentFilters['sortDirection'] = event.sortDirection;
     this.pageIndex = 0;
     this.loadDonationsWithFilters();
   }

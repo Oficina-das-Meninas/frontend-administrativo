@@ -7,6 +7,7 @@ import { ImageService } from '../../../shared/services/image-service';
 import { EventFilters } from '../models/event-filters';
 import { DataPage } from '../../../shared/models/data-table-helpers';
 import { Event } from '../models/event';
+import { ApiPagedResponse } from '../../../shared/models/api-response';
 
 @Injectable({
   providedIn: 'root',
@@ -41,21 +42,20 @@ export class EventService {
     }
 
     return this.httpClient
-      .get<any>(this.API_URL, { params })
+      .get<ApiPagedResponse<Event>>(this.API_URL, { params })
       .pipe(
-        map((resp: any) => {
-          const page = resp?.data ?? {};
-          const items = Array.isArray(page.contents) ? page.contents : [];
+        map((resp) => {
+          const contents = resp.data?.contents ?? [];
 
-          const mapped = items.map((ev: any) => ({
+          const mapped = contents.map((ev: Event) => ({
             ...ev,
             previewImageUrl: this.imageService.getPubImage(ev.previewImageUrl)
           }));
 
           return {
             data: mapped,
-            totalElements: typeof page.totalElements === 'number' ? page.totalElements : mapped.length,
-            totalPages: typeof page.totalPages === 'number' ? page.totalPages : 0
+            totalElements: resp.data?.totalElements ?? 0,
+            totalPages: resp.data?.totalPages ?? 0
           } as DataPage<Event>;
         })
       );
@@ -66,13 +66,13 @@ export class EventService {
   }
 
   getById(eventId: string): Observable<Event> {
-    return this.httpClient.get<any>(`${this.API_URL}/${eventId}`).pipe(
-      map((res: any) => {
-        const event = res.data;
+    return this.httpClient.get<ApiPagedResponse<Event>>(`${this.API_URL}/${eventId}`).pipe(
+      map((resp) => {
+        const ev = resp.data as unknown as Event;
         return {
-          ...event,
-          previewImageUrl: this.imageService.getPubImage(event?.previewImageUrl),
-          partnersImageUrl: this.imageService.getPubImage(event?.partnersImageUrl),
+          ...ev,
+          previewImageUrl: this.imageService.getPubImage(ev.previewImageUrl),
+          partnersImageUrl: this.imageService.getPubImage(ev?.partnersImageUrl),
         } as Event;
       })
     );

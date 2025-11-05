@@ -125,6 +125,16 @@ export const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'doacoes',
+        loadComponent: () =>
+          import('./domain/donations/containers/donations').then(
+            (m) => m.Donations
+          ),
+        data: {
+          breadcrumb: 'Doações',
+        },
+      }
     ],
   },
   { path: '**', redirectTo: '/' }

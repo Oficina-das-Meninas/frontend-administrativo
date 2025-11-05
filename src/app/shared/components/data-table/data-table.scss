@@ -52,25 +52,20 @@ mat-button-toggle-group {
   );
 }
 
-// esconde o toggle de visualização no mobile
-.view-toggle-group {
-  @media (max-width: 767px) {
-    display: none !important;
-    visibility: hidden !important;
-    border: none !important;
+mat-card-content {
+  height: 100%;
+}
 
-    .mat-button-toggle {
-      border: none !important;
-      outline: none !important;
-    }
-  }
-
-  @media (min-width: 768px) {
-    display: inline-flex !important;
-    visibility: visible !important;
+button.mat-stroked-button {
+  &.h-\[36px\] {
+    line-height: 34px;
+    padding: 0 12px;
   }
 }
 
-mat-card-content {
-  height: 100%;
+:host ::ng-deep .compact-select {
+  .mat-mdc-option {
+    min-height: 36px;
+    font-size: 14px;
+  }
 }

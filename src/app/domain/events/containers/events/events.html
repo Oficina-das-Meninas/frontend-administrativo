@@ -1,5 +1,6 @@
 <app-data-table
   dataTitle="Eventos"
+  searchPlaceholder="Buscar por título, local..."
   [data$]="events$"
   [columns]="columns"
   [enableDateFilter]="true"
@@ -14,14 +15,13 @@
   (clearFilters)="onClearFilters()">
 </app-data-table>
 
-<ng-template #eventCardTemplate let-event let-editFn="editFn" let-deleteFn="deleteFn" let-isLoadingFn="isLoadingFn">
+<ng-template #eventCardTemplate let-event let-editFn="editFn" let-deleteFn="deleteFn">
   <app-item-card
     [itemId]="event.id"
     [itemTitle]="event.title"
     [description]="event.location ?? 'Local não informado'"
     [imageUrl]="event.previewImageUrl"
     [date]="event.eventDate"
-    [isExternalLoading]="isLoadingFn(event.id)"
     basePath="/eventos"
     (edit)="editFn(event.id)"
     (delete)="deleteFn(event)"

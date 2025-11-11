@@ -1,0 +1,16 @@
+<app-data-table
+  dataTitle="Doadores"
+  [data$]="donors$"
+  [columns]="columns"
+  titleProperty="name"
+  basePath="/doadores"
+  [enableCardsView]="false"
+  [enableCreateButton]="false"
+  [enableDateFilter]="false"
+  [showActions]="false"
+  searchPlaceholder="Buscar por nome, email..."
+  (search)="onSearch($event)"
+  (clearSearch)="onClearSearch()"
+  (pageChange)="onPageChange($event)"
+  (clearFilters)="onClearFilters()">
+</app-data-table>

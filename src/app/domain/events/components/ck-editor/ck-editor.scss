@@ -25,6 +25,10 @@
   --ck-inner-shadow: rgba(186, 0, 92, 0.1);
 }
 
+.ck-powered-by-balloon{
+  display: none !important;
+}
+
 .ck-editor {
   .ck.ck-list__item .ck-button:hover:not(.ck-disabled),
   .ck.ck-list__item .ck-button.ck-on {

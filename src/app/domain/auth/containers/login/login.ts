@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../../auth/services/auth-service';
 import { LoginRequest } from '../../models/login-request';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +24,7 @@ export class Login {
 
   private authService = inject(AuthService);
   private formBuilder = inject(FormBuilder);
+  private router = inject(Router);
 
   constructor() {
     this.loginForm = this.formBuilder.group({
@@ -41,6 +43,7 @@ export class Login {
       this.authService.login(data).subscribe({
         next: () => {
           this.loginForm.reset();
+          this.router.navigate(['/']);
         },
         error: () => {
           this.loginForm.reset();

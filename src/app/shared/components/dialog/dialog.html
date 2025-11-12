@@ -1,4 +1,3 @@
-
 <section class="min-w-[400px]">
   <h2 mat-dialog-title>
     <span class="text-xl font-semibold"> 
@@ -12,7 +11,9 @@
   </mat-dialog-content>
   <mat-dialog-actions>
     <div class="flex gap-1 items-center">
-      <button matButton (click)="onCloseDialog()">Fechar</button>
+      @if (hasCloseButton()) {
+        <button matButton (click)="onCloseDialog()">Fechar</button>
+      }
       <ng-content select="[dialogConfirmButton]"></ng-content>
     </div>
   </mat-dialog-actions>

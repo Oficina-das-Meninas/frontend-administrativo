@@ -179,3 +179,22 @@
   .ck.ck-button.ck-on {
     color: #ffffff !important;
   }
+
+  .ck.ck-word-count {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.75rem 0.5rem 0 0;
+    font-size: 0.75rem;
+    color: var(--mat-sys-on-surface-variant);
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 0.4px;
+    transition: color 0.2s ease;
+
+    &.ck-word-count--exceeded {
+      color: #d32f2f;
+    }
+  }
+
+  .ck-word-count__characters {
+    padding-right: 0.5rem;
+  }

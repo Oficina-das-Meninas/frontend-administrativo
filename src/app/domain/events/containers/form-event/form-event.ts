@@ -89,7 +89,6 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
     previewImage: [[] as File[], [Validators.required, EventValidators.imageValidator]],
   });
 
-  // Snapshot of the initial normalized form value used to detect real changes
   private initialFormValue: any = null;
 
   private updateImageValidators(): void {
@@ -236,12 +235,10 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
       next: () => {
         const successMessage = this.isEditMode() ? 'Evento atualizado com sucesso!' : 'Evento cadastrado com sucesso!';
         this.snackbarService.success(successMessage);
-        // Reseta o formulário e atualiza o estado inicial para um formulário vazio
         this.eventForm.reset();
         this.description.set('');
         this.existingPreviewImageUrl.set('');
         this.existingPartnersImageUrl.set('');
-        // Após resetar, captura o estado vazio como inicial
         this.initialFormValue = this.normalizeValue(this.eventForm.getRawValue());
         this.router.navigate(['/eventos'], { replaceUrl: true });
       },
@@ -327,11 +324,8 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
   }
 
   canDeactivate(): boolean {
-    // Consider there are no changes if the current normalized value equals the
-    // initial snapshot. This handles the case where the user types and then
-    // reverts the input to its original value.
     if (!this.eventForm) return true;
-    if (this.isLoading()) return true; // Permite navegação se estiver carregando (acabou de salvar)
+    if (this.isLoading()) return true;
     return this.isFormEqualToInitial();
   }
 

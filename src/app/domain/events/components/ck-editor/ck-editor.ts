@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, forwardRef, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, forwardRef, Input, OnInit, Output, signal, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import {
@@ -32,7 +32,8 @@ import {
   Table,
   TableToolbar,
   Underline,
-  type EditorConfig
+  WordCount,
+  type EditorConfig,
 } from 'ckeditor5';
 import translations from 'ckeditor5/translations/pt-br.js';
 
@@ -48,12 +49,13 @@ const LICENSE_KEY = 'GPL';
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => CKEditorComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAccessor {
   @Input() initialData: string = '';
+  @Input() maxLength: number = 5000;
   @Output() dataChange = new EventEmitter<string>();
 
   public isLayoutReady = false;
@@ -62,6 +64,8 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
   public editorData: string = '';
   private editor: any = null;
   private isInitializingFromParent = false;
+  public charactersCount = signal<number>(0);
+  public isExceedingLimit = signal<boolean>(false);
 
   private onChangeCallback: ((value: string) => void) | null = null;
   private onTouched: (() => void) | null = null;
@@ -138,6 +142,7 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
         Table,
         TableToolbar,
         Underline,
+        WordCount,
       ],
       initialData: this.editorData,
       balloonToolbar: ['bold', 'italic', '|', 'link', '|', 'bulletedList', 'numberedList'],
@@ -213,6 +218,11 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
         contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'],
       },
       translations: [translations],
+      wordCount: {
+        onUpdate: stats => {
+          this.charactersCount.set(stats.characters);
+        },
+      },
     };
 
     this.isLayoutReady = true;
@@ -230,7 +240,19 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
   onEditorChange(event: any): void {
     if (!this.editor) return;
 
-    const data = this.editor.getData();
+    let data = this.editor.getData();
+
+    const plainText = data.replace(/<[^>]*>/g, '').trim();
+    const charCount = plainText.length;
+
+    this.charactersCount.set(charCount);
+    this.isExceedingLimit.set(charCount > this.maxLength);
+
+    if (charCount > this.maxLength) {
+      this.editor.setData(this.editorData);
+      return;
+    }
+
     this.editorData = data;
     this.dataChange.emit(data);
 

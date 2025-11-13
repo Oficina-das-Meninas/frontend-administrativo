@@ -15,7 +15,7 @@
           formControlName="title"
           label="Título*"
           placeholder="Digite o título do evento"
-          [maxLength]="200"
+          [maxLength]="100"
           [errorMessage]="getErrorMessage('title')"></app-form-input>
 
         <div class="flex flex-col md:flex-row flex-wrap gap-6 w-full">
@@ -42,7 +42,7 @@
               label="Localização*"
               placeholder="Digite a localização"
               prefixIcon="location_on"
-              [maxLength]="150"
+              [maxLength]="100"
               [errorMessage]="getErrorMessage('location')"></app-form-input>
           </div>
         </div>
@@ -54,7 +54,7 @@
           placeholder="exemplo.com"
           prefix="https://"
           hint="Coloque o url para a inscrição do evento na plataforma externa."
-          [maxLength]="300"
+          [maxLength]="256"
           (input)="onUrlInput($event)"
           [errorMessage]="getErrorMessage('urlToPlatform')"></app-form-input>
 
@@ -63,6 +63,7 @@
             <app-image-input
               label="Imagem do Evento*"
               text="Clique ou arraste para anexar"
+              [maxFileSize]="15"
               hint="PNG, JPG, JPEG ou WEBP"
               [initialUrls]="existingPreviewImageUrl() ? [existingPreviewImageUrl()] : []"
               (filesSelected)="onPreviewImageSelected($event)"></app-image-input>
@@ -75,6 +76,7 @@
               label="Imagem de Parceiros*"
               text="Clique ou arraste para anexar"
               hint="PNG, JPG, JPEG ou WEBP"
+              [maxFileSize]="15"
               [initialUrls]="existingPartnersImageUrl() ? [existingPartnersImageUrl()] : []"
               (filesSelected)="onPartnersImageSelected($event)"></app-image-input>
             @if (hasImageError('partnersImage')) {

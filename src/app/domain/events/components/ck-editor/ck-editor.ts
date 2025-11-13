@@ -219,8 +219,7 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
       },
       translations: [translations],
       wordCount: {
-        onUpdate: stats => {
-          this.charactersCount.set(stats.characters);
+        onUpdate: () => {
         },
       },
     };
@@ -231,9 +230,25 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
 
   onEditorReady(editor: any): void {
     this.editor = editor;
+
+    const maxLength = this.maxLength;
+
+    this.editor.model.document.on('change:data', () => {
+      const data = this.editor.getData();
+      const plainText = data.replace(/<[^>]*>/g, '').trim();
+      const charCount = plainText.length;
+
+      if (charCount > maxLength) {
+        this.editor.execute('undo');
+      }
+    });
+
     if (this.editorData && this.isInitializingFromParent) {
       editor.setData(this.editorData);
       this.isInitializingFromParent = false;
+
+      const plainText = this.editorData.replace(/<[^>]*>/g, '').trim();
+      this.charactersCount.set(plainText.length);
     }
   }
 
@@ -241,17 +256,11 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
     if (!this.editor) return;
 
     let data = this.editor.getData();
-
     const plainText = data.replace(/<[^>]*>/g, '').trim();
     const charCount = plainText.length;
 
     this.charactersCount.set(charCount);
     this.isExceedingLimit.set(charCount > this.maxLength);
-
-    if (charCount > this.maxLength) {
-      this.editor.setData(this.editorData);
-      return;
-    }
 
     this.editorData = data;
     this.dataChange.emit(data);

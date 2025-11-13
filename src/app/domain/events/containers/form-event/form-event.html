@@ -63,7 +63,7 @@
             <app-image-input
               label="Imagem do Evento*"
               text="Clique ou arraste para anexar"
-              [maxFileSize]="15"
+              [maxFileSize]="5"
               hint="PNG, JPG, JPEG ou WEBP"
               [initialUrls]="existingPreviewImageUrl() ? [existingPreviewImageUrl()] : []"
               (filesSelected)="onPreviewImageSelected($event)"></app-image-input>
@@ -76,7 +76,7 @@
               label="Imagem de Parceiros*"
               text="Clique ou arraste para anexar"
               hint="PNG, JPG, JPEG ou WEBP"
-              [maxFileSize]="15"
+              [maxFileSize]="5"
               [initialUrls]="existingPartnersImageUrl() ? [existingPartnersImageUrl()] : []"
               (filesSelected)="onPartnersImageSelected($event)"></app-image-input>
             @if (hasImageError('partnersImage')) {
@@ -87,7 +87,7 @@
 
         <div class="my-4">
           <label class="block text-sm font-medium text-gray-600 mb-3">Descrição do Evento*</label>
-          <app-ck-editor [initialData]="description()" (dataChange)="onDataChange($event)"></app-ck-editor>
+          <app-ck-editor [maxLength]="3000" [initialData]="description()" (dataChange)="onDataChange($event)"></app-ck-editor>
         </div>
 
         <div class="flex justify-end mt-6">

@@ -72,6 +72,12 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
 
   constructor(private changeDetector: ChangeDetectorRef) {}
 
+  private extractPlainText(html: string): string {
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    return (temp.textContent || temp.innerText || '').trim();
+  }
+
   ngOnInit(): void {
     this.editorData = this.initialData;
     this.isInitializingFromParent = true;
@@ -218,10 +224,6 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
         contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'],
       },
       translations: [translations],
-      wordCount: {
-        onUpdate: () => {
-        },
-      },
     };
 
     this.isLayoutReady = true;
@@ -235,20 +237,30 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
 
     this.editor.model.document.on('change:data', () => {
       const data = this.editor.getData();
-      const plainText = data.replace(/<[^>]*>/g, '').trim();
+      const plainText = this.extractPlainText(data);
       const charCount = plainText.length;
 
       if (charCount > maxLength) {
-        this.editor.execute('undo');
+        const undoCommand = this.editor.commands.get('undo');
+        if (undoCommand && undoCommand.isEnabled) {
+          this.editor.execute('undo');
+          const undoneData = this.editor.getData();
+          const undoneText = this.extractPlainText(undoneData);
+          this.charactersCount.set(undoneText.length);
+          this.isExceedingLimit.set(false);
+        }
       }
     });
 
     if (this.editorData && this.isInitializingFromParent) {
+      const plainText = this.extractPlainText(this.editorData);
+      this.charactersCount.set(plainText.length);
+
       editor.setData(this.editorData);
       this.isInitializingFromParent = false;
-
-      const plainText = this.editorData.replace(/<[^>]*>/g, '').trim();
-      this.charactersCount.set(plainText.length);
+    } else if (!this.editorData && this.isInitializingFromParent) {
+      this.charactersCount.set(0);
+      this.isInitializingFromParent = false;
     }
   }
 
@@ -256,7 +268,7 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
     if (!this.editor) return;
 
     let data = this.editor.getData();
-    const plainText = data.replace(/<[^>]*>/g, '').trim();
+    const plainText = this.extractPlainText(data);
     const charCount = plainText.length;
 
     this.charactersCount.set(charCount);

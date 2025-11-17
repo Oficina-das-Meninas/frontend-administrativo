@@ -85,13 +85,16 @@ export class ImageInputComponent implements OnChanges {
   }
 
   addFiles(files: File[]) {
+    this.fileSizeErrorMessage.set('');
+
+    const errors: string[] = [];
+
     for (let file of files) {
-      // Validar tamanho do arquivo (maxFileSize está em MB)
       const maxSizeInBytes = this.maxFileSize * 1024 * 1024;
       if (file.size > maxSizeInBytes) {
         const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
         const errorMessage = `Arquivo "${file.name}" excede o tamanho máximo de ${this.maxFileSize}MB (tamanho atual: ${fileSizeMB}MB)`;
-        this.fileSizeErrorMessage.set(errorMessage);
+        errors.push(errorMessage);
         this.fileSizeExceeded.emit({
           fileName: file.name,
           fileSize: file.size,
@@ -100,7 +103,6 @@ export class ImageInputComponent implements OnChanges {
         continue;
       }
 
-      this.fileSizeErrorMessage.set('');
       const reader = new FileReader();
       reader.onload = () => {
         this.zone.run(() => {
@@ -110,6 +112,10 @@ export class ImageInputComponent implements OnChanges {
         });
       };
       reader.readAsDataURL(file);
+    }
+
+    if (errors.length > 0) {
+      this.fileSizeErrorMessage.set(errors.join('\n'));
     }
   }
 

@@ -15,28 +15,24 @@ export class TransparencyService {
   private readonly API_URL = `${environment.apiUrl}/transparencies`;
   private httpClient = inject(HttpClient);
 
-  createCategory(data: TransparencyCategory): Observable<TransparencyCategory> {
-    return this.httpClient.post<TransparencyCategory>(`${this.API_URL}/categories`, data);
+  createCategory(data: TransparencyCategory): Observable<{ message: string }> {
+    return this.httpClient.post<{ message: string }>(`${this.API_URL}/categories`, data);
   }
   
-  updateCategory(id: string, data: TransparencyCategory): Observable<void> {
-    return this.httpClient.patch<void>(`${this.API_URL}/categories/${id}`, data);
+  updateCategory(id: string, data: TransparencyCategory): Observable<{ message: string }> {
+    return this.httpClient.patch<{ message: string }>(`${this.API_URL}/categories/${id}`, data);
   }
 
   updateCollaborator(id: string, data: TransparencyCategory): Observable<void> {
     return this.httpClient.patch<void>(`${this.API_URL}/collaborators/${id}`, data);
   }
 
-  createDocument(data: FormData): Observable<string> {
-    return this.httpClient.post(`${this.API_URL}/documents`, data, {
-      responseType: 'text'
-    });
+  createDocument(data: FormData): Observable<{ message: string }> {
+    return this.httpClient.post<{ message: string }>(`${this.API_URL}/documents`, data);
   }
 
-  createCollaborator(data: FormData): Observable<string> {
-    return this.httpClient.post(`${this.API_URL}/collaborators`, data, {
-      responseType: 'text'
-    });
+  createCollaborator(data: FormData): Observable<{ message: string }> {
+    return this.httpClient.post<{ message: string }>(`${this.API_URL}/collaborators`, data);
   }
 
   list(): Observable<AccordionContent[]> {
@@ -67,16 +63,16 @@ export class TransparencyService {
     );
   }
 
-  deleteCategory(id: string): Observable<void>  {
-    return this.httpClient.delete<void>(`${this.API_URL}/categories/${id}`);
+  deleteCategory(id: string): Observable<{ message: string }>  {
+    return this.httpClient.delete<{ message: string }>(`${this.API_URL}/categories/${id}`);
   }
 
-  deleteDocument(id: string): Observable<void> {
-    return this.httpClient.delete<void>(`${this.API_URL}/documents/${id}`);
+  deleteDocument(id: string): Observable<{ message: string }> {
+    return this.httpClient.delete<{ message: string }>(`${this.API_URL}/documents/${id}`);
   }
 
-  deleteCollaborator(id: string): Observable<void> {
-    return this.httpClient.delete<void>(`${this.API_URL}/collaborators/${id}`);
+  deleteCollaborator(id: string): Observable<{ message: string }> {
+    return this.httpClient.delete<{ message: string }>(`${this.API_URL}/collaborators/${id}`);
   }
 
 }

@@ -18,6 +18,8 @@ import { AccordionContent } from '../../models/transparency-accordion/accordion-
 import { DeleteItem } from '../../models/transparency-accordion/delete-item';
 import { TransparencyCategory } from '../../models/transparency/transparency-category';
 import { TransparencyService } from '../../services/transparency.service';
+import { SnackbarService } from '../../../../shared/services/snackbar-service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-transparency-content',
@@ -39,7 +41,7 @@ import { TransparencyService } from '../../services/transparency.service';
   templateUrl: './transparency-content.html',
   styleUrl: './transparency-content.scss'
 })
-export class TransparencyContent implements OnInit {
+export class TransparencyContent {
 
   @ViewChild('addDocumentDialog') addDocumentDialog!: TemplateRef<any>;
   @ViewChild('addCollaboratorDialog') addCollaboratorDialog!: TemplateRef<any>;
@@ -48,6 +50,7 @@ export class TransparencyContent implements OnInit {
   @ViewChild('deleteItemDialog') deleteItemDialog!: TemplateRef<any>;
 
   content = input.required<AccordionContent>();
+
   isUpdated = output();
 
   deleteItem: DeleteItem = {
@@ -62,6 +65,7 @@ export class TransparencyContent implements OnInit {
   private transparencyService = inject(TransparencyService);
   private dialog = inject(MatDialog);
   private formBuilder = inject(FormBuilder);
+  private snackbarService = inject(SnackbarService);
 
   constructor() {
     this.documentForm = this.formBuilder.group({
@@ -80,9 +84,6 @@ export class TransparencyContent implements OnInit {
     this.categoryForm = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(100)]],
     });
-  }
-
-  ngOnInit(): void {
   }
 
   openAddDocumentDialog() {
@@ -126,11 +127,17 @@ export class TransparencyContent implements OnInit {
         formData.append('file', file);
       }
 
-      this.transparencyService.createDocument(formData).subscribe({
-        next: () => {
+      this.transparencyService.createDocument(formData)
+      .pipe(
+        finalize(() => {
           this.isUpdated.emit();
+          this.dialog.closeAll();
           this.documentForm.reset();
-        }
+        })
+      )
+      .subscribe({
+        next: (response) => this.snackbarService.success(response.message),
+        error: (response) => this.snackbarService.error(response.error?.message)
       });
     }
   }
@@ -151,11 +158,17 @@ export class TransparencyContent implements OnInit {
         formData.append('image', image);
       }
 
-      this.transparencyService.createCollaborator(formData).subscribe({
-        next: () => {
+      this.transparencyService.createCollaborator(formData)
+      .pipe(
+        finalize(() => {
           this.isUpdated.emit();
+          this.dialog.closeAll();
           this.collaboratorForm.reset();
-        }
+        })
+      )
+      .subscribe({
+        next: (response) => this.snackbarService.success(response.message),
+        error: (response) => this.snackbarService.error(response.error?.message)
       });
     }
   }
@@ -167,12 +180,17 @@ export class TransparencyContent implements OnInit {
         priority: this.content().priority
       }
 
-      this.transparencyService.updateCategory(this.content().id ?? '', data).subscribe({
-        next: () => {
+      this.transparencyService.updateCategory(this.content().id ?? '', data)
+      .pipe(
+        finalize(() => {
           this.isUpdated.emit();
-          this.categoryForm.reset();
           this.dialog.closeAll();
-        }
+          this.categoryForm.reset();
+        })
+      )
+      .subscribe({
+        next: (response) => this.snackbarService.success(response.message),
+        error: (response) => this.snackbarService.error(response.error?.message)
       });
     }
   }
@@ -189,11 +207,16 @@ export class TransparencyContent implements OnInit {
   }
 
   onDeleteCategoryDialog() {
-    this.transparencyService.deleteCategory(this.content().id ?? '').subscribe({
-      next: () => {
+    this.transparencyService.deleteCategory(this.content().id ?? '')
+    .pipe(
+      finalize(() => {
         this.isUpdated.emit();
         this.dialog.closeAll();
-      }
+      })
+    )
+    .subscribe({
+      next: (response) => this.snackbarService.success(response.message),
+      error: (response) => this.snackbarService.error(response.error?.message)
     });
   }
 
@@ -203,11 +226,16 @@ export class TransparencyContent implements OnInit {
       ? this.transparencyService.deleteDocument.bind(this.transparencyService)
       : this.transparencyService.deleteCollaborator.bind(this.transparencyService);
 
-    deleteFn(id ?? '').subscribe({
-      next: () => {
+    deleteFn(id ?? '')
+    .pipe(
+      finalize(() => {
         this.isUpdated.emit();
         this.dialog.closeAll();
-      }
+      })
+    )
+    .subscribe({
+      next: (response) => this.snackbarService.success(response.message),
+      error: (response) => this.snackbarService.error(response.error?.message)
     });
   }
 

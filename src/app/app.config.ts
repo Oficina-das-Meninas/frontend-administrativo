@@ -12,7 +12,7 @@ registerLocaleData(localePt);
 
 function configureMatPaginatorIntl() {
   const matPaginatorIntl = new MatPaginatorIntl();
-  matPaginatorIntl.itemsPerPageLabel = 'Items por página:';
+  matPaginatorIntl.itemsPerPageLabel = 'Itens por página:';
   matPaginatorIntl.nextPageLabel = 'Próxima página';
   matPaginatorIntl.previousPageLabel = 'Página anterior';
   matPaginatorIntl.firstPageLabel = 'Primeira página';

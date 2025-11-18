@@ -1,9 +1,20 @@
 @use '@angular/material' as mat;
 
 mat-card {
-  @include mat.card-overrides((
-    outlined-container-color: white
-  ));
+  @include mat.card-overrides(
+    (
+      outlined-container-color: #ffffff,
+      outlined-outline-color: var(--color-gray-300),
+    )
+  );
+
+  height: 100%;
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
 }
 
 .cdk-placeholder {

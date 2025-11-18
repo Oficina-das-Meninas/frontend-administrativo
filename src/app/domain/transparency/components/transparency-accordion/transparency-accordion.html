@@ -4,32 +4,27 @@
     (closed)="panelOpenState.set(false)"
     hideToggle
   >
-    <mat-expansion-panel-header class="!h-16">
-      <mat-panel-title class="flex text-md sm:text-xl font-bold gap-2">
-        <span class="material-symbols-outlined text-gray-500">
-          drag_indicator
-        </span>
-        {{ content()?.categoryName }}
-      </mat-panel-title>
+  <mat-expansion-panel-header class="!h-16 flex justify-between items-center">
+    <mat-panel-title class="flex items-center gap-1 md:gap-2 text-md md:text-xl font-bold flex-1 truncate">
+      <span
+        class="material-symbols-outlined text-gray-500 mr-1"
+        (click)="$event.stopPropagation()"
+      >
+        drag_indicator
+      </span>
+      <span class="truncate">{{ content()?.categoryName }}</span>
+    </mat-panel-title>
 
-      <div class="flex gap-2 items-center text-gray-500 text-lg">
-        <div class="flex gap-2 w-fit h-fit" (click)="$event.stopPropagation()">
-          <ng-content select="[categoryActions]"></ng-content>
-        </div>
-
-        @if (!panelOpenState()) {
-          <!-- <img src="/svg/plus-circle.svg" alt="plus-circle" class="w-10" />  -->
-          <span class="material-symbols-outlined text-black">
-            keyboard_arrow_down
-          </span>
-        } @else {
-          <!-- <img src="/svg/minus-circle.svg" alt="minus-circle" class="w-10" /> -->
-          <span class="material-symbols-outlined text-black">
-            keyboard_arrow_up
-          </span>
-        }
+    <div class="flex gap-2 items-center text-gray-500 text-lg">
+      <div class="flex gap-2 w-[58px] h-fit" (click)="$event.stopPropagation()">
+        <ng-content select="[categoryActions]"></ng-content>
       </div>
-    </mat-expansion-panel-header>
+
+      <span class="material-symbols-outlined text-black">
+        {{ !panelOpenState() ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}
+      </span>
+    </div>
+  </mat-expansion-panel-header>
 
     @if (content()?.type === accordionContentType.DOCUMENT) {
       <section class="py-4">
@@ -51,11 +46,12 @@
             <div class="
               flex 
               items-center 
-              opacity-0 
-              group-hover:opacity-100 
+              opacity-100 
+              lg:opacity-0
+              lg:group-hover:opacity-100 
               transition-opacity 
-              duration-200"
-            >
+              duration-200
+            ">
               <span
                 class="material-symbols-outlined 
                 text-gray-500 hover:text-[#bf1469] 
@@ -76,7 +72,7 @@
     @if (content()?.type === accordionContentType.COLLABORATOR) {
       <section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 py-4 cdk-list" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="drop($event)">
         @for (item of content()?.collaborators; track $index) {
-          <section class="flex flex-col items-center gap-4 py-2 group cdk-box" cdkDrag>
+          <section class="flex flex-col items-center gap-4 py-2 group cdk-box" cdkDrag [cdkDragStartDelay]="100">
             <div class="cdk-placeholder" *cdkDragPlaceholder></div>
             <div class="flex flex-col justify-start items-center gap-1">
               <img 
@@ -91,11 +87,12 @@
             <div class="
               flex 
               items-center 
-              opacity-0 
-              group-hover:opacity-100 
+              opacity-100 
+              lg:opacity-0
+              lg:group-hover:opacity-100 
               transition-opacity 
-              duration-200"
-            >
+              duration-200
+            ">
               <span
                 class="material-symbols-outlined 
                 text-gray-500 hover:text-[#bf1469] 

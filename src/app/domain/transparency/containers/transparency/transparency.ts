@@ -12,7 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AccordionContentType } from '../../enums/transparency-accordion/accordion-content-type';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TransparencyCategory } from '../../models/transparency/transparency-category';
-import { Observable, tap } from 'rxjs';
+import { finalize, Observable, tap } from 'rxjs';
 import { TransparencyContent } from "../transparency-content/transparency-content";
 import { MatCardModule } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
@@ -20,6 +20,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
 import { FormSelect } from "../../../../shared/components/form-select/form-select";
 import { FormSelectItem } from '../../../../shared/models/form-select-item';
+import { SnackbarService } from '../../../../shared/services/snackbar-service';
 
 @Component({
   selector: 'app-transparency',
@@ -67,6 +68,7 @@ export class Transparency implements OnInit {
   private transparencyService = inject(TransparencyService);
   private dialog = inject(MatDialog);
   private formBuilder = inject(FormBuilder);
+  private snackbarService = inject(SnackbarService);
 
   constructor() {
     this.categoryForm = this.formBuilder.group({
@@ -100,13 +102,23 @@ export class Transparency implements OnInit {
           : false,
         priority: this.accordionContentList.length
       }
-      this.transparencyService.createCategory(data).subscribe({
-        next: () => {
+
+      this.transparencyService.createCategory(data)
+      .pipe(
+        finalize(() => {
           this.loadAccordionContent();
+          this.dialog.closeAll();
+        })
+      )
+      .subscribe({
+        next: (response) => {
           this.categoryForm.reset({ 
             type: AccordionContentType.DOCUMENT 
           });
-          this.dialog.closeAll();
+          this.snackbarService.error(response.message)
+        },
+        error: (response) => { 
+          this.snackbarService.error(response.error?.message)
         }
       });
     }

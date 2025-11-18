@@ -115,7 +115,7 @@ export class Transparency implements OnInit {
           this.categoryForm.reset({ 
             type: AccordionContentType.DOCUMENT 
           });
-          this.snackbarService.error(response.message)
+          this.snackbarService.success(response.message)
         },
         error: (response) => { 
           this.snackbarService.error(response.error?.message)

@@ -19,7 +19,7 @@ import { DeleteItem } from '../../models/transparency-accordion/delete-item';
 import { TransparencyCategory } from '../../models/transparency/transparency-category';
 import { TransparencyService } from '../../services/transparency.service';
 import { SnackbarService } from '../../../../shared/services/snackbar-service';
-import { finalize, tap } from 'rxjs';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-transparency-content',

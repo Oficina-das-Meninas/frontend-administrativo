@@ -215,7 +215,7 @@ export class TransparencyContent {
       })
     )
     .subscribe({
-      next: (response) => this.snackbarService.error(response.message),
+      next: (response) => this.snackbarService.success(response.message),
       error: (response) => this.snackbarService.error(response.error?.message)
     });
   }

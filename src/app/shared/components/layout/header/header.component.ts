@@ -3,7 +3,6 @@ import { MatMenuModule, MatMenuTrigger } from "@angular/material/menu";
 import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 import { NavItem } from '../../../models/nav-item';
 import { RouterLink } from '@angular/router';
-import { Profile } from '../../../models/profile';
 
 @Component({
   selector: 'app-header',
@@ -19,12 +18,11 @@ import { Profile } from '../../../models/profile';
 export class HeaderComponent {
 
   menuItems = input<NavItem[]>();
-  profile = input.required<Profile>();
+  username = input.required<string>();
   isMobile = input.required<boolean>();
   menuToggle = output<void>();
 
   onMenuClick() {
     this.menuToggle.emit();
   }
-
 }

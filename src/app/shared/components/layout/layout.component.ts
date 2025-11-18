@@ -25,7 +25,7 @@ export class LayoutComponent implements OnInit {
   isMobile: boolean = false;
   sidenavItems: NavItem[] = [];
   menuItems: NavItem[] = [];
-  profile!: Profile;
+  username: string = "usuário";
 
   constructor(private breakpointObserver: BreakpointObserver) {
     this.breakpointObserver.observe([Breakpoints.Handset]).subscribe(result => {
@@ -41,9 +41,8 @@ export class LayoutComponent implements OnInit {
         path: "/"
       },
       {
-        matIcon: "handshake",
-        title: "Transparência",
-        path: "/transparencia"
+        category: "Institucional",
+        isCategory: true
       },
       {
         matIcon: "calendar_month",
@@ -56,6 +55,15 @@ export class LayoutComponent implements OnInit {
         path: '/parceiros',
       },
       {
+        matIcon: "handshake",
+        title: "Transparência",
+        path: "/transparencia"
+      },
+      {
+        category: "Apoio",
+        isCategory: true
+      },
+      {
         matIcon: "volunteer_activism",
         title: "Doações",
         path: "/doacoes"
@@ -64,6 +72,12 @@ export class LayoutComponent implements OnInit {
         matIcon: "diversity_1",
         title: "Doadores",
         path: "/doadores"
+      },
+      {
+        matIcon: "settings",
+        title: "Configurações",
+        path: "/configuracoes",
+        position: "bottom"
       }
     ];
 
@@ -74,11 +88,5 @@ export class LayoutComponent implements OnInit {
         path: '/logout',
       },
     ];
-
-    this.profile = {
-      username: "Usuário Logado",
-      role: "Cargo",
-    }
   }
-
 }

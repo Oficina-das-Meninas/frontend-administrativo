@@ -8,15 +8,13 @@
     }
   </div>
 
-  <div
+    <div
     class="flex items-center gap-2 px-4 cursor-pointer h-full hover:bg-gray-100"
     [matMenuTriggerFor]="menu"
   >
-    <div class="flex flex-col items-end">
-      <h1 class="text-sm font-bold text-gray-500">{{ profile().username }}</h1>
-      <p class="text-xs text-gray-400 font-semibold">{{ profile().role }}</p>
-    </div>
     <span class="material-symbols-outlined text-gray-500 font-semibold profile-icon">person</span>
+    <h1 class="text-sm font-bold text-gray-500">{{ username() }}</h1>
+    <span class="material-symbols-outlined text-gray-500 text-sm">expand_more</span>
   </div>
 
   <mat-menu #menu="matMenu" xPosition="before">

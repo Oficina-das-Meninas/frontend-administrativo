@@ -1,59 +1,50 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { map, Observable, of } from 'rxjs';
 import { DataPage } from '../../../shared/models/data-table-helpers';
 import { Donor } from '../models/donor';
+import { environment } from '../../../../environments/environment';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { ApiPagedResponse } from '../../../shared/models/api-response';
+import { DonorFilters } from '../models/donor-filters';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DonorService {
-  private donors: Donor[] = [
-    {
-      id: '1',
-      name: 'Maria Silva',
-      email: 'maria@email.com',
-      document: '123.456.789-00',
-      phone: '(11) 91234-5678',
-      badge: 'semente',
-    },
-    {
-      id: '2',
-      name: 'João Souza',
-      email: 'joao@email.com',
-      document: '987.654.321-00',
-      phone: '(11) 99876-5432',
-      badge: 'broto',
-    },
-    {
-      id: '3',
-      name: 'Ana Costa',
-      email: 'ana@email.com',
-      document: '111.222.333-44',
-      phone: '(11) 93456-7890',
-      badge: 'margarida',
-    },
-  ];
+  // private readonly API_URL = `${environment.apiUrl}/donors`;
+  private readonly API_URL = 'http://localhost:8080/api/donors';
+  private httpClient = inject(HttpClient);
 
-  getDonors(
-    searchTerm: string = '',
-    page: number = 0,
-    pageSize: number = 10
-  ): Observable<DataPage<Donor>> {
-    let filtered = this.donors;
-    if (searchTerm) {
-      filtered = filtered.filter((d) =>
-        d.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  list(donorFilters: DonorFilters): Observable<DataPage<Donor>> {
+    let params = new HttpParams();
+
+    params = params.set('page', (donorFilters.page ?? 0).toString());
+    params = params.set('pageSize', (donorFilters.pageSize ?? 10).toString());
+
+    if (donorFilters.searchTerm?.trim()) {
+      params = params.set('searchTerm', donorFilters.searchTerm.trim());
     }
-    const start = page * pageSize;
-    const paged = filtered.slice(start, start + pageSize);
-    const totalElements = filtered.length;
-    const totalPages = Math.ceil(totalElements / pageSize);
 
-    return of({
-      data: paged,
-      totalElements,
-      totalPages,
-    });
+    if (donorFilters.badge) {
+      params = params.set('badge', donorFilters.badge);
+    }
+
+    if (donorFilters.sortField) {
+      params = params.set('sortField', donorFilters.sortField);
+    }
+
+    if (donorFilters.sortDirection) {
+      params = params.set('sortDirection', donorFilters.sortDirection);
+    }
+
+    return this.httpClient
+      .get<ApiPagedResponse<Donor>>(this.API_URL, { params })
+      .pipe(
+        map((response) => ({
+          data: response.data.contents,
+          totalElements: response.data.totalElements,
+          totalPages: response.data.totalPages,
+        }))
+      );
   }
 }

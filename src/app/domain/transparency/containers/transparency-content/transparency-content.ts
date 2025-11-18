@@ -185,7 +185,7 @@ export class TransparencyContent {
         finalize(() => {
           this.isUpdated.emit();
           this.dialog.closeAll();
-          this.collaboratorForm.reset();
+          this.categoryForm.reset();
         })
       )
       .subscribe({

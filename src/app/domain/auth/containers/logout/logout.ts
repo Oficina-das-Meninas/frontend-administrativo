@@ -16,7 +16,7 @@ export class Logout implements AfterViewInit, OnDestroy {
 
   @ViewChild('logoutDialog') logoutDialog!: TemplateRef<any>;
 
-  secondsRemaining = signal(7);
+  secondsRemaining = signal(10);
   private countdownSub?: Subscription;
 
   private authService = inject(AuthService);

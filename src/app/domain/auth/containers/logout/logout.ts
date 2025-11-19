@@ -3,7 +3,7 @@ import { AuthService } from '../../services/auth-service';
 import { Router } from '@angular/router';
 import { Dialog } from "../../../../shared/components/dialog/dialog";
 import { MatDialog } from '@angular/material/dialog';
-import { interval, Subscription, takeWhile } from 'rxjs';
+import { interval, Subscription, take } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
@@ -42,7 +42,7 @@ export class Logout implements AfterViewInit, OnDestroy {
 
   private startCountdown(): void {
     this.countdownSub = interval(1000)
-      .pipe(takeWhile(() => this.secondsRemaining() > 0))
+      .pipe(take(10))
       .subscribe({
         next: () => {
           const newValue = this.secondsRemaining() - 1;

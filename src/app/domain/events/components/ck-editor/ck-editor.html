@@ -7,6 +7,10 @@
           <ckeditor [editor]="Editor" [config]="config" (ready)="onEditorReady($event)" (change)="onEditorChange($event)" />
           }
         </div>
+
+        <div class="ck ck-word-count" [class.ck-word-count--exceeded]="isExceedingLimit()">
+          <div class="ck-word-count__characters">{{ charactersCount() }} / {{ maxLength }}</div>
+        </div>
       </div>
     </div>
   </div>

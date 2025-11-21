@@ -40,7 +40,7 @@ export class PartnerService {
     }
 
     return this.httpClient
-      .get<ApiPagedResponse<Partner>>(this.API_URL, { params })
+      .get<ApiPagedResponse<Partner>>(this.API_URL, { params, withCredentials: true })
       .pipe(
         map((resp) => {
           const contents = resp.data?.contents ?? [];
@@ -60,11 +60,11 @@ export class PartnerService {
   }
 
   create(partnerData: FormData): Observable<void> {
-    return this.httpClient.post<void>(this.API_URL, partnerData);
+    return this.httpClient.post<void>(this.API_URL, partnerData, { withCredentials: true });
   }
 
   getById(partnerId: string): Observable<Partner> {
-    return this.httpClient.get<PartnerResponse>(`${this.API_URL}/${partnerId}`).pipe(
+    return this.httpClient.get<PartnerResponse>(`${this.API_URL}/${partnerId}`, { withCredentials: true }).pipe(
       map((response) => ({
         ...response.data,
         previewImageUrl: this.imageService.getPubImage(response.data.previewImageUrl)
@@ -73,11 +73,11 @@ export class PartnerService {
   }
 
   update(partnerId: string, partnerData: FormData): Observable<void> {
-    return this.httpClient.put<void>(`${this.API_URL}/${partnerId}`, partnerData);
+    return this.httpClient.put<void>(`${this.API_URL}/${partnerId}`, partnerData, { withCredentials: true });
   }
 
   delete(partnerId: string): Observable<void> {
-    return this.httpClient.delete<void>(`${this.API_URL}/${partnerId}`);
+    return this.httpClient.delete<void>(`${this.API_URL}/${partnerId}`, { withCredentials: true });
   }
 }
 

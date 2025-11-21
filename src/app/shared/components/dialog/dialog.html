@@ -20,7 +20,9 @@
   </mat-dialog-content>
   <mat-dialog-actions>
     <div class="flex gap-1 items-center">
-      <button matButton tabindex="-1" (click)="onCloseDialog()">Fechar</button>
+      @if (hasCloseButton()) {
+        <button matButton tabindex="-1" (click)="onCloseDialog()">Fechar</button>
+      }
       <ng-content select="[dialogConfirmButton]"></ng-content>
     </div>
   </mat-dialog-actions>

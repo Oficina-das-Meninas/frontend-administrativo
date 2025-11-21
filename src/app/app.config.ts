@@ -1,5 +1,5 @@
 import { registerLocaleData } from '@angular/common';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import localePt from '@angular/common/locales/pt';
 import { ApplicationConfig, LOCALE_ID, provideZonelessChangeDetection } from '@angular/core';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
@@ -7,6 +7,7 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { CookieService } from 'ngx-cookie-service';
+import { authInterceptor } from './shared/interceptors/auth-interceptor';
 
 registerLocaleData(localePt);
 
@@ -32,7 +33,10 @@ export const appConfig: ApplicationConfig = {
     CookieService,
     provideZonelessChangeDetection(),
     provideRouter(routes),
-    provideHttpClient(withFetch()),
+    provideHttpClient(
+      withFetch(), 
+      withInterceptors([authInterceptor])
+    ),
     { provide: MatPaginatorIntl, useFactory: configureMatPaginatorIntl }
   ]
 };

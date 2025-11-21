@@ -21,6 +21,7 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 export class Dialog {
 
   title = input<string>('');
+  hasCloseButton = input<boolean>(true);
   formDialog = input<FormGroup>();
   dialogRef = inject(MatDialogRef<Dialog>);
 

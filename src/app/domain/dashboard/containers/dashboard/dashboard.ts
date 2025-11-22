@@ -18,22 +18,26 @@ export class Dashboard implements OnInit {
     {
       title: 'Doações',
       value: 2000500,
-      valueType: 'currency'
+      valueType: 'currency',
+      tooltipText: 'Quantidade total arrecadado em doações'
     },
     {
       title: 'Média de valor doado',
       value: 849.7,
-      valueType: 'currency'
+      valueType: 'currency',
+      tooltipText: 'Indica quanto, em média, cada pessoa doa. Por que isso é importante? É possível estimar quantos doadores serão necessários para alcançar a meta de arrecadação'
     },
     {
       title: 'Qtde. de doadores',
       value: 657800,
-      valueType: 'number'
+      valueType: 'number',
+      tooltipText: 'Número total de pessoas que realizaram doações'
     },
     {
       title: 'Padrinhos ativos',
       value: 1250,
-      valueType: 'number'
+      valueType: 'number',
+      tooltipText: 'Número de doadores que possuem doações recorrentes ativas'
     }
   ];
 

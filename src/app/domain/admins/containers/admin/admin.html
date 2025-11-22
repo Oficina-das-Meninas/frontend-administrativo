@@ -1,0 +1,55 @@
+<mat-card class="w-full" appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>Administradores</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="flex justify-end items-center gap-4 pt-4">
+      <button
+        mat-fab
+        matTooltip="Adicionar Administrador"
+        class="md:w-auto! md:px-4!"
+        (click)="openAddAdminDialog()">
+        <mat-icon class="md:mr-2">add</mat-icon>
+        <span class="hidden md:inline">Criar nova</span>
+      </button>
+    </div>
+  </mat-card-content>
+
+</mat-card>
+
+
+<ng-template #addAdminDialog>
+  <app-dialog title="Adicionar Administrador" [formDialog]="adminForm">
+    <ng-container dialogContent>
+      <div [formGroup]="adminForm" class="flex flex-col gap-2">
+        <app-form-input
+          formControlName="name"
+          label="Nome*"
+          placeholder="Digite o nome do administrador"
+          [maxLength]="100"
+          errorMessage="Nome de administrador inválido"
+        />
+        <app-form-input
+          formControlName="email"
+          label="Email*"
+          placeholder="Digite o email do administrador"
+          [maxLength]="100"
+          errorMessage="Email de administrador inválido"
+        />
+        <app-form-input
+          formControlName="password"
+          label="Senha*"
+          placeholder="Digite a senha do administrador"
+          [maxLength]="14"
+          errorMessage="Senha de administrador inválida"
+        />
+      </div>
+    </ng-container>
+    <ng-container dialogConfirmButton>
+      <button matButton="filled" (click)="onAddAdmin()" [disabled]="!adminForm.valid">
+        <span class="text-lg font-semibold">Adicionar</span>
+      </button>
+    </ng-container>
+  </app-dialog>
+</ng-template>

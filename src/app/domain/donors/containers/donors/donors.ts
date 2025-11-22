@@ -123,7 +123,7 @@ export class Donors {
   }
 
   onSelectFiltersChange(selected: Record<string, unknown>) {
-    const { status, type, ...otherFilters } = this.currentFilters as Record<
+    const { status, type, badge, ...otherFilters } = this.currentFilters as Record<
       string,
       unknown
     >;

@@ -1,0 +1,74 @@
+<div class="inline-block">
+  <button
+    (click)="toggleDrawer()"
+    class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors outline-none cursor-pointer">
+    <mat-icon matPrefix>calendar_month</mat-icon>
+    {{ selectedPeriod }}
+    <mat-icon class="text-lg w-[18px] h-[18px]">expand_more</mat-icon>
+  </button>
+
+  @if (isOpen) {
+    <div class="fixed inset-0 bg-black/32 z-[9998] animate-fade-in" (click)="closeDrawer()"></div>
+  }
+
+  @if (isOpen) {
+    <div class="fixed inset-y-0 right-0 w-[80%] max-w-[420px] bg-white z-[9999] shadow-lg animate-slide-in-right flex flex-col rounded-none">
+      <div class="flex flex-col h-full bg-white">
+        <div class="px-6 py-6 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+          <h2 class="m-0 text-xl font-medium text-gray-950">Selecionar Período</h2>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-0">
+          @for (period of periods; track period.label) {
+            <button
+              (click)="selectPeriod(period.label, period.days)"
+              type="button"
+              [class.bg-pink-100]="selectedPeriod === period.label"
+              [class.text-pink-600]="selectedPeriod === period.label"
+              class="w-full text-left px-6 py-4 m-0 bg-none border-b border-gray-100 text-sm text-gray-900 cursor-pointer transition-all font-medium hover:bg-gray-100 hover:text-pink-600 active:bg-gray-200">
+              {{ period.label }}
+            </button>
+          }
+
+          <div class="h-2 bg-gray-50 border-t border-b border-gray-100"></div>
+
+          <h3 class="mt-6 mb-5 px-6 text-xs font-semibold text-gray-600 uppercase tracking-wider">Período Customizado</h3>
+          <form [formGroup]="dateForm" class="px-6 pb-6">
+            <div class="flex flex-col md:flex-row gap-2 mb-6">
+              <div class="flex flex-col w-full md:w-1/2">
+                <app-date-picker
+                  [label]="'Data início'"
+                  [placeholder]="'DD/MM/YYYY'"
+                  [formControl]="startDate">
+                </app-date-picker>
+              </div>
+              <div class="flex flex-col w-full md:w-1/2">
+                <app-date-picker
+                  [label]="'Data fim'"
+                  [placeholder]="'DD/MM/YYYY'"
+                  [formControl]="endDate">
+                </app-date-picker>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <button
+                type="button"
+                (click)="applyCustom()"
+                matFab
+                class="flex-1 py-3 transition-all duration-200">
+                Aplicar
+              </button>
+              <button
+                type="button"
+                matFab
+                class="flex-1 py-3 transition-all duration-200 mat-fab-alternative"
+                (click)="closeDrawer()">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+</div>

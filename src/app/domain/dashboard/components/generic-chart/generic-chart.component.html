@@ -1,0 +1,23 @@
+<div [ngClass]="containerClass">
+  <h2 class="text-lg font-semibold mb-4">{{ chartTitle }}</h2>
+  <div class="w-full">
+    <apx-chart
+      [series]="series"
+      [chart]="chart"
+      [title]="title"
+      [xaxis]="xaxis"
+      [yaxis]="yaxis"
+      [legend]="legend"
+      [colors]="colors"
+      [stroke]="stroke"
+      [labels]="labels"
+      [dataLabels]="dataLabels"
+      [plotOptions]="plotOptions"
+      [tooltip]="tooltip"
+      [grid]="grid"
+      [states]="states"
+      [fill]="fill"
+      [responsive]="responsive">
+    </apx-chart>
+  </div>
+</div>

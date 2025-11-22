@@ -10,8 +10,7 @@ export interface ConfirmUnsavedChangesData {
 @Component({
   selector: 'app-confirm-unsaved-changes-dialog',
   templateUrl: './confirm-unsaved-changes-dialog.html',
-  imports: [MatButtonModule, MatDialogModule],
-  standalone: true,
+  imports: [MatButtonModule, MatDialogModule]
 })
 export class ConfirmUnsavedChangesDialog {
   constructor(

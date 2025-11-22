@@ -7,7 +7,6 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-dialog',
-  standalone: true,
   imports: [
     MatDialogModule,
     MatFormFieldModule,
@@ -30,6 +29,6 @@ export class Dialog {
     }
     this.dialogRef.close();
   }
-  
+
 }
 

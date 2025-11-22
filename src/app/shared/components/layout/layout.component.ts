@@ -36,9 +36,9 @@ export class LayoutComponent implements OnInit {
   ngOnInit(): void {
     this.sidenavItems = [
       {
-        matIcon: "home",
-        title: "Início",
-        path: "/"
+        matIcon: "dashboard",
+        title: "Dashboard",
+        path: "/dashboard"
       },
       {
         matIcon: "handshake",
@@ -54,7 +54,7 @@ export class LayoutComponent implements OnInit {
         matIcon: 'business',
         title: 'Parceiros',
         path: '/parceiros',
-      },  
+      },
       {
         matIcon: "volunteer_activism",
         title: "Doações",

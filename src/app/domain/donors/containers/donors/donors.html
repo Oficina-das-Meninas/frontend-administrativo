@@ -1,0 +1,47 @@
+<ng-template #donorBadgeTemplate let-item>
+  <span
+    [ngClass]="
+      'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ' +
+      getBadgeStyles(item.badge).bgColor + ' ' +
+      getBadgeStyles(item.badge).textColor
+    "
+  >
+    {{ item.badge | donorBadge }}
+  </span>
+</ng-template>
+
+<ng-template #totalDonatedTemplate let-item>
+  {{ item.totalDonated | currency: 'BRL' : 'symbol' : '1.2-2' }}
+</ng-template>
+
+<app-data-table
+  dataTitle="Doadores"
+  [data$]="donors$"
+  [columns]="columns"
+  titleProperty="name"
+  basePath="/doadores"
+  [enableSort]="true"
+  [enableCreateButton]="false"
+  [enableDateFilter]="false"
+  [showActions]="false"
+  searchPlaceholder="Buscar por nome, email, celular..."
+  [selectFilters]="[
+    {
+      key: 'badge',
+      label: 'Badge',
+      options: [
+        { value: 'semente', label: '🌱 Semente' },
+        { value: 'broto', label: '🌿 Broto' },
+        { value: 'margarida', label: '🌼 Margarida' }
+      ],
+      multiple: false
+    },
+  ]"
+  (selectFiltersChange)="onSelectFiltersChange($event)"
+  (search)="onSearch($event)"
+  (clearSearch)="onClearSearch()"
+  (pageChange)="onPageChange($event)"
+  (sortChange)="onSortChange($event)"
+  (clearFilters)="onClearFilters()"
+>
+</app-data-table>

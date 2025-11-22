@@ -11,8 +11,7 @@ import { DonorFilters } from '../models/donor-filters';
   providedIn: 'root',
 })
 export class DonorService {
-  // private readonly API_URL = `${environment.apiUrl}/donors`;
-  private readonly API_URL = 'http://localhost:8080/api/donors';
+  private readonly API_URL = `${environment.apiUrl}/donors`;
   private httpClient = inject(HttpClient);
 
   list(donorFilters: DonorFilters): Observable<DataPage<Donor>> {

@@ -30,12 +30,12 @@ export class Donors {
   donors$: Observable<DataPage<Donor>> | null = null;
 
   columns: TableColumn[] = [
-    { key: 'name', header: 'Nome' },
+    { key: 'name', header: 'Nome', type: 'text', sortable: true, sortField: 'name' },
     { key: 'email', header: 'Email' },
     { key: 'phone', header: 'Celular' },
     { key: 'totalDonated', header: 'Valor doado', type: 'currency', sortable: true, sortField: 'totalDonated' },
-    { key: 'points', header: 'Pontos' },
-    { key: 'badge', header: 'Badge' },
+    { key: 'points', header: 'Pontos', type: 'text', sortable: true, sortField: 'points' },
+    { key: 'badge', header: 'Nível' },
   ];
 
   searchTerm = '';
@@ -95,7 +95,6 @@ export class Donors {
     this.searchTerm = '';
     this.currentFilters = {};
     this.pageIndex = 0;
-    this.cdr.detectChanges();
     this.loadDonorsWithFilters();
   }
 

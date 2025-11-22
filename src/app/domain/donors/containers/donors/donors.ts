@@ -13,9 +13,9 @@ import {
   TableColumn,
 } from '../../../../shared/models/data-table-helpers';
 import { Donor } from '../../models/donor';
+import { DonorFilters } from '../../models/donor-filters';
 import { DonorBadgePipe } from '../../pipes/donor-badge-pipe';
 import { DonorService } from '../../services/donor-service';
-import { DonorFilters } from '../../models/donor-filters';
 
 @Component({
   selector: 'app-donors',
@@ -122,7 +122,7 @@ export class Donors {
   }
 
   onSelectFiltersChange(selected: Record<string, unknown>) {
-    const { status, type, badge, ...otherFilters } = this.currentFilters as Record<
+    const { badge, ...otherFilters } = this.currentFilters as Record<
       string,
       unknown
     >;
@@ -138,7 +138,7 @@ export class Donors {
 
   getBadgeStyles(badge: string): { bgColor: string; textColor: string } {
     const colors: Record<string, { bgColor: string; textColor: string }> = {
-      semente: { bgColor: 'bg-[#8b6f47] ', textColor: 'text-white' },
+      semente: { bgColor: 'bg-[#8b6f47]', textColor: 'text-white' },
       broto: { bgColor: 'bg-[#588157]', textColor: 'text-white' },
       margarida: {
         bgColor: 'margarida-badge',

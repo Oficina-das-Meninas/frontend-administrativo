@@ -5,4 +5,6 @@ export interface Donor {
   document: string;
   phone: string;
   badge: string;
+  totalDonated: number;
+  points: number;
 }

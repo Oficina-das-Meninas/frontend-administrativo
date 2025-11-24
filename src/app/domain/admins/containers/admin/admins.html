@@ -1,0 +1,12 @@
+<app-data-table
+  dataTitle="Adminstradores"
+  [data$]="admins$"
+  [columns]="columns"
+  [enableDateFilter]="false"
+  [enableCardsView]="false"
+  titleProperty="name"
+  basePath="/parceiros"
+  (search)="onSearch($event)"
+  (clearSearch)="onClearSearch()"
+  (pageChange)="onPageChange($event)">
+</app-data-table>

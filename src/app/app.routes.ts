@@ -136,8 +136,8 @@ export const routes: Routes = [
       {
         path: 'admins',
         loadComponent: () =>
-          import('./domain/admins/containers/admin/admin').then(
-            (m) => m.Admin
+          import('./domain/admins/containers/admin/admins').then(
+            (m) => m.Admins
           ),
         data: {
           breadcrumb: 'Administradores',

@@ -1,55 +1,74 @@
-<mat-card class="w-full" appearance="outlined">
-  <mat-card-header>
-    <mat-card-title>Administradores</mat-card-title>
-  </mat-card-header>
+<div class="flex flex-col items-center mx-auto bg-gradient">
+  <mat-card class="w-full max-w-[30rem]" appearance="outlined">
 
-  <mat-card-content>
-    <div class="flex justify-end items-center gap-4 pt-4">
+    <div class="w-full max-w-[30rem] mt-4 ml-4">
       <button
-        mat-fab
-        matTooltip="Adicionar Administrador"
-        class="md:w-auto! md:px-4!"
-        (click)="openAddAdminDialog()">
-        <mat-icon class="md:mr-2">add</mat-icon>
-        <span class="hidden md:inline">Criar nova</span>
+        mat-icon-button
+        (click)="goBack()"
+        class="back-button !text-gray-700 hover:!text-gray-900"
+        matTooltip="Voltar para listagem">
+        <mat-icon>arrow_back</mat-icon>
       </button>
     </div>
-  </mat-card-content>
-
-</mat-card>
 
 
-<ng-template #addAdminDialog>
-  <app-dialog title="Adicionar Administrador" [formDialog]="adminForm">
-    <ng-container dialogContent>
-      <div [formGroup]="adminForm" class="flex flex-col gap-2">
+    <mat-card-header class="mb-6 !text-4xl !font-bold !text-gray-900">
+      <mat-card-title>
+        {{ isEditMode() ? 'Editar Administrador' : 'Criar Administrador' }}
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="adminForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+
         <app-form-input
           formControlName="name"
           label="Nome*"
           placeholder="Digite o nome do administrador"
+          prefixIcon="person"
           [maxLength]="100"
-          errorMessage="Nome de administrador inválido"
-        />
+          [errorMessage]="getErrorMessage('name')">
+        </app-form-input>
+
         <app-form-input
           formControlName="email"
           label="Email*"
           placeholder="Digite o email do administrador"
+          prefixIcon="mail"
           [maxLength]="100"
-          errorMessage="Email de administrador inválido"
-        />
+          [errorMessage]="getErrorMessage('email')">
+        </app-form-input>
+
         <app-form-input
           formControlName="password"
+          type="password"
           label="Senha*"
           placeholder="Digite a senha do administrador"
+          prefixIcon="lock"
           [maxLength]="14"
-          errorMessage="Senha de administrador inválida"
-        />
-      </div>
-    </ng-container>
-    <ng-container dialogConfirmButton>
-      <button matButton="filled" (click)="onAddAdmin()" [disabled]="!adminForm.valid">
-        <span class="text-lg font-semibold">Adicionar</span>
-      </button>
-    </ng-container>
-  </app-dialog>
-</ng-template>
+          [errorMessage]="getErrorMessage('password')">
+        </app-form-input>
+
+        <div class="flex justify-end mt-6">
+          <button
+            matButton="filled"
+            color="primary"
+            type="submit"
+            [matTooltip]="!adminForm.valid ? 'Preencha todos os campos' : ''"
+            [disabled]="!adminForm.valid || isLoading()"
+            [disabledInteractive]="!adminForm.valid || isLoading()"
+            class="!px-16 !py-6 font-semibold text-base rounded-md normal-case tracking-normal">
+
+            <div class="flex items-center gap-2">
+              @if (isLoading()) {
+                <mat-spinner diameter="20" color="accent"></mat-spinner>
+              }
+              {{ isEditMode() ? 'Atualizar Administrador' : 'Criar Administrador' }}
+            </div>
+          </button>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

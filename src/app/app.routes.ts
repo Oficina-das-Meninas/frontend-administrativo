@@ -18,7 +18,6 @@ export const routes: Routes = [
       import('./domain/auth/containers/login/login').then(
         (m) => m.Login
       ),
-    canActivate: [authGuard],
   },
   {
     path: '',

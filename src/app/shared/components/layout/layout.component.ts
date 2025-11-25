@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { RouterOutlet } from '@angular/router';
@@ -7,6 +7,7 @@ import { HeaderComponent } from "./header/header.component";
 import { SidenavComponent } from "./sidenav/sidenav.component";
 import { NavItem } from '../../models/nav-item';
 import { Profile } from '../../models/profile';
+import { SessionService } from '../../../domain/auth/services/session-service';
 
 @Component({
   selector: 'app-layout',
@@ -25,7 +26,9 @@ export class LayoutComponent implements OnInit {
   isMobile: boolean = false;
   sidenavItems: NavItem[] = [];
   menuItems: NavItem[] = [];
-  username: string = "usuário";
+  username: string = "";
+
+  private sessionService = inject(SessionService);
 
   constructor(private breakpointObserver: BreakpointObserver) {
     this.breakpointObserver.observe([Breakpoints.Handset]).subscribe(result => {
@@ -34,6 +37,10 @@ export class LayoutComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.sessionService.username$.subscribe(username => {
+      this.username = username;
+    });
+
     this.sidenavItems = [
       {
         matIcon: "home",
@@ -89,4 +96,5 @@ export class LayoutComponent implements OnInit {
       },
     ];
   }
+
 }

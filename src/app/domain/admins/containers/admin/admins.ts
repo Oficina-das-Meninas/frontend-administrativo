@@ -1,4 +1,13 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, TemplateRef, ViewChild, inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
+import { Dialog } from '../../../../shared/components/dialog/dialog';
+import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
+import { SnackbarService } from '../../../../shared/services/snackbar-service';
 import { PageEvent } from '@angular/material/paginator';
 import { Observable } from 'rxjs';
 import { DataTable } from '../../../../shared/components/data-table/data-table';
@@ -9,10 +18,23 @@ import { Admin } from '../../models/admin';
 @Component({
   selector: 'app-admins',
   standalone: true,
-  imports: [DataTable],
+  imports: [
+    Dialog,
+    ReactiveFormsModule,
+    FormInputComponent,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
+    MatCardModule,
+    DataTable
+  ],
   templateUrl: './admins.html',
 })
 export class Admins implements OnInit {
+
+  @ViewChild('addAdminDialog') addAdminDialog!: TemplateRef<any>;
+
+  adminForm: FormGroup;
 
   admins$: Observable<DataPage<Admin>> | null = null;
 
@@ -26,6 +48,17 @@ export class Admins implements OnInit {
   pageSize = 10;
 
   private adminService = inject(AdminsService);
+  private dialog = inject(MatDialog);
+  private formBuilder = inject(FormBuilder);
+  private snackbar = inject(SnackbarService);
+
+  constructor() {
+    this.adminForm = this.formBuilder.group({
+      name: ['', [Validators.required, Validators.maxLength(100)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
+      password: ['', [Validators.required, Validators.maxLength(14)]]
+    });
+  }
 
   ngOnInit() {
     this.loadAdminWithFilters();
@@ -56,5 +89,24 @@ export class Admins implements OnInit {
       searchTerm: this.searchTerm || undefined
     });
     console.log(this.admins$)
+  }
+
+  openAddAdminDialog() {
+    this.dialog.open(this.addAdminDialog);
+  }
+
+  onAddAdmin() {
+    if (this.adminForm.valid) {
+      const data = this.adminForm.value;
+      this.adminService.createAdmin(data).subscribe({
+        next: (response) => {
+          this.snackbar.success(response.message);
+          this.dialog.closeAll();
+          this.adminForm.reset();
+          this.loadAdminWithFilters();
+        },
+        error: (err) => this.snackbar.error(err.error?.message)
+      });
+    }
   }
 }

@@ -1,14 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { DonationData } from '../../models/indicator-data';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis, ApexStroke, ApexLegend, ApexGrid, ApexTooltip, ApexResponsive, ApexDataLabels } from 'ng-apexcharts';
 import { GenericChartComponent } from '../generic-chart/generic-chart.component';
 import { THEME_COLORS } from '../../../../shared/constants/theme-colors';
 
 @Component({
-  selector: 'app-donors-line-chart',
+  selector: 'app-donations',
   imports: [GenericChartComponent],
-  templateUrl: './donors-line-chart.html'
+  templateUrl: './donations.html'
 })
-export class DonorsLineChart implements OnInit {
+export class Donations implements OnInit, OnChanges {
+  @Input() data: DonationData[] = [];
+
   series!: ApexAxisChartSeries;
   chart!: ApexChart;
   xaxis!: ApexXAxis;
@@ -25,15 +28,45 @@ export class DonorsLineChart implements OnInit {
     this.initializeChart();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data'] && !changes['data'].firstChange) {
+      this.updateChartData();
+    }
+  }
+
+  private updateChartData(): void {
+    if (this.data && this.data.length > 0) {
+      const recurringData = this.data.map(d => d.recurring);
+      const oneTimeData = this.data.map(d => d.oneTime);
+      const categories = this.data.map(d => this.formatPeriod(d.period));
+
+      this.series = [
+        {
+          name: 'Padrinho',
+          data: recurringData
+        },
+        {
+          name: 'Doação Única',
+          data: oneTimeData
+        }
+      ];
+
+      this.xaxis = {
+        ...this.xaxis,
+        categories: categories
+      };
+    }
+  }
+
   private initializeChart(): void {
     this.series = [
       {
         name: 'Padrinho',
-        data: [2500, 3200, 2800, 4100, 3900, 4500, 5200, 4800, 5100, 5900, 6200, 6800]
+        data: []
       },
       {
         name: 'Doação Única',
-        data: [1200, 1500, 1800, 2100, 1900, 2300, 2800, 2500, 2900, 3200, 3500, 3800]
+        data: []
       }
     ];
 
@@ -61,9 +94,9 @@ export class DonorsLineChart implements OnInit {
     };
 
     this.xaxis = {
-      categories: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+      categories: [],
       title: {
-        text: 'Mês',
+        text: 'Período',
         style: {
           fontSize: '14px',
           fontWeight: 600
@@ -116,5 +149,24 @@ export class DonorsLineChart implements OnInit {
         }
       }
     ];
+
+    // Atualiza os dados se fornecidos
+    if (this.data && this.data.length > 0) {
+      this.updateChartData();
+    }
+  }
+
+  private formatPeriod(period: string): string {
+    // Format 'YYYY-MM' or 'YYYY-MM-DD' for display
+    if (period.length === 7) { // YYYY-MM
+      const [year, month] = period.split('-');
+      const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      return `${monthNames[parseInt(month) - 1]} ${year}`;
+    } else if (period.length === 10) { // YYYY-MM-DD
+      const [year, month, day] = period.split('-');
+      const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      return `${day} ${monthNames[parseInt(month) - 1]}`;
+    }
+    return period;
   }
 }

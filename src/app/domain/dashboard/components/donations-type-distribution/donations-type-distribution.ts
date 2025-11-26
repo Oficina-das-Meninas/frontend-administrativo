@@ -1,14 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { DonationDistribution } from './../../models/indicator-data';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { ApexNonAxisChartSeries, ApexChart, ApexLegend, ApexDataLabels, ApexPlotOptions, ApexTooltip, ApexResponsive } from 'ng-apexcharts';
 import { GenericChartComponent } from '../generic-chart/generic-chart.component';
 import { THEME_COLORS } from '../../../../shared/constants/theme-colors';
 
 @Component({
-  selector: 'app-donors-percentage',
+  selector: 'app-donations-type-distribution',
   imports: [GenericChartComponent],
-  templateUrl: './donors-percentage.html'
+  templateUrl: './donations-type-distribution.html'
 })
-export class DonorsPercentage implements OnInit {
+export class DonationsTypeDistribution implements OnInit, OnChanges {
+  @Input() data: DonationDistribution | null = null;
+
   series!: ApexNonAxisChartSeries;
   chart!: ApexChart;
   legend!: ApexLegend;
@@ -17,14 +20,26 @@ export class DonorsPercentage implements OnInit {
   tooltip!: ApexTooltip;
   responsive!: ApexResponsive[];
   colors: string[] = [THEME_COLORS.PINK, THEME_COLORS.BLUE];
-  labels: string[] = ['Padrinhos', 'Doadores Únicos'];
+  labels: string[] = ['Padrinho', 'Doação Única'];
 
   ngOnInit(): void {
     this.initializeChart();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data'] && !changes['data'].firstChange) {
+      this.updateChartData();
+    }
+  }
+
+  private updateChartData(): void {
+    if (this.data) {
+      this.series = [this.data.recurring, this.data.oneTime];
+    }
+  }
+
   private initializeChart(): void {
-    this.series = [7250, 4100];
+    this.series = this.data ? [this.data.recurring, this.data.oneTime] : [0, 0];
 
     this.chart = {
       type: 'donut',

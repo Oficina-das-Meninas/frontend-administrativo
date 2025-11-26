@@ -7,7 +7,7 @@
           <app-period-picker (dateRangeSelected)="onIndicatorsDateRangeSelected($event)"></app-period-picker>
         </div>
         <div class="flex flex-wrap flex-col md:flex-row gap-2 justify-between">
-          @for (indicator of indicators; track indicator.title) {
+          @for (indicator of indicators(); track indicator.title) {
             <app-indicator
               [title]="indicator.title"
               [value]="indicator.value"
@@ -23,19 +23,19 @@
     <mat-card class="w-full" appearance="outlined">
       <mat-card-content class="p-4">
         <div class="flex justify-between items-center mb-4">
-          <mat-card-title>Padrinhos vs Doadores</mat-card-title>
-          <app-period-picker (dateRangeSelected)="onDonorsPercentageDateRangeSelected($event)"></app-period-picker>
+          <mat-card-title>Tipo de Doação</mat-card-title>
+          <app-period-picker (dateRangeSelected)="onDonationsTypeDistributionDateRangeSelected($event)"></app-period-picker>
         </div>
-        <app-donors-percentage/>
+        <app-donations-type-distribution [data]="donationDistribution()"/>
       </mat-card-content>
     </mat-card>
     <mat-card class="w-full" appearance="outlined">
       <mat-card-content class="p-4">
         <div class="flex justify-between items-center mb-4">
           <mat-card-title>Doações no período</mat-card-title>
-          <app-period-picker (dateRangeSelected)="onDonorsLineChartDateRangeSelected($event)"></app-period-picker>
+          <app-period-picker #donationsDatePicker [excludePeriods]="['Hoje']" (dateRangeSelected)="onDonationsDateRangeSelected($event)"></app-period-picker>
         </div>
-        <app-donors-line-chart/>
+        <app-donations [data]="donationTimeSeries()"/>
       </mat-card-content>
     </mat-card>
   </section>

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, MAT_DATE_LOCALE, DateAdapter } from '@angular/material/core';
@@ -10,6 +10,8 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { DatePickerComponent } from '../../../domain/events/components/date-picker/date-picker';
 import { CustomDateAdapter, BR_DATE_FORMATS } from '../../../domain/events/components/date-picker/date-picker';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 export interface DateRange {
   startDate: Date;
@@ -36,12 +38,15 @@ export interface DateRange {
     { provide: MAT_DATE_FORMATS, useValue: BR_DATE_FORMATS }
   ]
 })
-export class PeriodPicker {
+export class PeriodPicker implements OnInit, OnDestroy {
   @Output() dateRangeSelected = new EventEmitter<DateRange>();
+  @Input() excludePeriods: string[] = [];
 
   dateForm: FormGroup;
   isOpen = false;
   selectedPeriod = 'Últimos 30 dias';
+  private destroy$ = new Subject<void>();
+  private periodFilterService?: any;
 
   constructor() {
     this.dateForm = new FormGroup({
@@ -49,12 +54,38 @@ export class PeriodPicker {
       endDate: new FormControl<Date | null>(null),
     });
     this.initializeDefaultPeriod();
+
+    try {
+      this.periodFilterService = inject(this.periodFilterService);
+      this.periodFilterService.periodFilter$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((range: DateRange) => {
+          this.selectedPeriod = range.label;
+          this.dateForm.patchValue({
+            startDate: range.startDate,
+            endDate: range.endDate
+          });
+        });
+    } catch (e) {
+
+    }
+  }
+
+  ngOnInit(): void {}
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private initializeDefaultPeriod() {
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 30);
+
+    // Armazena as datas iniciais
+    this.currentStartDate = startDate;
+    this.currentEndDate = endDate;
 
     this.dateRangeSelected.emit({
       startDate,
@@ -79,26 +110,46 @@ export class PeriodPicker {
     { label: 'Últimos 90 dias', days: 90 }
   ];
 
+  private tempSelectedDays = 0;
+  private tempSelectedLabel = '';
+  private currentStartDate: Date | null = null;
+  private currentEndDate: Date | null = null;
+
   toggleDrawer() {
     this.isOpen = !this.isOpen;
+    
+    // Quando abrir o drawer, preenche os campos customizados com as datas atuais
+    if (this.isOpen && this.currentStartDate && this.currentEndDate) {
+      this.dateForm.patchValue({
+        startDate: this.currentStartDate,
+        endDate: this.currentEndDate
+      });
+    }
   }
 
   closeDrawer() {
     this.isOpen = false;
+    this.tempSelectedDays = 0;
+    this.tempSelectedLabel = '';
   }
 
   selectPeriod(label: string, days: number) {
+    this.tempSelectedLabel = label;
+    this.tempSelectedDays = days;
     this.selectedPeriod = label;
+
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    this.dateRangeSelected.emit({
+    // Armazena as datas atuais
+    this.currentStartDate = startDate;
+    this.currentEndDate = endDate;
+
+    this.dateForm.patchValue({
       startDate,
-      endDate,
-      label
+      endDate
     });
-    this.isOpen = false;
   }
 
   applyCustom() {
@@ -106,15 +157,33 @@ export class PeriodPicker {
     const endDate = this.dateForm.get('endDate')?.value;
 
     if (startDate && endDate) {
-      const formattedStartDate = this.formatDate(startDate);
-      const formattedEndDate = this.formatDate(endDate);
-      this.selectedPeriod = `${formattedStartDate} - ${formattedEndDate}`;
-      this.dateRangeSelected.emit({
+      let label = this.tempSelectedLabel;
+
+      if (!label) {
+        const formattedStartDate = this.formatDate(startDate);
+        const formattedEndDate = this.formatDate(endDate);
+        label = `${formattedStartDate} - ${formattedEndDate}`;
+      }
+
+      this.selectedPeriod = label;
+
+      // Armazena as datas atuais
+      this.currentStartDate = startDate;
+      this.currentEndDate = endDate;
+
+      const range: DateRange = {
         startDate,
         endDate,
-        label: this.selectedPeriod
-      });
+        label
+      };
+
+      this.dateRangeSelected.emit(range);
+      if (this.periodFilterService) {
+        this.periodFilterService.emitPeriodFilter(range);
+      }
       this.isOpen = false;
+      this.tempSelectedDays = 0;
+      this.tempSelectedLabel = '';
     }
   }
 

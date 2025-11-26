@@ -1,62 +1,203 @@
 import { Indicator } from '../../components/indicator/indicator';
-import { DonorsPercentage } from '../../components/donors-percentage/donors-percentage';
-import { DonorsLineChart } from '../../components/donors-line-chart/donors-line-chart';
+import { DonationsTypeDistribution } from '../../components/donations-type-distribution/donations-type-distribution';
 import { PeriodPicker, DateRange } from '../../../../shared/components/period-picker/period-picker';
-import { Component, OnInit } from '@angular/core';
-import { IndicatorData } from '../../models/indicator-data';
+import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
+import { IndicatorData, DonationData, DonationDistribution } from '../../models/indicator-data';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
+import { Donations } from '../../components/donations/donations';
+import { DashboardService, DonationTimeSeriesData, IndicatorsResponse, DonationTypeDistributionResponse, DonationTimeSeriesResponse } from '../../services/dashboard-service';
+import { CommonModule } from '@angular/common';
+import { Subject } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [Indicator, DonorsPercentage, DonorsLineChart, PeriodPicker, FormsModule, MatCardModule],
+  imports: [Indicator, DonationsTypeDistribution, Donations, PeriodPicker, FormsModule, MatCardModule, CommonModule],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })
-export class Dashboard implements OnInit {
-  indicators: IndicatorData[] = [
-    {
-      title: 'Doações',
-      value: 2000500,
-      valueType: 'currency'
-    },
-    {
-      title: 'Média de valor doado',
-      value: 849.7,
-      valueType: 'currency'
-    },
-    {
-      title: 'Qtde. de doadores',
-      value: 657800,
-      valueType: 'number'
-    },
-    {
-      title: 'Padrinhos ativos',
-      value: 1250,
-      valueType: 'number'
-    }
-  ];
+export class Dashboard implements OnInit, OnDestroy {
+  private dashboardService = inject(DashboardService);
+  private destroy$ = new Subject<void>();
 
-  indicatorsDateRange: DateRange | null = null;
-  donorsPercentageDateRange: DateRange | null = null;
-  donorsLineChartDateRange: DateRange | null = null;
+  // Signals para armazenar os dados
+  indicators = signal<IndicatorData[]>([]);
+  donationDistribution = signal<DonationDistribution | null>(null);
+  donationTimeSeries = signal<DonationData[]>([]);
 
-  constructor() {}
+  // Subjects para disparar as requisições individuais
+  private indicatorsDateRangeSubject = new Subject<DateRange>();
+  private donationDistributionDateRangeSubject = new Subject<DateRange>();
+  private donationTimeSeriesDateRangeSubject = new Subject<DateRange>();
+
+  constructor() {
+    // Cada Subject carrega seus próprios dados
+    this.indicatorsDateRangeSubject
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(range => {
+        this.loadIndicators(range);
+      });
+
+    this.donationDistributionDateRangeSubject
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(range => {
+        this.loadDonationTypeDistribution(range);
+      });
+
+    this.donationTimeSeriesDateRangeSubject
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(range => {
+        this.loadDonationTimeSeries(range);
+      });
+  }
 
   onIndicatorsDateRangeSelected(range: DateRange) {
-    this.indicatorsDateRange = range;
-    console.log('Filtro indicadores:', range);
+    this.indicatorsDateRangeSubject.next(range);
   }
 
-  onDonorsPercentageDateRangeSelected(range: DateRange) {
-    this.donorsPercentageDateRange = range;
-    console.log('Filtro gráfico percentual:', range);
+  onDonationsTypeDistributionDateRangeSelected(range: DateRange) {
+    this.donationDistributionDateRangeSubject.next(range);
   }
 
-  onDonorsLineChartDateRangeSelected(range: DateRange) {
-    this.donorsLineChartDateRange = range;
-    console.log('Filtro gráfico linha:', range);
+  onDonationsDateRangeSelected(range: DateRange) {
+    this.donationTimeSeriesDateRangeSubject.next(range);
   }
 
-  ngOnInit(): void {}
+  private loadIndicators(range: DateRange): void {
+    const startDate = this.formatDateToString(range.startDate);
+    const endDate = this.formatDateToString(range.endDate);
+
+    this.dashboardService
+      .getIndicators(startDate, endDate)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: IndicatorsResponse) => {
+          this.indicators.set([
+            {
+              title: 'Doações',
+              value: response.data.totalDonations,
+              valueType: 'currency'
+            },
+            {
+              title: 'Média de valor doado',
+              value: response.data.averageDonationValue,
+              valueType: 'currency'
+            },
+            {
+              title: 'Qtde. de doadores',
+              value: response.data.totalDonors,
+              valueType: 'number'
+            },
+            {
+              title: 'Padrinhos ativos',
+              value: response.data.activeSponsorships,
+              valueType: 'number'
+            }
+          ]);
+        },
+        error: (error) => {
+          console.error('Erro ao carregar indicadores:', error);
+        }
+      });
+  }
+
+  private loadDonationTypeDistribution(range: DateRange): void {
+    const startDate = this.formatDateToString(range.startDate);
+    const endDate = this.formatDateToString(range.endDate);
+
+    this.dashboardService
+      .getDonationTypeDistribution(startDate, endDate)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: DonationTypeDistributionResponse) => {
+          this.donationDistribution.set({
+            oneTime: response.data.oneTimeDonation,
+            recurring: response.data.recurringDonation,
+            total: response.data.totalDonations
+          });
+        },
+        error: (error) => {
+          console.error('Erro ao carregar distribuição de doações:', error);
+        }
+      });
+  }
+
+  private loadDonationTimeSeries(range: DateRange): void {
+    const startDate = this.formatDateToString(range.startDate);
+    const endDate = this.formatDateToString(range.endDate);
+    const groupBy = this.calculateGroupBy(range);
+
+    this.dashboardService
+      .getDonationsByPeriod(startDate, endDate, groupBy)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: DonationTimeSeriesResponse) => {
+          this.donationTimeSeries.set(
+            this.transformTimeSeriesData(response.data)
+          );
+        },
+        error: (error) => {
+          console.error('Erro ao carregar série temporal de doações:', error);
+        }
+      });
+  }
+
+  private transformTimeSeriesData(data: DonationTimeSeriesData): DonationData[] {
+    const dataMap = new Map<string, DonationData>();
+
+    data.oneTimeDonations.forEach(item => {
+      if (!dataMap.has(item.period)) {
+        dataMap.set(item.period, { period: item.period, oneTime: 0, recurring: 0 });
+      }
+      const current = dataMap.get(item.period)!;
+      current.oneTime += item.value;
+    });
+
+    data.recurringDonations.forEach(item => {
+      if (!dataMap.has(item.period)) {
+        dataMap.set(item.period, { period: item.period, oneTime: 0, recurring: 0 });
+      }
+      const current = dataMap.get(item.period)!;
+      current.recurring += item.value;
+    });
+
+    return Array.from(dataMap.values()).sort((a, b) => a.period.localeCompare(b.period));
+  }
+
+  private calculateGroupBy(range: DateRange): 'month' | 'day' {
+    const start = new Date(range.startDate);
+    const end = new Date(range.endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays > 90 ? 'month' : 'day';
+  }
+
+  private formatDateToString(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  ngOnInit(): void {
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    const initialRange: DateRange = {
+      startDate: thirtyDaysAgo,
+      endDate: today,
+      label: 'Últimos 30 dias'
+    };
+
+    this.indicatorsDateRangeSubject.next(initialRange);
+    this.donationDistributionDateRangeSubject.next(initialRange);
+    this.donationTimeSeriesDateRangeSubject.next(initialRange);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

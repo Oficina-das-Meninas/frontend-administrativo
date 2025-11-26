@@ -42,7 +42,7 @@ export class EventService {
     }
 
     return this.httpClient
-      .get<ApiPagedResponse<Event>>(this.API_URL, { params })
+      .get<ApiPagedResponse<Event>>(this.API_URL, { params, withCredentials: true })
       .pipe(
         map((resp) => {
           const contents = resp.data?.contents ?? [];
@@ -62,11 +62,11 @@ export class EventService {
   }
 
   create(eventData: FormData): Observable<void> {
-    return this.httpClient.post<void>(this.API_URL, eventData);
+    return this.httpClient.post<void>(this.API_URL, eventData, { withCredentials: true });
   }
 
   getById(eventId: string): Observable<Event> {
-    return this.httpClient.get<ApiPagedResponse<Event>>(`${this.API_URL}/${eventId}`).pipe(
+    return this.httpClient.get<ApiPagedResponse<Event>>(`${this.API_URL}/${eventId}`, { withCredentials: true }).pipe(
       map((resp) => {
         const ev = resp.data as unknown as Event;
         return {
@@ -79,7 +79,7 @@ export class EventService {
   }
 
   update(eventId: string, eventData: FormData): Observable<void> {
-    return this.httpClient.put<void>(`${this.API_URL}/${eventId}`, eventData);
+    return this.httpClient.put<void>(`${this.API_URL}/${eventId}`, eventData, { withCredentials: true });
   }
 
   delete(eventId: string): Observable<void> {

@@ -14,9 +14,11 @@ export class ImageInputComponent implements OnChanges {
   @Input() label: string = '';
   @Input() hint: string = '';
   @Input() limit: number = 1;
+  @Input() maxFileSize: number = 10;
   @Input() fullPreview: boolean = false;
   @Input() initialUrls: string[] = [];
   @Output() filesSelected = new EventEmitter<File[]>();
+  @Output() fileSizeExceeded = new EventEmitter<{ fileName: string; fileSize: number; maxSize: number }>();
 
   private zone = inject(NgZone);
   @Input() readonly = false;
@@ -27,6 +29,7 @@ export class ImageInputComponent implements OnChanges {
   private dragCounter = 0;
   isLoadingInitialImages = signal<boolean>(false);
   private loadingCounter = signal<number>(0);
+  fileSizeErrorMessage = signal<string>('');
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['initialUrls']) {
@@ -82,7 +85,24 @@ export class ImageInputComponent implements OnChanges {
   }
 
   addFiles(files: File[]) {
+    this.fileSizeErrorMessage.set('');
+
+    const errors: string[] = [];
+
     for (let file of files) {
+      const maxSizeInBytes = this.maxFileSize * 1024 * 1024;
+      if (file.size > maxSizeInBytes) {
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        const errorMessage = `Arquivo "${file.name}" excede o tamanho máximo de ${this.maxFileSize}MB (tamanho atual: ${fileSizeMB}MB)`;
+        errors.push(errorMessage);
+        this.fileSizeExceeded.emit({
+          fileName: file.name,
+          fileSize: file.size,
+          maxSize: maxSizeInBytes
+        });
+        continue;
+      }
+
       const reader = new FileReader();
       reader.onload = () => {
         this.zone.run(() => {
@@ -92,6 +112,10 @@ export class ImageInputComponent implements OnChanges {
         });
       };
       reader.readAsDataURL(file);
+    }
+
+    if (errors.length > 0) {
+      this.fileSizeErrorMessage.set(errors.join('\n'));
     }
   }
 

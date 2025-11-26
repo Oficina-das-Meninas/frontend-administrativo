@@ -1,0 +1,18 @@
+<ng-template #logoutDialog>
+  <app-dialog title="Sessão Expirada" [hasCloseButton]="false">
+    <ng-container dialogContent>
+      <p class="text-base text-gray-600">
+        Sua sessão expirou. Por favor, faça login novamente para continuar.
+      </p>
+      <p class="mt-2 text-sm text-gray-600">
+        Você será redirecionado automaticamente para a tela de login em 
+        <strong>{{ secondsRemaining() }}</strong> segundos.
+      </p>
+    </ng-container>
+    <ng-container dialogConfirmButton>
+      <button matButton="filled" (click)="toLogin()">
+        <span class="text-lg font-semibold">Ir para Login</span>
+      </button>
+    </ng-container>
+  </app-dialog>
+</ng-template>

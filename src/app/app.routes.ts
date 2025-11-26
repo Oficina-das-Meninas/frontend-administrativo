@@ -3,16 +3,14 @@ import { eventResolver } from './domain/events/guards/event-resolver';
 import { partnerResolver } from './domain/partners/guards/partner-resolver';
 import { unsavedChangesGuard } from './shared/guards/unsaved-changes.guard';
 import { authGuard } from './shared/guards/auth/auth-guard';
-import { inject } from '@angular/core';
-import { AuthService } from './domain/auth/services/auth-service';
 
 export const routes: Routes = [
   {
     path: 'logout',
-    redirectTo: () => {
-      const authService = inject(AuthService);
-      return authService.logout();
-    },
+    loadComponent: () =>
+      import('./domain/auth/containers/logout/logout').then(
+        (m) => m.Logout
+      ),
   },
   {
     path: 'login',
@@ -20,7 +18,6 @@ export const routes: Routes = [
       import('./domain/auth/containers/login/login').then(
         (m) => m.Login
       ),
-    canActivate: [authGuard],
   },
   {
     path: '',
@@ -141,6 +138,16 @@ export const routes: Routes = [
           ),
         data: {
           breadcrumb: 'Doações',
+        },
+      },
+      {
+        path: 'doadores',
+        loadComponent: () =>
+          import('./domain/donors/containers/donors/donors').then(
+            (m) => m.Donors
+          ),
+        data: {
+          breadcrumb: 'Doadores',
         },
       }
     ],

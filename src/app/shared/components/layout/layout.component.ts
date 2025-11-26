@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { RouterOutlet } from '@angular/router';
@@ -7,6 +7,7 @@ import { HeaderComponent } from "./header/header.component";
 import { SidenavComponent } from "./sidenav/sidenav.component";
 import { NavItem } from '../../models/nav-item';
 import { Profile } from '../../models/profile';
+import { SessionService } from '../../../domain/auth/services/session-service';
 
 @Component({
   selector: 'app-layout',
@@ -25,7 +26,9 @@ export class LayoutComponent implements OnInit {
   isMobile: boolean = false;
   sidenavItems: NavItem[] = [];
   menuItems: NavItem[] = [];
-  profile!: Profile;
+  username: string = "";
+
+  private sessionService = inject(SessionService);
 
   constructor(private breakpointObserver: BreakpointObserver) {
     this.breakpointObserver.observe([Breakpoints.Handset]).subscribe(result => {
@@ -34,6 +37,10 @@ export class LayoutComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.sessionService.username$.subscribe(username => {
+      this.username = username;
+    });
+
     this.sidenavItems = [
       {
         matIcon: "dashboard",
@@ -41,9 +48,8 @@ export class LayoutComponent implements OnInit {
         path: "/dashboard"
       },
       {
-        matIcon: "handshake",
-        title: "Transparência",
-        path: "/transparencia"
+        category: "Institucional",
+        isCategory: true
       },
       {
         matIcon: "calendar_month",
@@ -56,9 +62,29 @@ export class LayoutComponent implements OnInit {
         path: '/parceiros',
       },
       {
+        matIcon: "handshake",
+        title: "Transparência",
+        path: "/transparencia"
+      },
+      {
+        category: "Apoio",
+        isCategory: true
+      },
+      {
         matIcon: "volunteer_activism",
         title: "Doações",
         path: "/doacoes"
+      },
+      {
+        matIcon: "diversity_1",
+        title: "Doadores",
+        path: "/doadores"
+      },
+      {
+        matIcon: "settings",
+        title: "Configurações",
+        path: "/configuracoes",
+        position: "bottom"
       }
     ];
 
@@ -69,11 +95,6 @@ export class LayoutComponent implements OnInit {
         path: '/logout',
       },
     ];
-
-    this.profile = {
-      username: "Usuário Logado",
-      role: "Cargo",
-    }
   }
 
 }

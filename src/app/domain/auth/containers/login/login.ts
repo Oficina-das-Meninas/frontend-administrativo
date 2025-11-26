@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../../auth/services/auth-service';
 import { LoginRequest } from '../../models/login-request';
+import { Router } from '@angular/router';
+import { SessionService } from '../../services/session-service';
 
 @Component({
   selector: 'app-login',
@@ -18,11 +20,13 @@ import { LoginRequest } from '../../models/login-request';
 })
 export class Login {
 
-  isInvalidRequest = false;
+  errorMessage: string | null = null;
   loginForm: FormGroup;
 
   private authService = inject(AuthService);
+  private sessionService = inject(SessionService);
   private formBuilder = inject(FormBuilder);
+  private router = inject(Router);
 
   constructor() {
     this.loginForm = this.formBuilder.group({
@@ -39,12 +43,18 @@ export class Login {
       }
 
       this.authService.login(data).subscribe({
-        next: () => {
+        next: (response) => {
+          this.errorMessage = null;
           this.loginForm.reset();
+
+          const user = response.data.user;
+          this.sessionService.setUsername(user.name);
+          
+          this.router.navigate(['/']);
         },
-        error: () => {
-          this.loginForm.reset();
-          this.isInvalidRequest = true;
+        error: (response) => {
+          this.loginForm.reset();    
+          this.errorMessage = response.error?.message;
         }
       });
     }

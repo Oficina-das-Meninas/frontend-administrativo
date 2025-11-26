@@ -157,7 +157,7 @@
                     } @else {
                       <th mat-header-cell *matHeaderCellDef> {{ column.header }} </th>
                     }
-                    <td mat-cell *matCellDef="let element">
+                    <td mat-cell *matCellDef="let element" class="max-w-md">
                       @if (column.cellTemplate) {
                         <ng-container
                           [ngTemplateOutlet]="column.cellTemplate"
@@ -179,7 +179,7 @@
                           @case ('badge') {
                             @if (getCellValue(element, column)) {
                               @if (getBadgeStyles(getCellValue(element, column), column); as styles) {
-                                <span [ngClass]="'inline-flex items-center px-3 py-1 rounded-xl text-xs font-semibold capitalize tracking-wide ' + styles.bgColor + ' ' + styles.textColor">
+                                <span [ngClass]="'inline-flex items-center px-3 py-1 rounded-xl text-xs font-semibold capitalize tracking-wide' + styles.bgColor + ' ' + styles.textColor">
                                   {{ getCellValue(element, column) }}
                                 </span>
                               }

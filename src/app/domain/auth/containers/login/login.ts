@@ -59,6 +59,7 @@ export class Login {
           this.isUnauthorized = true;
         },
         error: () => {
+          this.isUnauthorized = false;
           this.loginForm.reset();
           this.isInvalidRequest = true;
         }

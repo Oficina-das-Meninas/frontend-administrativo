@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../../auth/services/auth-service';
 import { LoginRequest } from '../../models/login-request';
 import { Router } from '@angular/router';
+import { SessionService } from '../../services/session-service';
 
 @Component({
   selector: 'app-login',
@@ -19,10 +20,12 @@ import { Router } from '@angular/router';
 })
 export class Login {
 
+  isUnauthorized = false;
   isInvalidRequest = false;
   loginForm: FormGroup;
 
   private authService = inject(AuthService);
+  private sessionService = inject(SessionService);
   private formBuilder = inject(FormBuilder);
   private router = inject(Router);
 
@@ -41,11 +44,22 @@ export class Login {
       }
 
       this.authService.login(data).subscribe({
-        next: () => {
+        next: (response) => {
+          this.isInvalidRequest = false;
+          this.isUnauthorized = false;
           this.loginForm.reset();
-          this.router.navigate(['/']);
+          const user = response.data.user;
+
+          if (user.isAdmin) {
+            this.sessionService.setUsername(user.name);
+            this.router.navigate(['/']);
+            return;
+          }
+
+          this.isUnauthorized = true;
         },
         error: () => {
+          this.isUnauthorized = false;
           this.loginForm.reset();
           this.isInvalidRequest = true;
         }

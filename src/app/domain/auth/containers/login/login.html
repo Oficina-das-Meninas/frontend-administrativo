@@ -61,6 +61,12 @@
         </p>
       }
 
+      @if (isUnauthorized) {
+        <p class="text-[#ba1a1a] text-sm py-2">
+          Usuário não autorizado a acessar o sistema!
+        </p>
+      }
+
       <div class="flex w-full justify-end py-2">
         <p class="text-[#bf1469] text-sm cursor-pointer hover:underline">
           Esqueceu sua senha?

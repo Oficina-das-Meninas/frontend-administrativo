@@ -3,25 +3,13 @@ import { inject } from '@angular/core';
 import { SessionService } from '../../../domain/auth/services/session-service';
 import { catchError, map, of } from 'rxjs';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = () => {
   const router = inject(Router);
   const sessionService = inject(SessionService);
 
-  const isLoginPage = state.url === '/login';
-
   return sessionService.getSession().pipe(
-    map(() => {
-      if (isLoginPage) {
-        return router.parseUrl('/');
-      }
-      return true;
-    }),
-    catchError(() => {
-      if (!isLoginPage) {
-        return of(router.parseUrl('/login'));
-      }
-      return of(true);
-    })
+    map(() => true),
+    catchError(() => of(router.parseUrl('/login')))
   );
-  
 };
+

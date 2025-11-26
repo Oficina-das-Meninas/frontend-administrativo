@@ -45,6 +45,8 @@ export class Login {
 
       this.authService.login(data).subscribe({
         next: (response) => {
+          this.isInvalidRequest = false;
+          this.isUnauthorized = false;
           this.loginForm.reset();
           const user = response.data.user;
 

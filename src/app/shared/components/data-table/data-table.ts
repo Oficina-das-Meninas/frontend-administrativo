@@ -82,6 +82,8 @@ export class DataTable<T extends { id: string }> implements OnInit {
   @Output() dateFilter = new EventEmitter<DateRange>();
   @Output() clearFilters = new EventEmitter<void>();
   @Output() sortChange = new EventEmitter<{ sortField: string; sortDirection: 'asc' | 'desc' }>();
+  @Output() deleteSuccess = new EventEmitter<string>();
+  @Output() deleteError = new EventEmitter<any>();
 
   pageIndex = 0;
   pageSize = 10;
@@ -260,7 +262,9 @@ export class DataTable<T extends { id: string }> implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result && this.deleteService && this.itemToDelete) {
         this.deleteService.delete(this.itemToDelete.id).subscribe({
-          next: () => {
+          next: (response: any) => {
+            const message = response?.message || 'Item excluído com sucesso';
+            this.deleteSuccess.emit(message);
             this.pageChange.emit({
               pageIndex: this.pageIndex,
               pageSize: this.pageSize,
@@ -269,6 +273,7 @@ export class DataTable<T extends { id: string }> implements OnInit {
           },
           error: (error) => {
             console.error('Erro ao excluir item:', error);
+            this.deleteError.emit(error);
           }
         });
       }

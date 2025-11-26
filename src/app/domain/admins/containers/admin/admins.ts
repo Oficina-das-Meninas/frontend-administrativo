@@ -47,6 +47,12 @@ export class Admins implements OnInit {
   pageIndex = 0;
   pageSize = 10;
 
+  deleteService = {
+    delete: (id: string) => {
+      return this.adminService.deleteAdmin(id);
+    }
+  };
+
   private adminService = inject(AdminsService);
   private dialog = inject(MatDialog);
   private formBuilder = inject(FormBuilder);
@@ -88,7 +94,6 @@ export class Admins implements OnInit {
       pageSize: this.pageSize,
       searchTerm: this.searchTerm || undefined
     });
-    console.log(this.admins$)
   }
 
   openAddAdminDialog() {
@@ -108,5 +113,13 @@ export class Admins implements OnInit {
         error: (err) => this.snackbar.error(err.error?.message)
       });
     }
+  }
+
+  onDeleteSuccess(message: string) {
+    this.snackbar.success(message);
+  }
+
+  onDeleteError(error: any) {
+    this.snackbar.error(error.error?.message || 'Erro ao excluir administrador');
   }
 }

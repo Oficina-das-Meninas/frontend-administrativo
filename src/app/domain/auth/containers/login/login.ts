@@ -49,8 +49,8 @@ export class Login {
           const user = response.data.user;
 
           if (user.isAdmin) {
-            this.router.navigate(['/']);
             this.sessionService.setUsername(user.name);
+            this.router.navigate(['/']);
             return;
           }
 

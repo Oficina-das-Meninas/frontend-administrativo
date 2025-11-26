@@ -1,5 +1,5 @@
 <div class="bg-gray-50 min-h-screen">
-  <section class="mb-8">
+  <section class="mb-6">
     <mat-card class="w-full" appearance="outlined">
       <mat-card-content class="p-4">
         <div class="flex justify-between items-center mb-4">
@@ -11,7 +11,8 @@
             <app-indicator
               [title]="indicator.title"
               [value]="indicator.value"
-              [valueType]="indicator.valueType">
+              [valueType]="indicator.valueType"
+              [tooltipText]="indicator.tooltipText">
             </app-indicator>
           }
         </div>

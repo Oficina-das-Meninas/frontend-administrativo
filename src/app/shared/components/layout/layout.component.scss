@@ -17,3 +17,6 @@
   justify-content: start;
 }
 
+::ng-deep .mat-drawer-content {
+  z-index: auto !important;
+}

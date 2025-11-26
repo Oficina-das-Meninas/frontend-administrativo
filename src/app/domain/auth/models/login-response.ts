@@ -1,3 +1,8 @@
 export type LoginResponse = {
-  token: string
+  user: {
+    id: string
+    name: string
+    isAdmin: boolean
+  },
+  expiresIn: number
 }

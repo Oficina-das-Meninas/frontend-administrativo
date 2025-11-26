@@ -69,11 +69,11 @@ export class LayoutComponent implements OnInit {
         path: "/doacoes"
       },
       {
-<<<<<<< HEAD
         matIcon: "people",
         title: "Administradores",
-        path: "/admins"
-=======
+        path: "/admins",
+      },
+      {
         matIcon: "diversity_1",
         title: "Doadores",
         path: "/doadores"
@@ -83,7 +83,6 @@ export class LayoutComponent implements OnInit {
         title: "Configurações",
         path: "/configuracoes",
         position: "bottom"
->>>>>>> a88311c459bd22a21a62beb0851be0da4fb41db4
       }
     ];
 

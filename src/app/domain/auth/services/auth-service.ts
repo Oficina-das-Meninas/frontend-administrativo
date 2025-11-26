@@ -14,8 +14,8 @@ export class AuthService {
 
   private httpClient = inject(HttpClient);
 
-  login(data: LoginRequest): Observable<{ data: LoginResponse }> {
-    return this.httpClient.post<{ data: LoginResponse }>(`${this.API_URL}/login`, data, { withCredentials: true });
+  login(data: LoginRequest): Observable<{ message: string, data: LoginResponse }> {
+    return this.httpClient.post<{ message: string, data: LoginResponse }>(`${this.API_URL}/login`, data, { withCredentials: true });
   }
 
   logout(): Observable<void> {

@@ -55,15 +55,9 @@
         </button>
       </form>
 
-      @if (isInvalidRequest) {
+      @if (errorMessage) {
         <p class="text-[#ba1a1a] text-sm py-2">
-          Credenciais inválidas, tente novamente em instantes!
-        </p>
-      }
-
-      @if (isUnauthorized) {
-        <p class="text-[#ba1a1a] text-sm py-2">
-          Usuário não autorizado a acessar o sistema!
+          {{ errorMessage }}
         </p>
       }
 

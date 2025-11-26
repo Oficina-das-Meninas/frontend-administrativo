@@ -20,8 +20,7 @@ import { SessionService } from '../../services/session-service';
 })
 export class Login {
 
-  isUnauthorized = false;
-  isInvalidRequest = false;
+  errorMessage: string | null = null;
   loginForm: FormGroup;
 
   private authService = inject(AuthService);
@@ -45,23 +44,17 @@ export class Login {
 
       this.authService.login(data).subscribe({
         next: (response) => {
-          this.isInvalidRequest = false;
-          this.isUnauthorized = false;
+          this.errorMessage = null;
           this.loginForm.reset();
+
           const user = response.data.user;
-
-          if (user.isAdmin) {
-            this.sessionService.setUsername(user.name);
-            this.router.navigate(['/']);
-            return;
-          }
-
-          this.isUnauthorized = true;
+          this.sessionService.setUsername(user.name);
+          
+          this.router.navigate(['/']);
         },
-        error: () => {
-          this.isUnauthorized = false;
-          this.loginForm.reset();
-          this.isInvalidRequest = true;
+        error: (response) => {
+          this.loginForm.reset();    
+          this.errorMessage = response.error?.message;
         }
       });
     }

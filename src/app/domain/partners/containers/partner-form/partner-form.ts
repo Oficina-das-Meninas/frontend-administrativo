@@ -172,22 +172,12 @@ export class PartnerForm implements OnInit, CanComponentDeactivate {
 
     request$.subscribe({
       next: () => {
-        const successMessage = this.isEditMode()
-          ? 'Parceiro atualizado com sucesso!'
-          : 'Parceiro cadastrado com sucesso!';
-
-        this.snackbarService.success(successMessage);
         this.partnerForm.reset();
         this.existingPreviewImageUrl.set('');
         this.initialFormValue = this.normalizeValue(this.partnerForm.getRawValue());
         this.router.navigate(['/parceiros'], { replaceUrl: true });
       },
       error: (error) => {
-        const errorMessage = this.isEditMode()
-          ? 'Erro ao atualizar parceiro. Tente novamente.'
-          : 'Erro ao cadastrar parceiro. Tente novamente.';
-
-        this.snackbarService.error(errorMessage);
         console.error('Erro ao salvar parceiro:', error);
         this.isLoading.set(false);
       }

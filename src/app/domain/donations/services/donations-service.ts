@@ -90,7 +90,7 @@ export class DonationsService {
       params = params.set('sortDirection', filters.sortDirection);
     }
 
-    return this.httpClient.get<ApiPagedResponse<Donation>>(this.API_URL, { params }).pipe(
+    return this.httpClient.get<ApiPagedResponse<Donation>>(this.API_URL, { params, withCredentials: true }).pipe(
       map((resp) => {
         const contents = resp.data?.contents ?? [];
 
@@ -118,7 +118,7 @@ export class DonationsService {
   }
 
   getById(donationId: string): Observable<Donation> {
-    return this.httpClient.get<ApiPagedResponse<Donation>>(`${this.API_URL}/${donationId}`).pipe(
+    return this.httpClient.get<ApiPagedResponse<Donation>>(`${this.API_URL}/${donationId}`, { withCredentials: true }).pipe(
       map((resp) => {
         const donation = resp.data?.contents?.[0] ?? resp.data as unknown as Donation;
         return {

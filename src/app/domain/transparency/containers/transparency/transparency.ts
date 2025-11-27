@@ -20,7 +20,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
 import { FormSelect } from "../../../../shared/components/form-select/form-select";
 import { FormSelectItem } from '../../../../shared/models/form-select-item';
-import { SnackbarService } from '../../../../shared/services/snackbar-service';
 
 @Component({
   selector: 'app-transparency',
@@ -68,7 +67,6 @@ export class Transparency implements OnInit {
   private transparencyService = inject(TransparencyService);
   private dialog = inject(MatDialog);
   private formBuilder = inject(FormBuilder);
-  private snackbarService = inject(SnackbarService);
 
   constructor() {
     this.categoryForm = this.formBuilder.group({
@@ -111,14 +109,10 @@ export class Transparency implements OnInit {
         })
       )
       .subscribe({
-        next: (response) => {
+        next: () => {
           this.categoryForm.reset({ 
             type: AccordionContentType.DOCUMENT 
           });
-          this.snackbarService.success(response.message)
-        },
-        error: (response) => { 
-          this.snackbarService.error(response.error?.message)
         }
       });
     }

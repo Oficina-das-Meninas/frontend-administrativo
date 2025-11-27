@@ -37,7 +37,7 @@ export class DonorService {
     }
 
     return this.httpClient
-      .get<ApiPagedResponse<Donor>>(this.API_URL, { params })
+      .get<ApiPagedResponse<Donor>>(this.API_URL, { params, withCredentials: true })
       .pipe(
         map((response) => ({
           data: response.data.contents,

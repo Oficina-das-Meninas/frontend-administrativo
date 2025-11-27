@@ -18,7 +18,6 @@ import { AccordionContent } from '../../models/transparency-accordion/accordion-
 import { DeleteItem } from '../../models/transparency-accordion/delete-item';
 import { TransparencyCategory } from '../../models/transparency/transparency-category';
 import { TransparencyService } from '../../services/transparency.service';
-import { SnackbarService } from '../../../../shared/services/snackbar-service';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -65,7 +64,6 @@ export class TransparencyContent {
   private transparencyService = inject(TransparencyService);
   private dialog = inject(MatDialog);
   private formBuilder = inject(FormBuilder);
-  private snackbarService = inject(SnackbarService);
 
   constructor() {
     this.documentForm = this.formBuilder.group({
@@ -135,10 +133,7 @@ export class TransparencyContent {
           this.documentForm.reset();
         })
       )
-      .subscribe({
-        next: (response) => this.snackbarService.success(response.message),
-        error: (response) => this.snackbarService.error(response.error?.message)
-      });
+      .subscribe();
     }
   }
 
@@ -166,10 +161,7 @@ export class TransparencyContent {
           this.collaboratorForm.reset();
         })
       )
-      .subscribe({
-        next: (response) => this.snackbarService.success(response.message),
-        error: (response) => this.snackbarService.error(response.error?.message)
-      });
+      .subscribe();
     }
   }
 
@@ -188,10 +180,7 @@ export class TransparencyContent {
           this.categoryForm.reset();
         })
       )
-      .subscribe({
-        next: (response) => this.snackbarService.success(response.message),
-        error: (response) => this.snackbarService.error(response.error?.message)
-      });
+      .subscribe();
     }
   }
 
@@ -214,10 +203,7 @@ export class TransparencyContent {
         this.dialog.closeAll();
       })
     )
-    .subscribe({
-      next: (response) => this.snackbarService.success(response.message),
-      error: (response) => this.snackbarService.error(response.error?.message)
-    });
+    .subscribe();
   }
 
   onDeleteItemDialog(): void {
@@ -233,10 +219,7 @@ export class TransparencyContent {
         this.dialog.closeAll();
       })
     )
-    .subscribe({
-      next: (response) => this.snackbarService.success(response.message),
-      error: (response) => this.snackbarService.error(response.error?.message)
-    });
+    .subscribe();
   }
 
 }

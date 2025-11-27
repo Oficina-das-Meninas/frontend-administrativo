@@ -83,7 +83,6 @@ export class PeriodPicker implements OnInit, OnDestroy {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 30);
 
-    // Armazena as datas iniciais
     this.currentStartDate = startDate;
     this.currentEndDate = endDate;
 
@@ -117,8 +116,7 @@ export class PeriodPicker implements OnInit, OnDestroy {
 
   toggleDrawer() {
     this.isOpen = !this.isOpen;
-    
-    // Quando abrir o drawer, preenche os campos customizados com as datas atuais
+
     if (this.isOpen && this.currentStartDate && this.currentEndDate) {
       this.dateForm.patchValue({
         startDate: this.currentStartDate,
@@ -142,7 +140,6 @@ export class PeriodPicker implements OnInit, OnDestroy {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    // Armazena as datas atuais
     this.currentStartDate = startDate;
     this.currentEndDate = endDate;
 
@@ -167,7 +164,6 @@ export class PeriodPicker implements OnInit, OnDestroy {
 
       this.selectedPeriod = label;
 
-      // Armazena as datas atuais
       this.currentStartDate = startDate;
       this.currentEndDate = endDate;
 

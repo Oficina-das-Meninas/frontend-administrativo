@@ -21,18 +21,28 @@ export class Dashboard implements OnInit, OnDestroy {
   private dashboardService = inject(DashboardService);
   private destroy$ = new Subject<void>();
 
-  // Signals para armazenar os dados
   indicators = signal<IndicatorData[]>([]);
   donationDistribution = signal<DonationDistribution | null>(null);
   donationTimeSeries = signal<DonationData[]>([]);
 
-  // Subjects para disparar as requisições individuais
   private indicatorsDateRangeSubject = new Subject<DateRange>();
   private donationDistributionDateRangeSubject = new Subject<DateRange>();
   private donationTimeSeriesDateRangeSubject = new Subject<DateRange>();
 
-  constructor() {
-    // Cada Subject carrega seus próprios dados
+  ngOnInit(): void {
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    const initialRange: DateRange = {
+      startDate: thirtyDaysAgo,
+      endDate: today,
+      label: 'Últimos 30 dias'
+    };
+
+    this.indicatorsDateRangeSubject.next(initialRange);
+    this.donationDistributionDateRangeSubject.next(initialRange);
+    this.donationTimeSeriesDateRangeSubject.next(initialRange);
+
     this.indicatorsDateRangeSubject
       .pipe(takeUntil(this.destroy$))
       .subscribe(range => {
@@ -77,22 +87,26 @@ export class Dashboard implements OnInit, OnDestroy {
             {
               title: 'Doações',
               value: response.data.totalDonations,
-              valueType: 'currency'
+              valueType: 'currency',
+              tooltipText: 'Quantidade total arrecadado em doações'
             },
             {
               title: 'Média de valor doado',
               value: response.data.averageDonationValue,
-              valueType: 'currency'
+              valueType: 'currency',
+              tooltipText: 'Indica quanto, em média, cada pessoa doa. Por que isso é importante? É possível estimar quantos doadores serão necessários para alcançar a meta de arrecadação'
             },
             {
               title: 'Qtde. de doadores',
               value: response.data.totalDonors,
-              valueType: 'number'
+              valueType: 'number',
+              tooltipText: 'Número total de pessoas que realizaram doações'
             },
             {
               title: 'Padrinhos ativos',
               value: response.data.activeSponsorships,
-              valueType: 'number'
+              valueType: 'number',
+              tooltipText: 'Número de doadores que possuem doações recorrentes ativas'
             }
           ]);
         },
@@ -127,6 +141,8 @@ export class Dashboard implements OnInit, OnDestroy {
     const startDate = this.formatDateToString(range.startDate);
     const endDate = this.formatDateToString(range.endDate);
     const groupBy = this.calculateGroupBy(range);
+
+    console.log(startDate, endDate, groupBy);
 
     this.dashboardService
       .getDonationsByPeriod(startDate, endDate, groupBy)
@@ -179,21 +195,6 @@ export class Dashboard implements OnInit, OnDestroy {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
-  }
-
-  ngOnInit(): void {
-    const today = new Date();
-    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-    const initialRange: DateRange = {
-      startDate: thirtyDaysAgo,
-      endDate: today,
-      label: 'Últimos 30 dias'
-    };
-
-    this.indicatorsDateRangeSubject.next(initialRange);
-    this.donationDistributionDateRangeSubject.next(initialRange);
-    this.donationTimeSeriesDateRangeSubject.next(initialRange);
   }
 
   ngOnDestroy(): void {

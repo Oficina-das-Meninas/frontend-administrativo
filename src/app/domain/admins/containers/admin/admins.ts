@@ -117,6 +117,7 @@ export class Admins implements OnInit {
 
   onDeleteSuccess(message: string) {
     this.snackbar.success(message);
+    this.loadAdminWithFilters();
   }
 
   onDeleteError(error: any) {

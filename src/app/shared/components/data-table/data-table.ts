@@ -50,6 +50,7 @@ import { DataPage, DeleteService, TableColumn, BadgeColorConfig } from '../../mo
 })
 export class DataTable<T extends { id: string }> implements OnInit {
   @Input() showActions = true;
+  @Input() removeEditAction = false;
   @Input() enableSort = false;
   @Input() dataTitle = '';
   @Input() searchPlaceholder = 'Buscar...';

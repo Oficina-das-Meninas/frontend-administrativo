@@ -205,10 +205,12 @@
                         <mat-icon>more_vert</mat-icon>
                       </button>
                       <mat-menu #menu="matMenu">
-                        <button mat-menu-item (click)="navigateToEdit(element.id)">
-                          <mat-icon>edit</mat-icon>
-                          <span>Editar</span>
-                        </button>
+                        @if (!removeEditAction) {
+                          <button mat-menu-item (click)="navigateToEdit(element.id)">
+                            <mat-icon>edit</mat-icon>
+                            <span>Editar</span>
+                          </button>
+                        }
                         <button mat-menu-item (click)="confirmDelete(element)">
                           <mat-icon>delete</mat-icon>
                           <span>Excluir</span>

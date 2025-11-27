@@ -8,6 +8,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { CookieService } from 'ngx-cookie-service';
 import { authInterceptor } from './shared/interceptors/auth-interceptor';
+import { snackbarInterceptor } from './shared/interceptors/snackbar-interceptor';
 
 registerLocaleData(localePt);
 
@@ -35,7 +36,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(
       withFetch(), 
-      withInterceptors([authInterceptor])
+      withInterceptors([authInterceptor, snackbarInterceptor])
     ),
     { provide: MatPaginatorIntl, useFactory: configureMatPaginatorIntl }
   ]

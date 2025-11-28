@@ -39,10 +39,6 @@ export class Dashboard implements OnInit, OnDestroy {
       label: 'Últimos 30 dias'
     };
 
-    this.indicatorsDateRangeSubject.next(initialRange);
-    this.donationDistributionDateRangeSubject.next(initialRange);
-    this.donationTimeSeriesDateRangeSubject.next(initialRange);
-
     this.indicatorsDateRangeSubject
       .pipe(takeUntil(this.destroy$))
       .subscribe(range => {
@@ -60,6 +56,11 @@ export class Dashboard implements OnInit, OnDestroy {
       .subscribe(range => {
         this.loadDonationTimeSeries(range);
       });
+
+    this.indicatorsDateRangeSubject.next(initialRange);
+    this.donationDistributionDateRangeSubject.next(initialRange);
+    this.donationTimeSeriesDateRangeSubject.next(initialRange);
+
   }
 
   onIndicatorsDateRangeSelected(range: DateRange) {

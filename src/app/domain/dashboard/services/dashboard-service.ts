@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 export interface TimeSeriesFilters {
   startDate: string;
@@ -60,7 +61,7 @@ export interface DonationTypeDistributionResponseWrapper {
   providedIn: 'root'
 })
 export class DashboardService {
-  private readonly API_URL = `http://localhost:8080/api/statistics`;
+  private readonly API_URL = `${environment.apiUrl}/statistics`;
   private httpClient = inject(HttpClient);
 
   getIndicators(startDate?: string, endDate?: string): Observable<IndicatorsResponse> {

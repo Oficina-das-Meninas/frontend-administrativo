@@ -1,7 +1,7 @@
 import { Indicator } from '../../components/indicator/indicator';
 import { DonationsTypeDistribution } from '../../components/donations-type-distribution/donations-type-distribution';
 import { PeriodPicker, DateRange } from '../../../../shared/components/period-picker/period-picker';
-import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { IndicatorData, DonationData, DonationDistribution } from '../../models/indicator-data';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -89,7 +89,7 @@ export class Dashboard implements OnInit, OnDestroy {
               title: 'Doações',
               value: response.data.totalDonations,
               valueType: 'currency',
-              tooltipText: 'Quantidade total arrecadado em doações'
+              tooltipText: 'Valor total arrecadado em doações'
             },
             {
               title: 'Média de valor doado',

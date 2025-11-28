@@ -163,7 +163,7 @@ export class Donations implements OnInit, OnChanges {
       const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
       return `${monthNames[parseInt(month) - 1]} ${year}`;
     } else if (period.length === 10) { // YYYY-MM-DD
-      const [year, month, day] = period.split('-');
+      const [month, day] = period.split('-');
       const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
       return `${day} ${monthNames[parseInt(month) - 1]}`;
     }

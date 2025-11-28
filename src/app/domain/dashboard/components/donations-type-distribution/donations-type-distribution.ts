@@ -27,7 +27,7 @@ export class DonationsTypeDistribution implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] && !changes['data'].firstChange) {
+    if (changes['data']) {
       this.updateChartData();
     }
   }

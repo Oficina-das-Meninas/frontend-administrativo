@@ -52,11 +52,6 @@ export interface DonationDistributionData {
   totalDonations: number;
 }
 
-export interface DonationTypeDistributionResponseWrapper {
-  data: DonationDistributionData;
-  date: string;
-}
-
 @Injectable({
   providedIn: 'root'
 })

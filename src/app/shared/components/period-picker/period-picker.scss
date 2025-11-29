@@ -1,0 +1,49 @@
+@use '@angular/material' as mat;
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-in-out;
+}
+
+.mat-fab-alternative {
+  @include mat.fab-overrides((
+    container-color: rgba(200, 200, 200, 0.456),
+  ));
+}
+
+.mat-mdc-fab {
+  color: #000000;
+}
+
+.mat-mdc-fab-base {
+  height: 2.5rem !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+input[type="date"]::-webkit-inner-spin-button {
+  display: none;
+}

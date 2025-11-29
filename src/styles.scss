@@ -1,1 +1,81 @@
-/* You can add global styles to this file, and also import other style files */
+@use "tailwindcss";
+@use '@angular/material' as mat;
+@use 'ckeditor5/ckeditor5.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Send+Flowers&family=Sniglet:wght@400;800&display=swap');
+
+html {
+  @include mat.theme((
+    color: (
+      primary: mat.$rose-palette,
+      tertiary: mat.$red-palette,
+    ),
+    density: 0,
+  ));
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+}
+
+* {
+  font-family: 'Inter', sans-serif;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* resolve conflito da borda do componente
+    mat-form-field appearance="outline" */
+.mdc-notched-outline__notch{
+  border-right: none;
+}
+
+.mat-mdc-fab {
+  @include mat.fab-overrides((
+    container-elevation-shadow: none,
+    hover-container-elevation-shadow: none,
+    focus-container-elevation-shadow: none,
+    pressed-container-elevation-shadow: none,
+    extended-container-elevation-shadow: none,
+    extended-hover-container-elevation-shadow: none,
+    extended-focus-container-elevation-shadow: none,
+    extended-pressed-container-elevation-shadow: none
+  ));
+}
+
+.mat-mdc-fab-base{
+  height: 3rem !important;
+}
+
+.mat-mdc-button-base.mdc-button--outlined{
+  border-radius: var(--mat-sys-corner-large);
+  height: 3rem !important;
+}
+
+.snackbar-success {
+  --mdc-snackbar-container-color: #4caf50 !important;
+  --mat-snack-bar-button-color: #fff !important;
+  --mdc-snackbar-supporting-text-color: #fff !important;
+}
+
+.snackbar-error {
+  --mdc-snackbar-container-color: #f44336 !important;
+  --mat-snack-bar-button-color: #fff !important;
+  --mdc-snackbar-supporting-text-color: #fff !important;
+}
+
+.snackbar-warning {
+  --mdc-snackbar-container-color: #ff9800 !important;
+  --mat-snack-bar-button-color: #fff !important;
+  --mdc-snackbar-supporting-text-color: #fff !important;
+}
+
+.snackbar-info {
+  --mdc-snackbar-container-color: #2196f3 !important;
+  --mat-snack-bar-button-color: #fff !important;
+  --mdc-snackbar-supporting-text-color: #fff !important;
+}

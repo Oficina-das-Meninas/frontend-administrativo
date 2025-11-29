@@ -1,0 +1,16 @@
+<mat-form-field appearance="outline" class="w-full time-picker-field">
+  <mat-label>{{ label }}</mat-label>
+  <mat-icon matPrefix class="time-icon">schedule</mat-icon>
+  <input
+    matInput
+    type="time"
+    [placeholder]="placeholder"
+    [value]="value"
+    [disabled]="disabled"
+    (input)="onInput($event)"
+    (blur)="onBlur()"
+  />
+  @if (errorMessage) {
+    <mat-error>{{ errorMessage }}</mat-error>
+  }
+</mat-form-field>

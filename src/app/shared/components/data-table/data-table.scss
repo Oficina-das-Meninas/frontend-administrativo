@@ -1,0 +1,71 @@
+@use '@angular/material' as mat;
+
+mat-paginator {
+  @include mat.paginator-overrides(
+    (
+      container-background-color: #ffffff,
+    )
+  );
+}
+
+table {
+  @include mat.table-overrides(
+    (
+      background-color: #ffffff,
+      row-item-outline-color: var(--color-gray-300),
+    )
+  );
+}
+
+mat-card {
+  @include mat.card-overrides(
+    (
+      outlined-container-color: #ffffff,
+      outlined-outline-color: var(--color-gray-300),
+    )
+  );
+
+  height: 100%;
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.mat-mdc-fab {
+  @include mat.fab-overrides(
+    (
+      container-elevation-shadow: none,
+      hover-container-elevation-shadow: none,
+      focus-container-elevation-shadow: none,
+      pressed-container-elevation-shadow: none,
+    )
+  );
+}
+
+mat-button-toggle-group {
+  @include mat.button-toggle-overrides(
+    (
+      selected-state-text-color: var(--mat-sys-on-primary-fixed-variant),
+    )
+  );
+}
+
+mat-card-content {
+  height: 100%;
+}
+
+button.mat-stroked-button {
+  &.h-\[36px\] {
+    line-height: 34px;
+    padding: 0 12px;
+  }
+}
+
+:host ::ng-deep .compact-select {
+  .mat-mdc-option {
+    min-height: 36px;
+    font-size: 14px;
+  }
+}

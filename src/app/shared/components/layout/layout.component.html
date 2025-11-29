@@ -1,0 +1,32 @@
+<mat-drawer-container class="min-h-screen">
+
+  <mat-drawer #drawer
+    [mode]="isMobile ? 'over' : 'side'"
+    [opened]="!isMobile"
+    class="border-r-gray-300"
+  >
+    <app-sidenav [sidenavItems]="sidenavItems" />
+  </mat-drawer>
+
+  <div class="flex flex-col h-screen">
+
+    <app-header
+      [username]="username"
+      [menuItems]="menuItems"
+      [isMobile]="isMobile"
+      (menuToggle)="drawer.toggle()"
+    />
+
+    <!-- @if (isMobile) {
+      <div class="pb-2">
+        <app-breadcrumb />
+      </div>
+    } -->
+
+    <main class="p-4 flex-1">
+      <router-outlet />
+    </main>
+
+  </div>
+
+</mat-drawer-container>

@@ -1,0 +1,24 @@
+<nav class="px-4 py-2 flex text-md text-gray-400 font-semibold items-center">
+  @if ((breadcrumbs$ | async)?.length) {
+    <span
+      class="material-symbols-outlined cursor-pointer text-xs hover:text-gray-500"
+      routerLink="/"
+    >
+      home
+    </span>
+  } 
+  @for (item of breadcrumbs$ | async; track item.url; let last = $last) {
+    <span class="flex items-center">
+      <mat-icon class="material-symbols-outlined">chevron_right</mat-icon>
+      @if (!last) {
+        <a [routerLink]="item.url" class="cursor-pointer hover:text-gray-500">
+          {{ item.label }}
+      </a>
+      } @else {
+        <span class="text-gray-500 font-bold">
+          {{ item.label }}
+        </span>
+      }
+    </span>
+  }
+</nav>

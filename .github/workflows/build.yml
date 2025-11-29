@@ -38,14 +38,20 @@ jobs:
       - name: Build Angular
         run: |
           echo "🏗️ Buildando para ${{ github.event.inputs.ENVIRONMENT }}..."
-          npm run build --configuration=${{ github.event.inputs.ENVIRONMENT }}
+
+          if [ "${{ github.event.inputs.ENVIRONMENT }}" = "development" ]; then
+            npm run build:dev
+          else
+            npm run build
+          fi
+
 
       # 5. Publica o build como artefato para ser usado no job deploy
       - name: Upload build como artefato
         uses: actions/upload-artifact@v4
         with:
           name: frontend-dist
-          path: dist/frontend-administrativo/browser/
+          path: dist/angular-app/browser/
 
 
   deploy:
@@ -58,7 +64,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: frontend-dist
-          path: dist/frontend-administrativo/browser/
+          path: dist/angular-app/browser/
 
       # 2. Configura acesso SSH (com a chave armazenada no secret)
       - name: Configurar SSH
@@ -70,7 +76,7 @@ jobs:
 
       # 3. Apenas para debug (lista arquivos do build)
       - name: Debug arquivos do build
-        run: ls -R dist/frontend-administrativo/browser/
+        run: ls -R dist/angular-app/browser/
 
       # 4. Copia os arquivos do build para a VM
       - name: Enviar arquivos para VM
@@ -85,4 +91,4 @@ jobs:
           VM_HOST="${{ vars.VM_HOST }}"
 
           echo "📤 Enviando arquivos para $VM_USER@$VM_HOST:$DEST_DIR ..."
-          rsync -avz --delete dist/frontend-administrativo/browser/ $VM_USER@$VM_HOST:$DEST_DIR/
+          rsync -avz --delete dist/angular-app/browser/ $VM_USER@$VM_HOST:$DEST_DIR/

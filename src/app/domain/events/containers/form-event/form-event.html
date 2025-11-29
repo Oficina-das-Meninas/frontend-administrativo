@@ -1,0 +1,113 @@
+<div class="flex flex-col items-center mx-auto bg-gradient">
+  <mat-card class="w-full max-w-[920px]" appearance="outlined">
+    <div class="w-full max-w-[920px] mt-4 ml-4">
+      <button mat-icon-button (click)="goBack()" class="back-button !text-gray-700 hover:!text-gray-900" matTooltip="Voltar para listagem">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
+    <mat-card-header class="mb-6 !text-4xl !font-bold !text-gray-900">
+      <mat-card-title>{{ isEditMode() ? 'Editar Evento' : 'Criar Evento' }}</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+        <app-form-input
+          formControlName="title"
+          label="Título*"
+          placeholder="Digite o título do evento"
+          [maxLength]="100"
+          [errorMessage]="getErrorMessage('title')"></app-form-input>
+
+        <div class="flex flex-col md:flex-row flex-wrap gap-6 w-full">
+          <app-date-picker
+            formControlName="eventDate"
+            label="Data do Evento"
+            placeholder="DD/MM/AAAA"
+            [errorMessage]="getErrorMessage('eventDate')"
+            class="w-full md:flex-1" />
+
+          <div class="w-full md:flex-1">
+            <app-time-picker
+              formControlName="eventTime"
+              label="Hora do Evento (opcional)"
+              placeholder="HH:MM"
+              [errorMessage]="getErrorMessage('eventTime')"></app-time-picker>
+          </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-6 w-full">
+          <div class="w-full md:flex-1">
+            <app-form-input
+              formControlName="location"
+              label="Localização*"
+              placeholder="Digite a localização"
+              prefixIcon="location_on"
+              [maxLength]="100"
+              [errorMessage]="getErrorMessage('location')"></app-form-input>
+          </div>
+        </div>
+
+        <app-form-input
+          formControlName="urlToPlatform"
+          label="Link da plataforma*"
+          type="url"
+          placeholder="exemplo.com"
+          prefix="https://"
+          hint="Coloque o url para a inscrição do evento na plataforma externa."
+          [maxLength]="256"
+          (input)="onUrlInput($event)"
+          [errorMessage]="getErrorMessage('urlToPlatform')"></app-form-input>
+
+        <div class="flex flex-col md:flex-row gap-6 my-4">
+          <div class="w-full md:w-1/2">
+            <app-image-input
+              label="Imagem do Evento*"
+              text="Clique ou arraste para anexar"
+              [maxFileSize]="5"
+              hint="PNG, JPG, JPEG ou WEBP"
+              [initialUrls]="existingPreviewImageUrl() ? [existingPreviewImageUrl()] : []"
+              (filesSelected)="onPreviewImageSelected($event)"></app-image-input>
+            @if (hasImageError('previewImage')) {
+            <div class="text-red-700 text-xs mt-1 ml-3">{{ getImageErrorMessage('previewImage') }}</div>
+            }
+          </div>
+          <div class="w-full md:w-1/2">
+            <app-image-input
+              label="Imagem de Parceiros*"
+              text="Clique ou arraste para anexar"
+              hint="PNG, JPG, JPEG ou WEBP"
+              [maxFileSize]="5"
+              [initialUrls]="existingPartnersImageUrl() ? [existingPartnersImageUrl()] : []"
+              (filesSelected)="onPartnersImageSelected($event)"></app-image-input>
+            @if (hasImageError('partnersImage')) {
+            <div class="text-red-700 text-xs mt-1 ml-3">{{ getImageErrorMessage('partnersImage') }}</div>
+            }
+          </div>
+        </div>
+
+        <div class="my-4">
+          <label class="block text-sm font-medium text-gray-600 mb-3">Descrição do Evento*</label>
+          <app-ck-editor [maxLength]="3000" [initialData]="description()" (dataChange)="onDataChange($event)"></app-ck-editor>
+        </div>
+
+        <div class="flex justify-end mt-6">
+          <button
+            matButton="filled"
+            color="primary"
+            type="submit"
+            [matTooltip]="!eventForm.valid ? 'Preencha todos os campos' : ''"
+            [disabled]="!eventForm.valid || isLoading()"
+            [disabledInteractive]="!eventForm.valid || isLoading()"
+            class="!px-16 !py-6 font-semibold text-base rounded-md normal-case tracking-normal">
+            <div class="flex items-center gap-2">
+              @if (isLoading()) {
+                <mat-spinner diameter="20" color="accent"></mat-spinner>
+              }
+              {{ isEditMode() ? 'Atualizar Evento' : 'Criar Evento' }}
+            </div>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

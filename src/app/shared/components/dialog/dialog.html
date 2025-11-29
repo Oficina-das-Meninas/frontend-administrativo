@@ -1,0 +1,30 @@
+
+<section 
+  class="
+    min-w-[240px] 
+    md:min-w-[400px]
+    max-h-[80vh] 
+    landscape:max-h-[100vh]
+    overflow-auto
+  "
+>
+  <h2 mat-dialog-title>
+    <span class="text-xl font-semibold"> 
+      {{ title() }}
+    </span>
+  </h2>
+  <mat-dialog-content>
+    <div class="p-2">
+      <ng-content select="[dialogContent]"></ng-content>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <div class="flex gap-1 items-center">
+      @if (hasCloseButton()) {
+        <button matButton tabindex="-1" (click)="onCloseDialog()">Fechar</button>
+      }
+      <ng-content select="[dialogConfirmButton]"></ng-content>
+    </div>
+  </mat-dialog-actions>
+</section>
+

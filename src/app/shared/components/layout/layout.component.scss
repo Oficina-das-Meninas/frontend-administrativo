@@ -1,0 +1,18 @@
+.mat-drawer-container {
+  background-color: #f9fafc;
+}
+
+.mat-drawer {
+  color: black;
+  background-color: white;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-right: 1px solid #d1d5dc;
+  width: 260px;
+}
+
+::ng-deep .mat-drawer-inner-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+}

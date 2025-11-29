@@ -1,0 +1,14 @@
+<app-data-table
+  dataTitle="Parceiros"
+  [data$]="partners$"
+  [columns]="columns"
+  [enableDateFilter]="false"
+  [enableCardsView]="false"
+  [deleteService]="partnerService"
+  titleProperty="name"
+  basePath="/parceiros"
+  (search)="onSearch($event)"
+  (clearSearch)="onClearSearch()"
+  (pageChange)="onPageChange($event)"
+  (clearFilters)="onClearFilters()">
+</app-data-table>

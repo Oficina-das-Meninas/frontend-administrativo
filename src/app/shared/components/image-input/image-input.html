@@ -1,0 +1,75 @@
+<div class="w-full">
+  @if (label) {
+    <label class="text-sm font-medium text-gray-600 m-0 mb-3 block">{{ label }}</label>
+  }
+
+  @if (fileSizeErrorMessage()) {
+    <div class="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+      {{ fileSizeErrorMessage() }}
+    </div>
+  }
+
+  <div class="w-full">
+    @if (isLoadingInitialImages()) {
+      <div class="w-full h-64 rounded-lg flex items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300">
+        <div class="flex flex-col items-center gap-2">
+          <mat-spinner [diameter]="40" [strokeWidth]="3"></mat-spinner>
+          <p class="text-sm text-gray-500">Carregando imagem...</p>
+        </div>
+      </div>
+    } @else if (previewUrls().length === 0) {
+      <div
+        class="drop-area w-full h-64 rounded-lg text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 p-8"
+        [class.dragging]="isDragging"
+        [class.disabled]="readonly"
+        (click)="!readonly && fileInput.click()"
+        (dragover)="onDragOver($event)"
+        (dragenter)="onDragEnter($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)">
+
+        <mat-icon class="upload-icon">{{ isDragging ? 'cloud_upload' : 'attach_file' }}</mat-icon>
+
+        <span class="upload-text font-medium">{{ isDragging ? 'Solte aqui' : text }}</span>
+
+        @if (!isDragging && hint) {
+          <p class="text-xs text-gray-400 m-0">{{ hint }}</p>
+        }
+
+        <input #fileInput type="file" [multiple]="limit" accept="image/*" class="hidden" [disabled]="readonly" (change)="onFileSelected($event)" />
+      </div>
+    } @else {
+      <div class="flex flex-col gap-3 "
+        [class.dragging]="isDragging"
+        [class.disabled]="readonly"
+        (dragover)="onDragOver($event)"
+        (dragenter)="onDragEnter($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)">
+        @for (url of previewUrls(); track $index) {
+          <div class="relative transition-all duration-200 group bg-gray-50 rounded-lg border-2 border-gray-200 p-4 w-full h-64 flex items-center justify-center ">
+            <img [src]="url" alt="Preview" class="max-w-full max-h-full w-auto h-auto object-contain rounded cursor-pointer" (click)="showFullPreview(url)" />
+
+            <button
+              type="button"
+              [disabled]="readonly"
+              [hidden]="readonly"
+              class="cursor-pointer absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white text-sm rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md"
+              (click)="removeImage($index)">
+              ✕
+            </button>
+          </div>
+        }
+
+        <input #fileInput type="file" [multiple]="limit" accept="image/*" class="hidden" [disabled]="readonly" (change)="onFileSelected($event)" />
+      </div>
+    }
+  </div>
+</div>
+
+@if (fullPreviewUrl && fullPreview) {
+<div class="fixed inset-0 bg-[rgb(0_0_0_/_60%)] flex items-center justify-center z-100" (click)="closePreview()">
+  <img [src]="fullPreviewUrl" class="absolute max-h-[60vh] object-contain rounded-4xl shadow-lg" alt="Preview grande" />
+  <p>Nome: {{ getFileName(fullPreviewUrl) }}</p>
+</div>
+}

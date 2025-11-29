@@ -1,0 +1,36 @@
+<ng-template #donationTypeTemplate let-item>
+  <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
+    <span>{{ item.donationType }}</span>
+    @if (item.sponsorStatusLabel) {
+      @if (getBadgeStyles(item.sponsorStatusLabel); as styles) {
+        <span [ngClass]="'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ' + styles.bgColor + ' ' + styles.textColor">
+          {{ item.sponsorStatusLabel }}
+        </span>
+      }
+    }
+  </span>
+</ng-template>
+
+<app-data-table
+  dataTitle="Doações"
+  [showActions]="false"
+  [enableSort]="true"
+  [enableCreateButton]="false"
+  searchPlaceholder="Buscar por nome do doador..."
+  [data$]="donations$"
+  [columns]="columns"
+  [enableDateFilter]="true"
+  titleProperty="title"
+  basePath="/doacoes"
+  [selectFilters]="[
+    { key: 'status', label: 'Status', options: [{ value: 'PENDING', label: 'Pendente' }, { value: 'PAID', label: 'Concluído' }, { value: 'CANCELED', label: 'Cancelado' }], multiple: false },
+    { key: 'type', label: 'Tipo', options: [{ value: 'RECURRING', label: 'Recorrente' }, { value: 'ONE_TIME', label: 'Única' }], multiple: false }
+  ]"
+  (selectFiltersChange)="onSelectFiltersChange($event)"
+  (search)="onSearch($event)"
+  (clearSearch)="onClearSearch()"
+  (pageChange)="onPageChange($event)"
+  (dateFilter)="onDateFilter($event)"
+  (sortChange)="onSortChange($event)"
+  (clearFilters)="onClearFilters()">
+</app-data-table>

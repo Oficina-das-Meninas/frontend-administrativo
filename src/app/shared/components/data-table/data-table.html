@@ -1,0 +1,341 @@
+<mat-card class="w-full" appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>{{ dataTitle }}</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="flex items-center justify-between mt-4 gap-2 sm:gap-4 w-full">
+      <div class="flex items-center gap-2 flex-1 min-w-0">
+        <app-search-input
+          class="flex-1 min-w-0 max-w-none sm:max-w-md"
+          placeholder="{{ searchPlaceholder }}"
+          [debounceTime]="500"
+          (search)="onSearch($event)"></app-search-input>
+
+        @if (enableDateFilter) {
+        <app-calendar-filter
+          [(dateRange)]="dateRange"
+          (apply)="applyDateFilter()"
+          (clear)="clearAllFilters()"
+          tooltipText="Filtrar por data"
+          class="flex-shrink-0" />
+        }
+      </div>
+
+      <div class="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+        @if (enableCardsView) {
+        <mat-button-toggle-group
+          name="view"
+          aria-label="Visualização"
+          class="hidden sm:inline-flex view-toggle-group"
+          [value]="viewMode"
+          (change)="onViewModeChange($event.value)">
+          <mat-button-toggle value="cards">
+            <mat-icon>grid_view</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="table">
+            <mat-icon>format_align_justify</mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+        } @if (enableCreateButton) {
+        <button matFab matTooltip="Criar novo" class="h-12 w-12 sm:h-auto sm:w-auto transition-all duration-200" (click)="navigateToCreate()">
+          <mat-icon>add</mat-icon>
+        </button>
+        }
+      </div>
+    </div>
+
+    @if(selectFilters.length){
+      <div class="mt-4 w-full mb-4">
+        <div class="flex flex-wrap gap-2">
+          @for(sf of selectFilters; track $index) {
+            <div class="relative">
+              <button
+                [style.color]="selectedFilters[sf.key] ? 'var(--mat-button-toggle-selected-state-text-color, var(--mat-sys-on-secondary-container))' : 'rgb(55, 65, 81)'"
+                [style.backgroundColor]="selectedFilters[sf.key] ? 'var(--mat-button-toggle-selected-state-background-color, var(--mat-sys-secondary-container))' : 'rgb(255, 255, 255)'"
+                [style.border]="'solid 1px var(--mat-button-toggle-divider-color, var(--mat-sys-outline))'"
+                class="inline-flex items-center h-10 px-4 text-sm font-medium rounded-full hover:bg-gray-50 transition-colors outline-none cursor-pointer"
+                [matMenuTriggerFor]="filterMenu">
+                {{ sf.label }}
+                <mat-icon class="text-lg ml-1 w-[18px] h-[18px]">expand_more</mat-icon>
+              </button>
+              <mat-menu #filterMenu="matMenu" class="min-w-[180px] rounded-lg overflow-hidden">
+                @if (sf.multiple) {
+                  <div class="p-1">
+                    @for (opt of sf.options; track $index) {
+                      <button
+                        mat-menu-item
+                        class="flex items-center text-sm h-10"
+                        (click)="onSelectFilterChange(sf.key, opt.value)">
+                        @if (isFilterValueSelected(sf.key, opt.value)) {
+                          <mat-icon [style.color]="'var(--mat-button-toggle-selected-state-text-color, var(--mat-sys-on-secondary-container))'" class="mr-2 text-lg w-4 h-4">check</mat-icon>
+                        }
+                        {{ opt.label }}
+                      </button>
+                    }
+                  </div>
+                } @else {
+                  @for (opt of sf.options; track $index) {
+                    <button
+                      mat-menu-item
+                      class="flex items-center text-sm h-10"
+                      (click)="onSelectFilterChange(sf.key, opt.value)">
+                      @if (selectedFilters[sf.key] === opt.value) {
+                        <mat-icon [style.color]="'var(--mat-button-toggle-selected-state-text-color, var(--mat-sys-on-secondary-container))'" class="mr-2 text-lg w-4 h-4">check</mat-icon>
+                      }
+                      {{ opt.label }}
+                    </button>
+                  }
+                }
+              </mat-menu>
+            </div>
+          }
+
+          @if (hasSelectedFilters()) {
+            <button class="inline-flex items-center justify-center h-10 px-4 text-sm text-gray-700 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors cursor-pointer outline-none" (click)="clearSelectFilters()">
+              <mat-icon class="text-base mr-1 w-4 h-4">close</mat-icon>
+              <span>Limpar</span>
+            </button>
+          }
+        </div>
+
+        @if (hasSelectedFilters()) {
+          <div class="mt-3 flex flex-wrap gap-2">
+            @for (sf of selectFilters; track $index) {
+              @if (selectedFilters[sf.key]) {
+                @if (!sf.multiple) {
+                  @for (opt of sf.options; track $index) {
+                    @if (opt.value === selectedFilters[sf.key]) {
+                      <div [style.backgroundColor]="'var(--mat-button-toggle-selected-state-background-color, var(--mat-sys-secondary-container))'" [style.color]="'var(--mat-button-toggle-selected-state-text-color, var(--mat-sys-on-secondary-container))'" class="inline-flex items-center h-8 px-3 rounded-full text-sm">
+                        <span class="mr-2">{{ opt.label }}</span>
+                        <button [style.color]="'var(--mat-button-toggle-selected-state-text-color, var(--mat-sys-on-secondary-container))'" class="w-5 h-5 flex items-center justify-center bg-transparent rounded-full hover:opacity-70 transition-opacity cursor-pointer outline-none" (click)="onSelectFilterChange(sf.key, null)">
+                          <mat-icon class="text-base w-4 h-4">close</mat-icon>
+                        </button>
+                      </div>
+                    }
+                  }
+                } @else {
+                  @for (val of getSelectedFiltersArray(sf.key); track val) {
+                    @for (opt of sf.options; track $index) {
+                      @if (opt.value === val) {
+                        <div [style.backgroundColor]="'var(--mat-button-toggle-selected-state-background-color, var(--mat-sys-secondary-container))'" [style.color]="'var(--mat-button-toggle-selected-state-text-color, var(--mat-sys-on-secondary-container))'" class="inline-flex items-center h-8 px-3 rounded-full text-sm">
+                          <span class="mr-2">{{ opt.label }}</span>
+                          <button [style.color]="'var(--mat-button-toggle-selected-state-text-color, var(--mat-sys-on-secondary-container))'" class="w-5 h-5 flex items-center justify-center bg-transparent rounded-full hover:opacity-70 transition-opacity cursor-pointer outline-none" (click)="onSelectFilterChange(sf.key, val)">
+                            <mat-icon class="text-base w-4 h-4">close</mat-icon>
+                          </button>
+                        </div>
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          </div>
+        }
+      </div>
+    }
+
+    @if (data$ | async; as dataPage) {
+      @if (dataPage.data.length > 0) {
+        @if (viewMode === 'table' || !enableCardsView) {
+
+          <div class="mat-elevation-z8 w-full mt-5">
+            <div class="overflow-x-auto w-full">
+              <table mat-table [dataSource]="dataPage.data" matSort class="w-full min-w-[600px] border-collapse md:text-sm">
+
+                @for (column of columns; track column.key) {
+                  <ng-container [matColumnDef]="column.key">
+                    @if (enableSort && column.sortable) {
+                      <th mat-header-cell *matHeaderCellDef (click)="onSortChange(column)" class="cursor-pointer hover:bg-gray-200 transition-colors select-none">
+                        <div class="flex items-center gap-1">
+                          <span>{{ column.header }}</span>
+                          @if (getSortIndicator(column); as indicator) {
+                            <mat-icon class="text-sm">{{ indicator }}</mat-icon>
+                          }
+                        </div>
+                      </th>
+                    } @else {
+                      <th mat-header-cell *matHeaderCellDef> {{ column.header }} </th>
+                    }
+                    <td mat-cell *matCellDef="let element" class="max-w-md">
+                      @if (column.cellTemplate) {
+                        <ng-container
+                          [ngTemplateOutlet]="column.cellTemplate"
+                          [ngTemplateOutletContext]="{ $implicit: element, row: element, column: column }">
+                        </ng-container>
+                      } @else {
+                        @switch (column.type) {
+                          @case ('date') {
+                            {{ formatDateValue(getCellValue(element, column)) }}
+                          }
+                          @case ('currency') {
+                            {{ formatCurrencyValue(getCellValue(element, column)) }}
+                          }
+                          @case ('image') {
+                            <div class="size-24 flex items-center justify-center">
+                              <img class="m-1 object-contain" [src]="getCellValue(element, column)"/>
+                            </div>
+                          }
+                          @case ('badge') {
+                            @if (getCellValue(element, column)) {
+                              @if (getBadgeStyles(getCellValue(element, column), column); as styles) {
+                                <span [ngClass]="'inline-flex items-center px-3 py-1 rounded-xl text-xs font-semibold capitalize tracking-wide' + styles.bgColor + ' ' + styles.textColor">
+                                  {{ getCellValue(element, column) }}
+                                </span>
+                              }
+                            }
+                          }
+                          @default {
+                            {{ getCellValue(element, column) }}
+                          }
+                        }
+                      }
+                    </td>
+                  </ng-container>
+                }
+
+                @if (showActions) {
+                  <ng-container matColumnDef="acoes">
+                    <th mat-header-cell *matHeaderCellDef> &nbsp;</th>
+                    <td mat-cell *matCellDef="let element">
+
+                      <button matIconButton [matMenuTriggerFor]="menu" aria-label="Ações" matTooltip="Ver ações">
+                        <mat-icon>more_vert</mat-icon>
+                      </button>
+                      <mat-menu #menu="matMenu">
+                        <button mat-menu-item (click)="navigateToEdit(element.id)">
+                          <mat-icon>edit</mat-icon>
+                          <span>Editar</span>
+                        </button>
+                        <button mat-menu-item (click)="confirmDelete(element)">
+                          <mat-icon>delete</mat-icon>
+                          <span>Excluir</span>
+                        </button>
+                      </mat-menu>
+
+                    </td>
+                  </ng-container>
+                }
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageIndex" [pageSize]="pageSize"
+              [length]="dataPage.totalElements" (page)="refresh($event)" showFirstLastButtons
+              aria-label="Selecione a página"
+              class="relative z-10"></mat-paginator>
+          </div>
+        } @else {
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mt-6 px-2 sm:px-0">
+            @for (item of dataPage.data; track item.id) {
+              @if (cardTemplate) {
+                @if (cardTemplate; as template) {
+                  <ng-template
+                    [ngTemplateOutlet]="template"
+                    [ngTemplateOutletContext]="{
+                      $implicit: item,
+                      item: item,
+                      editFn: navigateToEdit.bind(this),
+                      deleteFn: confirmDelete.bind(this)
+                    }">
+                  </ng-template>
+                }
+              } @else {
+                <mat-card class="w-full relative card-item rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                  @if (showActions) {
+                    <button matIconButton
+                            [matMenuTriggerFor]="cardMenu"
+                            class="absolute top-2 right-2 z-10 bg-white/80 hover:bg-white shadow-sm rounded-full"
+                            aria-label="Ações"
+                            matTooltip="Ver ações">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #cardMenu="matMenu">
+                      <button mat-menu-item (click)="navigateToEdit(item.id)">
+                        <mat-icon>edit</mat-icon>
+                        <span>Editar</span>
+                      </button>
+                      <button mat-menu-item (click)="confirmDelete(item)">
+                        <mat-icon>delete</mat-icon>
+                        <span>Excluir</span>
+                      </button>
+                    </mat-menu>
+                  }
+
+                  <mat-card-content class="p-4">
+                    @for (column of columns.slice(0, 5); track column.key) {
+                      @if ($index === 0) {
+                        <div class="mb-4 pb-3 border-b border-gray-200">
+                          <div class="text-lg font-bold text-gray-800 truncate hover:text-[var(--mat-sys-on-primary-fixed-variant)] transition-colors">
+                            {{ getCellValue(item, column) }}
+                          </div>
+                        </div>
+                      } @else {
+                        <div class="mb-3 flex items-start justify-between gap-2">
+                          <div class="flex items-center gap-2 flex-shrink-0">
+                            <span class="text-sm font-semibold text-gray-600">{{ column.header }}:</span>
+                          </div>
+                          <div class="text-sm text-gray-900 text-right flex-1">
+                            @if (column.cellTemplate) {
+                              <ng-container
+                                [ngTemplateOutlet]="column.cellTemplate"
+                                [ngTemplateOutletContext]="{ $implicit: item, row: item, column: column }">
+                              </ng-container>
+                            } @else {
+                              @switch (column.type) {
+                                @case ('date') {
+                                  <span class="inline-block">{{ formatDateValue(getCellValue(item, column)) }}</span>
+                                }
+                                @case ('currency') {
+                                  <span class="inline-block">{{ formatCurrencyValue(getCellValue(item, column)) }}</span>
+                                }
+                                @case ('badge') {
+                                  @if (getCellValue(item, column)) {
+                                    @if (getBadgeStyles(getCellValue(item, column), column); as styles) {
+                                      <span [ngClass]="'inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold capitalize ' + styles.bgColor + ' ' + styles.textColor">
+                                        {{ getCellValue(item, column) }}
+                                      </span>
+                                    }
+                                  }
+                                }
+                                @default {
+                                  <span class="inline-block">{{ getCellValue(item, column) }}</span>
+                                }
+                              }
+                            }
+                          </div>
+                        </div>
+                      }
+                    }
+                  </mat-card-content>
+                </mat-card>
+              }
+            }
+          </div>
+
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 20]"
+      [pageIndex]="pageIndex"
+      [pageSize]="pageSize"
+      [length]="dataPage.totalElements"
+      (page)="refresh($event)"
+      showFirstLastButtons
+      aria-label="Selecione a página"
+      class="relative z-10 mt-6"></mat-paginator>
+    } } @else {
+    <div class="flex flex-col items-center justify-center gap-4 py-12 text-gray-500">
+      <mat-icon class="text-5xl">event_busy</mat-icon>
+      <div class="text-center">
+        <span class="font-medium text-lg block mb-1">Nenhum item encontrado</span>
+      </div>
+    </div>
+    } } @else {
+    <div class="w-full min-h-[40vh] flex items-center justify-center">
+      <app-flower-spinner target="{{dataTitle.toLowerCase()}}"></app-flower-spinner>
+    </div>
+    }
+  </mat-card-content>
+</mat-card>

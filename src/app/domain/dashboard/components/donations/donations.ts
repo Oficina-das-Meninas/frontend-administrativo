@@ -1,20 +1,37 @@
 import { DonationData } from '../../models/indicator-data';
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis, ApexStroke, ApexLegend, ApexGrid, ApexTooltip, ApexResponsive, ApexDataLabels } from 'ng-apexcharts';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
+import {
+  ApexAxisChartSeries,
+  ApexChart,
+  ApexXAxis,
+  ApexYAxis,
+  ApexStroke,
+  ApexLegend,
+  ApexGrid,
+  ApexTooltip,
+  ApexResponsive,
+  ApexDataLabels,
+} from 'ng-apexcharts';
 import { GenericChartComponent } from '../generic-chart/generic-chart.component';
 import { THEME_COLORS } from '../../../../shared/constants/theme-colors';
 
 @Component({
   selector: 'app-donations',
   imports: [GenericChartComponent],
-  templateUrl: './donations.html'
+  templateUrl: './donations.html',
 })
 export class Donations implements OnInit, OnChanges {
   @Input() data: DonationData[] = [];
 
   series!: ApexAxisChartSeries;
   chart!: ApexChart;
-  xaxis!: ApexXAxis;
+  xaxis!: ApexXAxis; // aqui
   yaxis!: ApexYAxis;
   stroke!: ApexStroke;
   legend!: ApexLegend;
@@ -32,28 +49,30 @@ export class Donations implements OnInit, OnChanges {
     if (changes['data']) {
       this.updateChartData();
     }
+    console.log(this.data);
   }
 
   private updateChartData(): void {
     if (this.data && this.data.length > 0) {
-      const recurringData = this.data.map(d => d.recurring);
-      const oneTimeData = this.data.map(d => d.oneTime);
-      const categories = this.data.map(d => this.formatPeriod(d.period));
+      const recurringData = this.data.map((d) => d.recurring);
+      const oneTimeData = this.data.map((d) => d.oneTime);
+      const categories = this.data.map((d) => this.formatPeriod(d.period));
+      console.log('Categories:', categories);
 
       this.series = [
         {
           name: 'Padrinho',
-          data: recurringData
+          data: recurringData,
         },
         {
           name: 'Doação Única',
-          data: oneTimeData
-        }
+          data: oneTimeData,
+        },
       ];
 
       this.xaxis = {
         ...this.xaxis,
-        categories: categories
+        categories: categories,
       };
     }
   }
@@ -62,12 +81,12 @@ export class Donations implements OnInit, OnChanges {
     this.series = [
       {
         name: 'Padrinho',
-        data: []
+        data: [],
       },
       {
         name: 'Doação Única',
-        data: []
-      }
+        data: [],
+      },
     ];
 
     this.chart = {
@@ -82,15 +101,16 @@ export class Donations implements OnInit, OnChanges {
           zoomout: false,
           selection: false,
           pan: false,
-          zoom: false
-        }
+          zoom: false,
+        },
       },
-      fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto'
+      fontFamily:
+        'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto',
     };
 
     this.stroke = {
       curve: 'smooth',
-      width: 2
+      width: 2,
     };
 
     this.xaxis = {
@@ -99,9 +119,9 @@ export class Donations implements OnInit, OnChanges {
         text: 'Período',
         style: {
           fontSize: '14px',
-          fontWeight: 600
-        }
-      }
+          fontWeight: 600,
+        },
+      },
     };
 
     this.yaxis = {
@@ -109,34 +129,34 @@ export class Donations implements OnInit, OnChanges {
         text: 'Valor (R$)',
         style: {
           fontSize: '14px',
-          fontWeight: 600
-        }
+          fontWeight: 600,
+        },
       },
       labels: {
-        formatter: (value: number) => `R$ ${value.toLocaleString('pt-BR')}`
-      }
+        formatter: (value: number) => `R$ ${value.toLocaleString('pt-BR')}`,
+      },
     };
 
     this.legend = {
       position: 'top',
       horizontalAlign: 'left',
-      fontSize: '13px'
+      fontSize: '13px',
     };
 
     this.grid = {
       borderColor: '#e5e7eb',
-      strokeDashArray: 3
+      strokeDashArray: 3,
     };
 
     this.dataLabels = {
-      enabled: false
+      enabled: false,
     };
 
     this.tooltip = {
       theme: 'light',
       y: {
-        formatter: (value: number) => `R$ ${value.toLocaleString('pt-BR')}`
-      }
+        formatter: (value: number) => `R$ ${value.toLocaleString('pt-BR')}`,
+      },
     };
 
     this.responsive = [
@@ -144,10 +164,10 @@ export class Donations implements OnInit, OnChanges {
         breakpoint: 768,
         options: {
           chart: {
-            height: 300
-          }
-        }
-      }
+            height: 300,
+          },
+        },
+      },
     ];
 
     // Atualiza os dados se fornecidos
@@ -157,14 +177,41 @@ export class Donations implements OnInit, OnChanges {
   }
 
   private formatPeriod(period: string): string {
-    // Format 'YYYY-MM' or 'YYYY-MM-DD' for display
-    if (period.length === 7) { // YYYY-MM
+    if (period.length === 7) {
+      // YYYY-MM
       const [year, month] = period.split('-');
-      const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const monthNames = [
+        'Jan',
+        'Fev',
+        'Mar',
+        'Abr',
+        'Mai',
+        'Jun',
+        'Jul',
+        'Ago',
+        'Set',
+        'Out',
+        'Nov',
+        'Dez',
+      ];
       return `${monthNames[parseInt(month) - 1]} ${year}`;
-    } else if (period.length === 10) { // YYYY-MM-DD
-      const [month, day] = period.split('-');
-      const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    } else if (period.length === 10) {
+      const [_, month, day] = period.split('-');
+      console.log('Month:', month, 'Day:', day);
+      const monthNames = [
+        'Jan',
+        'Fev',
+        'Mar',
+        'Abr',
+        'Mai',
+        'Jun',
+        'Jul',
+        'Ago',
+        'Set',
+        'Out',
+        'Nov',
+        'Dez',
+      ];
       return `${day} ${monthNames[parseInt(month) - 1]}`;
     }
     return period;

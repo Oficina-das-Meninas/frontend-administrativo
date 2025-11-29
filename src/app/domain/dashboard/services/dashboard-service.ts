@@ -53,13 +53,16 @@ export interface DonationDistributionData {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DashboardService {
   private readonly API_URL = `${environment.apiUrl}/statistics`;
   private httpClient = inject(HttpClient);
 
-  getIndicators(startDate?: string, endDate?: string): Observable<IndicatorsResponse> {
+  getIndicators(
+    startDate?: string,
+    endDate?: string
+  ): Observable<IndicatorsResponse> {
     let params = new HttpParams();
 
     if (startDate) {
@@ -69,10 +72,16 @@ export class DashboardService {
       params = params.set('endDate', endDate);
     }
 
-    return this.httpClient.get<IndicatorsResponse>(`${this.API_URL}/indicators`, { params });
+    return this.httpClient.get<IndicatorsResponse>(
+      `${this.API_URL}/indicators`,
+      { params, withCredentials: true }
+    );
   }
 
-  getDonationTypeDistribution(startDate?: string, endDate?: string): Observable<DonationTypeDistributionResponse> {
+  getDonationTypeDistribution(
+    startDate?: string,
+    endDate?: string
+  ): Observable<DonationTypeDistributionResponse> {
     let params = new HttpParams();
 
     if (startDate) {
@@ -82,15 +91,25 @@ export class DashboardService {
       params = params.set('endDate', endDate);
     }
 
-    return this.httpClient.get<DonationTypeDistributionResponse>(`${this.API_URL}/donations/distribution`, { params });
+    return this.httpClient.get<DonationTypeDistributionResponse>(
+      `${this.API_URL}/donations/distribution`,
+      { params, withCredentials: true }
+    );
   }
 
-  getDonationsByPeriod(startDate: string, endDate: string, groupBy: 'month' | 'day' = 'month'): Observable<DonationTimeSeriesResponse> {
+  getDonationsByPeriod(
+    startDate: string,
+    endDate: string,
+    groupBy: 'month' | 'day' = 'month'
+  ): Observable<DonationTimeSeriesResponse> {
     let params = new HttpParams()
       .set('startDate', startDate)
       .set('endDate', endDate)
       .set('groupBy', groupBy);
 
-    return this.httpClient.get<DonationTimeSeriesResponse>(`${this.API_URL}/donations`, { params });
+    return this.httpClient.get<DonationTimeSeriesResponse>(
+      `${this.API_URL}/donations`,
+      { params, withCredentials: true }
+    );
   }
 }

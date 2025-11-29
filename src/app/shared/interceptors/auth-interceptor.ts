@@ -1,3 +1,4 @@
+import { SessionExpiredDialogService } from './../services/session-expired-dialog-service';
 import { inject } from '@angular/core';
 import {
   HttpInterceptorFn,
@@ -7,6 +8,7 @@ import {
 } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { SessionService } from '../../domain/auth/services/session-service';
 
 const IGNORED_URLS = [
   '/login',
@@ -14,6 +16,8 @@ const IGNORED_URLS = [
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
   const router = inject(Router);
+  const sessionService = inject(SessionService);
+  const sessionExpiredDialogService = inject(SessionExpiredDialogService);
 
   const shouldIgnore = IGNORED_URLS.some(url => req.url.includes(url));
 
@@ -21,7 +25,14 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
     catchError((error: HttpErrorResponse) => {
 
       if (!shouldIgnore && error.status === 401) {
-        router.navigateByUrl('/logout');
+
+        sessionService.hasSession().subscribe(hasCookie => {
+          if (hasCookie.data) {
+            sessionExpiredDialogService.open();
+          } else {
+            router.navigateByUrl('/login');
+          }
+        });
       }
 
       return throwError(() => error);

@@ -6,13 +6,6 @@ import { authGuard } from './shared/guards/auth/auth-guard';
 
 export const routes: Routes = [
   {
-    path: 'logout',
-    loadComponent: () =>
-      import('./domain/auth/containers/logout/logout').then(
-        (m) => m.Logout
-      ),
-  },
-  {
     path: 'login',
     loadComponent: () =>
       import('./domain/auth/containers/login/login').then(

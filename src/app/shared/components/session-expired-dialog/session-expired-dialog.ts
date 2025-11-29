@@ -1,20 +1,20 @@
 import { AfterViewInit, Component, inject, OnDestroy, signal, TemplateRef, ViewChild } from '@angular/core';
-import { AuthService } from '../../services/auth-service';
-import { Router } from '@angular/router';
-import { Dialog } from "../../../../shared/components/dialog/dialog";
-import { MatDialog } from '@angular/material/dialog';
-import { interval, Subscription, take } from 'rxjs';
+import { Dialog } from "../dialog/dialog";
 import { MatButtonModule } from '@angular/material/button';
+import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { AuthService } from '../../../domain/auth/services/auth-service';
+import { interval, Subscription, take } from 'rxjs';
 
 @Component({
-  selector: 'app-logout',
+  selector: 'app-session-expired-dialog',
   imports: [Dialog, MatButtonModule],
-  templateUrl: './logout.html',
-  styleUrl: './logout.scss',
+  templateUrl: './session-expired-dialog.html',
+  styleUrl: './session-expired-dialog.scss',
 })
-export class Logout implements AfterViewInit, OnDestroy {
+export class SessionExpiredDialog implements AfterViewInit, OnDestroy {
 
-  @ViewChild('logoutDialog') logoutDialog!: TemplateRef<any>;
+  @ViewChild('sessionExpiredDialog') logoutDialog!: TemplateRef<any>;
 
   secondsRemaining = signal(10);
   private countdownSub?: Subscription;
@@ -34,8 +34,7 @@ export class Logout implements AfterViewInit, OnDestroy {
 
   toLogin() {
     this.authService.logout().subscribe({
-      next: () => this.router.navigate(['/login']),
-      error: () => this.router.navigate(['/login'])
+      next: () => this.router.navigate(['/login'])
     });
     this.dialog.closeAll();
   }
@@ -53,5 +52,5 @@ export class Logout implements AfterViewInit, OnDestroy {
         },
       });
   }
-  
+
 }

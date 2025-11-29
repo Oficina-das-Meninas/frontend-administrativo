@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Logout } from './logout';
+import { SessionExpiredDialog } from './session-expired-dialog';
 
-describe('Logout', () => {
-  let component: Logout;
-  let fixture: ComponentFixture<Logout>;
+describe('SessionExpiredDialog', () => {
+  let component: SessionExpiredDialog;
+  let fixture: ComponentFixture<SessionExpiredDialog>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Logout]
+      imports: [SessionExpiredDialog]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Logout);
+    fixture = TestBed.createComponent(SessionExpiredDialog);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

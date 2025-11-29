@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+
 
 @Injectable({ providedIn: 'root' })
 export class SessionService {
@@ -30,8 +31,12 @@ export class SessionService {
     this.usernameSubject.next('Usuário');
   }
 
-  getSession() {
+  getSession(): Observable<void> {
     return this.httpClient.get<void>(`${this.API_URL}`, { withCredentials: true });
+  }
+
+  hasSession(): Observable<{ data: boolean }> {
+    return this.httpClient.get<{ data: boolean }>(`${this.API_URL}/present`, { withCredentials: true });
   }
 
 }

@@ -20,8 +20,16 @@ export const routes: Routes = [
     children: [
       {
         path: '',
+        redirectTo: '/dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
         loadComponent: () =>
-          import('./domain/home/containers/home/home').then((m) => m.Home),
+          import('./domain/dashboard/containers/dashboard/dashboard').then((m) => m.Dashboard),
+        data: {
+          breadcrumb: 'Dashboard',
+        },
       },
       {
         path: 'transparencia',

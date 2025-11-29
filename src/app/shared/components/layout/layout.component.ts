@@ -45,9 +45,9 @@ export class LayoutComponent implements OnInit {
 
     this.sidenavItems = [
       {
-        matIcon: "home",
-        title: "Início",
-        path: "/"
+        matIcon: "dashboard",
+        title: "Dashboard",
+        path: "/dashboard"
       },
       {
         category: "Institucional",

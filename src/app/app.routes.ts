@@ -6,18 +6,9 @@ import { authGuard } from './shared/guards/auth/auth-guard';
 
 export const routes: Routes = [
   {
-    path: 'logout',
-    loadComponent: () =>
-      import('./domain/auth/containers/logout/logout').then(
-        (m) => m.Logout
-      ),
-  },
-  {
     path: 'login',
     loadComponent: () =>
-      import('./domain/auth/containers/login/login').then(
-        (m) => m.Login
-      ),
+      import('./domain/auth/containers/login/login').then((m) => m.Login),
   },
   {
     path: '',
@@ -43,9 +34,9 @@ export const routes: Routes = [
       {
         path: 'transparencia',
         loadComponent: () =>
-          import('./domain/transparency/containers/transparency/transparency').then(
-            (m) => m.Transparency
-          ),
+          import(
+            './domain/transparency/containers/transparency/transparency'
+          ).then((m) => m.Transparency),
         data: {
           breadcrumb: 'Transparência',
         },
@@ -106,9 +97,9 @@ export const routes: Routes = [
           {
             path: 'cadastro',
             loadComponent: () =>
-              import('./domain/partners/containers/partner-form/partner-form').then(
-                (m) => m.PartnerForm
-              ),
+              import(
+                './domain/partners/containers/partner-form/partner-form'
+              ).then((m) => m.PartnerForm),
             canDeactivate: [unsavedChangesGuard],
             data: {
               breadcrumb: 'Cadastro de Parceiro',
@@ -120,9 +111,9 @@ export const routes: Routes = [
               partner: partnerResolver,
             },
             loadComponent: () =>
-              import('./domain/partners/containers/partner-form/partner-form').then(
-                (m) => m.PartnerForm
-              ),
+              import(
+                './domain/partners/containers/partner-form/partner-form'
+              ).then((m) => m.PartnerForm),
             canDeactivate: [unsavedChangesGuard],
             data: {
               breadcrumb: 'Edição de Parceiro',
@@ -149,8 +140,8 @@ export const routes: Routes = [
         data: {
           breadcrumb: 'Doadores',
         },
-      }
+      },
     ],
   },
-  { path: '**', redirectTo: '/' }
+  { path: '**', redirectTo: '/' },
 ];

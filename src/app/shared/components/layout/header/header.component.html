@@ -19,12 +19,21 @@
 
   <mat-menu #menu="matMenu" xPosition="before">
     @for (item of menuItems(); track $index) {
-      <button mat-menu-item [routerLink]="item.path">
-        <div class="flex items-center p-2 gap-2 text-gray-500 font-bold">
-          <span class="material-symbols-outlined">{{ item.matIcon }}</span>
-          <p>{{ item.title }}</p>
-        </div>
-      </button>
+      @if (item.action) {
+        <button mat-menu-item (click)="item.action()">
+          <div class="flex items-center p-2 gap-2 text-gray-500 font-bold">
+            <span class="material-symbols-outlined">{{ item.matIcon }}</span>
+            <p>{{ item.title }}</p>
+          </div>
+        </button>
+      } @else {
+        <button mat-menu-item [routerLink]="item.path">
+          <div class="flex items-center p-2 gap-2 text-gray-500 font-bold">
+            <span class="material-symbols-outlined">{{ item.matIcon }}</span>
+            <p>{{ item.title }}</p>
+          </div>
+        </button>
+      }
     }
   </mat-menu>
 </header>

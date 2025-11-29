@@ -1,13 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { HeaderComponent } from "./header/header.component";
 import { SidenavComponent } from "./sidenav/sidenav.component";
 import { NavItem } from '../../models/nav-item';
-import { Profile } from '../../models/profile';
 import { SessionService } from '../../../domain/auth/services/session-service';
+import { AuthService } from '../../../domain/auth/services/auth-service';
 
 @Component({
   selector: 'app-layout',
@@ -29,6 +29,8 @@ export class LayoutComponent implements OnInit {
   username: string = "";
 
   private sessionService = inject(SessionService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   constructor(private breakpointObserver: BreakpointObserver) {
     this.breakpointObserver.observe([Breakpoints.Handset]).subscribe(result => {
@@ -92,9 +94,15 @@ export class LayoutComponent implements OnInit {
       {
         matIcon: 'logout',
         title: 'Sair',
-        path: '/logout',
+        action: () => this.onLogout(),
       },
     ];
+  }
+
+  onLogout(): void {
+    this.authService.logout().subscribe({
+      next: () => this.router.navigate(['/login'])
+    });
   }
 
 }

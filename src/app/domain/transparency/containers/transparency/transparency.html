@@ -41,7 +41,6 @@
   </mat-card-content>
 </mat-card>
 
-
 <ng-template #addCategoryDialog>
   <app-dialog title="Adicionar Categoria" [formDialog]="categoryForm">
     <ng-container dialogContent>
@@ -62,8 +61,13 @@
       </div>
     </ng-container>
     <ng-container dialogConfirmButton>
-      <button matButton="filled" (click)="onAddCategory()" [disabled]="!categoryForm.valid">
-        <span class="text-lg font-semibold">Adicionar</span>
+      <button matButton="filled" (click)="onAddCategory()" [disabled]="!categoryForm.valid || isLoading">
+        <div class="flex flex-row items-center gap-2">
+          @if (isLoading) {
+            <mat-spinner diameter="20" color="accent"></mat-spinner>
+          }
+          <span class="text-lg font-semibold">Adicionar</span>
+        </div>
       </button>
     </ng-container>
   </app-dialog>

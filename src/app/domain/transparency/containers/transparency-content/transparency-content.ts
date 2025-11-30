@@ -32,6 +32,7 @@ import { DeleteItem } from '../../models/transparency-accordion/delete-item';
 import { TransparencyCategory } from '../../models/transparency/transparency-category';
 import { TransparencyService } from '../../services/transparency.service';
 import { finalize } from 'rxjs';
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-transparency-content',
@@ -49,21 +50,22 @@ import { finalize } from 'rxjs';
     FormInputComponent,
     DatePickerComponent,
     UploadFile,
-  ],
+    MatProgressSpinner
+],
   templateUrl: './transparency-content.html',
   styleUrl: './transparency-content.scss',
 })
 export class TransparencyContent {
   @ViewChild('addDocumentDialog') addDocumentDialog!: TemplateRef<any>;
   @ViewChild('addCollaboratorDialog') addCollaboratorDialog!: TemplateRef<any>;
-  @ViewChild('updateCategoryNameDialog')
-  updateCategoryNameDialog!: TemplateRef<any>;
+  @ViewChild('updateCategoryNameDialog') updateCategoryNameDialog!: TemplateRef<any>;
   @ViewChild('deleteCategoryDialog') deleteCategoryDialog!: TemplateRef<any>;
   @ViewChild('deleteItemDialog') deleteItemDialog!: TemplateRef<any>;
 
   content = input.required<AccordionContent>();
 
   isUpdated = output();
+  isLoading = false;
 
   deleteItem: DeleteItem = {
     id: '',
@@ -123,6 +125,7 @@ export class TransparencyContent {
 
   onAddDocument() {
     if (this.documentForm.valid) {
+      this.isLoading = true;
       const formData = new FormData();
 
       formData.append('title', this.documentForm.value.title);
@@ -144,6 +147,7 @@ export class TransparencyContent {
         .createDocument(formData)
         .pipe(
           finalize(() => {
+            this.isLoading = false;
             this.isUpdated.emit();
             this.dialog.closeAll();
             this.documentForm.reset();
@@ -155,6 +159,7 @@ export class TransparencyContent {
 
   onAddCollaborator() {
     if (this.collaboratorForm.valid) {
+      this.isLoading = true;
       const formData = new FormData();
 
       formData.append('name', this.collaboratorForm.value.name);
@@ -176,6 +181,7 @@ export class TransparencyContent {
         .createCollaborator(formData)
         .pipe(
           finalize(() => {
+            this.isLoading = false;
             this.isUpdated.emit();
             this.dialog.closeAll();
             this.collaboratorForm.reset();
@@ -187,6 +193,7 @@ export class TransparencyContent {
 
   onUpdateCategoryName() {
     if (this.categoryForm.valid) {
+      this.isLoading = true;
       const data: TransparencyCategory = {
         name: this.categoryForm.value.name,
         priority: this.content().priority,
@@ -196,6 +203,7 @@ export class TransparencyContent {
         .updateCategory(this.content().id ?? '', data)
         .pipe(
           finalize(() => {
+            this.isLoading = false;
             this.isUpdated.emit();
             this.dialog.closeAll();
             this.categoryForm.reset();

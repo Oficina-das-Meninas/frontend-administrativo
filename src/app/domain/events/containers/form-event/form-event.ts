@@ -78,12 +78,12 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
     description: ['', [Validators.required]],
     eventDate: [null as Date | null, [Validators.required]],
     eventTime: ['', [EventValidators.timeValidator]],
-    location: ['', [Validators.required]],
+    location: [''],
     urlToPlatform: [
       '',
-      [Validators.required, Validators.pattern(/^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/)],
+      [Validators.pattern(/^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/)],
     ],
-    partnersImage: [[] as File[], [Validators.required, EventValidators.imageValidator]],
+    partnersImage: [[] as File[]],
     previewImage: [[] as File[], [Validators.required, EventValidators.imageValidator]],
   });
 
@@ -102,11 +102,7 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
         previewControl.setValidators([Validators.required, EventValidators.imageValidator]);
       }
 
-      if (this.existingPartnersImageUrl()?.trim()) {
-        partnersControl.setValidators([EventValidators.imageValidator]);
-      } else {
-        partnersControl.setValidators([Validators.required, EventValidators.imageValidator]);
-      }
+      partnersControl.setValidators([]);
     }
 
     previewControl.updateValueAndValidity();

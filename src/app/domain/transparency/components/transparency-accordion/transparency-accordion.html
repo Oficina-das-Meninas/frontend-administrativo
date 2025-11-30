@@ -37,9 +37,11 @@
             >
               <p class="text-lg font-semibold">
                 {{ item.name }}
-                <span class="text-gray-500 text-sm">
-                  ({{ item.effectiveDate |  date:'dd/MM/yyyy' }})
-                </span>
+                @if (item.effectiveDate) {
+                  <span class="text-gray-500 text-sm">
+                    ({{ item.effectiveDate |  date:'dd/MM/yyyy' }})
+                  </span>
+                }
               </p>
               <span class="material-symbols-outlined">download</span>
             </a>

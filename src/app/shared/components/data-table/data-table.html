@@ -37,7 +37,9 @@
             <mat-icon>format_align_justify</mat-icon>
           </mat-button-toggle>
         </mat-button-toggle-group>
-        } @if (enableCreateButton) {
+        } 
+        <ng-content></ng-content>
+        @if (enableCreateButton) {
         <button matFab matTooltip="Criar novo" class="h-12 w-12 sm:h-auto sm:w-auto transition-all duration-200" (click)="navigateToCreate()">
           <mat-icon>add</mat-icon>
         </button>
@@ -203,10 +205,12 @@
                         <mat-icon>more_vert</mat-icon>
                       </button>
                       <mat-menu #menu="matMenu">
-                        <button mat-menu-item (click)="navigateToEdit(element.id)">
-                          <mat-icon>edit</mat-icon>
-                          <span>Editar</span>
-                        </button>
+                        @if (!removeEditAction) {
+                          <button mat-menu-item (click)="navigateToEdit(element.id)">
+                            <mat-icon>edit</mat-icon>
+                            <span>Editar</span>
+                          </button>
+                        }
                         <button mat-menu-item (click)="confirmDelete(element)">
                           <mat-icon>delete</mat-icon>
                           <span>Excluir</span>

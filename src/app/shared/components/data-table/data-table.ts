@@ -1,26 +1,26 @@
-import { AsyncPipe, NgTemplateOutlet, CommonModule } from '@angular/common';
+import { AsyncPipe, CommonModule, NgTemplateOutlet } from '@angular/common';
 import { Component, EventEmitter, HostListener, inject, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatSort, MatSortModule } from '@angular/material/sort';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { CalendarFilter } from '../calendar-filter/calendar-filter';
-import { SearchInput } from '../search-input/search-input';
+import { BadgeColorConfig, DataPage, DeleteService, TableColumn } from '../../models/data-table-helpers';
 import { DateRange } from '../../models/date-range';
+import { CalendarFilter } from '../calendar-filter/calendar-filter';
 import { ConfirmDeleteDialog } from '../confirm-delete-dialog/confirm-delete-dialog';
 import { FlowerSpinner } from '../flower-spinner/flower-spinner';
-import { DataPage, DeleteService, TableColumn, BadgeColorConfig } from '../../models/data-table-helpers';
+import { SearchInput } from '../search-input/search-input';
 
 @Component({
   selector: 'app-data-table',

@@ -1,4 +1,23 @@
 <div class="bg-gray-50 min-h-screen">
+  <div class="flex justify-end items-center pb-4 pt-0">
+    <mat-button-toggle-group
+            name="view"
+            aria-label="Visualização"
+            class="hidden sm:inline-flex view-toggle-group"
+            [value]="viewMode"
+            (change)="onViewModeChange($event.value)"
+            >
+            <mat-button-toggle value="valueLiquid">
+              Valor líquido
+              <mat-icon>percent</mat-icon>
+            </mat-button-toggle>
+            <mat-button-toggle value="value">
+              Valor Bruto
+              <span class="material-symbols-outlined">savings</span>
+            </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
   <section class="mb-6">
     <mat-card class="w-full" appearance="outlined">
       <mat-card-content class="p-4">
@@ -10,7 +29,7 @@
           @for (indicator of indicators(); track indicator.title) {
             <app-indicator
               [title]="indicator.title"
-              [value]="indicator.value"
+              [value]="viewMode === 'valueLiquid' ? indicator.valueLiquid : indicator.value"
               [valueType]="indicator.valueType"
               [tooltipText]="indicator.tooltipText">
             </app-indicator>
@@ -27,7 +46,9 @@
           <mat-card-title>Tipo de Doação</mat-card-title>
           <app-period-picker (dateRangeSelected)="onDonationsTypeDistributionDateRangeSelected($event)"></app-period-picker>
         </div>
-        <app-donations-type-distribution [data]="donationDistribution()"/>
+        <app-donations-type-distribution
+          [data]="donationDistribution()"
+          [viewMode]="viewMode"/>
       </mat-card-content>
     </mat-card>
     <mat-card class="w-full" appearance="outlined">
@@ -36,7 +57,7 @@
           <mat-card-title>Doações no período</mat-card-title>
           <app-period-picker #donationsDatePicker [excludePeriods]="['Hoje']" (dateRangeSelected)="onDonationsDateRangeSelected($event)"></app-period-picker>
         </div>
-        <app-donations [data]="donationTimeSeries()"/>
+        <app-donations [data]="donationTimeSeries()" [viewMode]="viewMode"/>
       </mat-card-content>
     </mat-card>
   </section>

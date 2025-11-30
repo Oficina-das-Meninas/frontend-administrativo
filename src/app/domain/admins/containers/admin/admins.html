@@ -33,7 +33,6 @@
   </app-dialog>
 </ng-template>
 
-
 <app-data-table
   dataTitle="Adminstradores"
   [data$]="admins$"
@@ -50,12 +49,11 @@
   (pageChange)="onPageChange($event)"
   (deleteSuccess)="onDeleteSuccess($event)"
   (deleteError)="onDeleteError($event)">
-  <button 
-    mat-fab 
-    matTooltip="Adicionar Administrador"
+  <button
+    mat-fab
+    matTooltip="Adicionar administrador"
     class="md:w-auto! md:px-4!"
     (click)="openAddAdminDialog()">
-    <mat-icon class="md:mr-2">add</mat-icon>
-    <span class="hidden md:inline">Criar novo</span>
+    <mat-icon>add</mat-icon>
   </button>
 </app-data-table>

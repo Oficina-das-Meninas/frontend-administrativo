@@ -26,7 +26,7 @@ import { DashboardService } from '../../services/dashboard-service';
             MatIconModule,
             CommonModule],
   templateUrl: './dashboard.html',
-  styleUrls: ['./dashboard.scss']
+  styleUrls: ['./dashboard.scss'],
 })
 export class Dashboard implements OnInit, OnDestroy {
   private dashboardService = inject(DashboardService);
@@ -49,24 +49,24 @@ export class Dashboard implements OnInit, OnDestroy {
     const initialRange: DateRange = {
       startDate: thirtyDaysAgo,
       endDate: today,
-      label: 'Últimos 30 dias'
+      label: 'Últimos 30 dias',
     };
 
     this.indicatorsDateRangeSubject
       .pipe(takeUntil(this.destroy$))
-      .subscribe(range => {
+      .subscribe((range) => {
         this.loadIndicators(range);
       });
 
     this.donationDistributionDateRangeSubject
       .pipe(takeUntil(this.destroy$))
-      .subscribe(range => {
+      .subscribe((range) => {
         this.loadDonationTypeDistribution(range);
       });
 
     this.donationTimeSeriesDateRangeSubject
       .pipe(takeUntil(this.destroy$))
-      .subscribe(range => {
+      .subscribe((range) => {
         this.loadDonationTimeSeries(range);
       });
 
@@ -112,34 +112,36 @@ export class Dashboard implements OnInit, OnDestroy {
               value: response.data.totalDonation,
               valueLiquid: response.data.totalDonationLiquid,
               valueType: 'currency',
-              tooltipText: 'Valor total arrecadado em doações'
+              tooltipText: 'Valor total arrecadado em doações',
             },
             {
               title: 'Média de valor doado',
               value: response.data.averageDonation,
               valueLiquid: response.data.averageDonationLiquid,
               valueType: 'currency',
-              tooltipText: 'Indica quanto, em média, cada pessoa doa. Por que isso é importante? É possível estimar quantos doadores serão necessários para alcançar a meta de arrecadação'
+              tooltipText:
+                'Indica quanto, em média, cada pessoa doa. Por que isso é importante? É possível estimar quantos doadores serão necessários para alcançar a meta de arrecadação',
             },
             {
               title: 'Qtde. de doadores',
               value: response.data.totalDonors,
               valueLiquid: response.data.totalDonors,
               valueType: 'number',
-              tooltipText: 'Número total de pessoas que realizaram doações'
+              tooltipText: 'Número total de pessoas que realizaram doações',
             },
             {
               title: 'Padrinhos ativos',
               value: response.data.activeSponsorships,
               valueLiquid: response.data.activeSponsorships,
               valueType: 'number',
-              tooltipText: 'Número de doadores que possuem doações recorrentes ativas'
-            }
+              tooltipText:
+                'Número de doadores que possuem doações recorrentes ativas',
+            },
           ]);
         },
         error: (error) => {
           console.error('Erro ao carregar indicadores:', error);
-        }
+        },
       });
   }
 
@@ -163,7 +165,7 @@ export class Dashboard implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Erro ao carregar distribuição de doações:', error);
-        }
+        },
       });
   }
 
@@ -183,14 +185,16 @@ export class Dashboard implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Erro ao carregar série temporal de doações:', error);
-        }
+        },
       });
   }
 
-  private transformTimeSeriesData(data: DonationTimeSeriesData): DonationData[] {
+  private transformTimeSeriesData(
+    data: DonationTimeSeriesData
+  ): DonationData[] {
     const dataMap = new Map<string, DonationData>();
 
-    data.oneTimeDonations.forEach(item => {
+    data.oneTimeDonations.forEach((item) => {
       if (!dataMap.has(item.period)) {
         dataMap.set(item.period, {
           period: item.period,
@@ -205,7 +209,7 @@ export class Dashboard implements OnInit, OnDestroy {
       current.oneTimeLiquid += item.valueLiquid;
     });
 
-    data.recurringDonations.forEach(item => {
+    data.recurringDonations.forEach((item) => {
       if (!dataMap.has(item.period)) {
         dataMap.set(item.period, {
           period: item.period,
@@ -220,7 +224,9 @@ export class Dashboard implements OnInit, OnDestroy {
       current.recurringLiquid += item.valueLiquid;
     });
 
-    return Array.from(dataMap.values()).sort((a, b) => a.period.localeCompare(b.period));
+    return Array.from(dataMap.values()).sort((a, b) =>
+      a.period.localeCompare(b.period)
+    );
   }
 
   private calculateGroupBy(range: DateRange): 'month' | 'day' {

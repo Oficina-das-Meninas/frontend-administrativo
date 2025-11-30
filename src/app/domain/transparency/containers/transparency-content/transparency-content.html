@@ -72,8 +72,13 @@
       </div>
     </ng-container>
     <ng-container dialogConfirmButton>
-      <button matButton="filled" (click)="onAddDocument()" [disabled]="!documentForm.valid">
-        <span class="text-lg font-semibold">Adicionar</span>
+      <button matButton="filled" (click)="onAddDocument()" [disabled]="!documentForm.valid || isLoading">
+        <div class="flex flex-row items-center gap-2">
+          @if (isLoading) {
+            <mat-spinner diameter="20" color="accent"></mat-spinner>
+          }
+          <span class="text-lg font-semibold">Adicionar</span>
+        </div>
       </button>
     </ng-container>
   </app-dialog>
@@ -110,8 +115,13 @@
       </div>
     </ng-container>
     <ng-container dialogConfirmButton>
-      <button matButton="filled" (click)="onAddCollaborator()" [disabled]="!collaboratorForm.valid">
-        <span class="text-lg font-semibold">Adicionar</span>
+      <button matButton="filled" (click)="onAddCollaborator()" [disabled]="!collaboratorForm.valid || isLoading">
+        <div class="flex flex-row items-center gap-2">
+          @if (isLoading) {
+            <mat-spinner diameter="20" color="accent"></mat-spinner>
+          }
+          <span class="text-lg font-semibold">Adicionar</span>
+        </div>
       </button>
     </ng-container>
   </app-dialog>
@@ -131,8 +141,13 @@
       </div>
     </ng-container>
     <ng-container dialogConfirmButton>
-      <button matButton="filled" (click)="onUpdateCategoryName()" [disabled]="!categoryForm.valid">
-        <span class="text-lg font-semibold">Editar</span>
+      <button matButton="filled" (click)="onUpdateCategoryName()" [disabled]="!categoryForm.valid || isLoading">
+        <div class="flex flex-row items-center gap-2">
+          @if (isLoading) {
+            <mat-spinner diameter="20" color="accent"></mat-spinner>
+          }
+          <span class="text-lg font-semibold">Editar</span>
+        </div>
       </button>
     </ng-container>
   </app-dialog>

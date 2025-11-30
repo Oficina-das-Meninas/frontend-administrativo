@@ -38,6 +38,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
 import { FormSelect } from '../../../../shared/components/form-select/form-select';
 import { FormSelectItem } from '../../../../shared/models/form-select-item';
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-transparency',
@@ -59,7 +60,8 @@ import { FormSelectItem } from '../../../../shared/models/form-select-item';
     MatTooltipModule,
     FormInputComponent,
     FormSelect,
-  ],
+    MatProgressSpinner
+],
   templateUrl: './transparency.html',
   styleUrl: './transparency.scss',
 })
@@ -80,6 +82,7 @@ export class Transparency implements OnInit {
       name: 'Colaboradores',
     },
   ];
+  isLoading = false;
 
   private transparencyService = inject(TransparencyService);
   private dialog = inject(MatDialog);
@@ -114,6 +117,7 @@ export class Transparency implements OnInit {
 
   onAddCategory() {
     if (this.categoryForm.valid) {
+      this.isLoading = true;
       const data: TransparencyCategory = {
         name: this.categoryForm.value.name,
         isImage:
@@ -130,6 +134,7 @@ export class Transparency implements OnInit {
           });
         },
         complete: () => {
+          this.isLoading = false;
           this.loadAccordionContent();
           this.dialog.closeAll();
         },
@@ -152,4 +157,5 @@ export class Transparency implements OnInit {
       this.transparencyService.updateCategory(item.id ?? '', data).subscribe();
     });
   }
+    
 }

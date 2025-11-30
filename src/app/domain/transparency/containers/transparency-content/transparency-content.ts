@@ -1,5 +1,18 @@
-import { Component, inject, input, OnInit, output, TemplateRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  Component,
+  inject,
+  input,
+  OnInit,
+  output,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -10,9 +23,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Dialog } from '../../../../shared/components/dialog/dialog';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
 import { DatePickerComponent } from '../../../events/components/date-picker/date-picker';
-import { TransparencyAccordionComponent } from "../../components/transparency-accordion/transparency-accordion";
-import { UploadFile } from "../../components/upload-file/upload-file";
-import { UploadProfileImage } from "../../components/upload-profile-image/upload-profile-image";
+import { TransparencyAccordionComponent } from '../../components/transparency-accordion/transparency-accordion';
+import { UploadFile } from '../../components/upload-file/upload-file';
+import { UploadProfileImage } from '../../components/upload-profile-image/upload-profile-image';
 import { AccordionCollaborator } from '../../models/transparency-accordion/accordion-collaborator';
 import { AccordionContent } from '../../models/transparency-accordion/accordion-content';
 import { DeleteItem } from '../../models/transparency-accordion/delete-item';
@@ -35,16 +48,16 @@ import { finalize } from 'rxjs';
     MatTooltipModule,
     FormInputComponent,
     DatePickerComponent,
-    UploadFile
-],
+    UploadFile,
+  ],
   templateUrl: './transparency-content.html',
-  styleUrl: './transparency-content.scss'
+  styleUrl: './transparency-content.scss',
 })
 export class TransparencyContent {
-
   @ViewChild('addDocumentDialog') addDocumentDialog!: TemplateRef<any>;
   @ViewChild('addCollaboratorDialog') addCollaboratorDialog!: TemplateRef<any>;
-  @ViewChild('updateCategoryNameDialog') updateCategoryNameDialog!: TemplateRef<any>;
+  @ViewChild('updateCategoryNameDialog')
+  updateCategoryNameDialog!: TemplateRef<any>;
   @ViewChild('deleteCategoryDialog') deleteCategoryDialog!: TemplateRef<any>;
   @ViewChild('deleteItemDialog') deleteItemDialog!: TemplateRef<any>;
 
@@ -68,7 +81,7 @@ export class TransparencyContent {
   constructor() {
     this.documentForm = this.formBuilder.group({
       title: ['', [Validators.required, Validators.maxLength(200)]],
-      effectiveDate: ['', Validators.required],
+      effectiveDate: [''],
       file: ['', Validators.required],
     });
 
@@ -94,7 +107,7 @@ export class TransparencyContent {
 
   openUpdateCategoryName() {
     this.categoryForm.setValue({
-      name: this.content().categoryName
+      name: this.content().categoryName,
     });
     this.dialog.open(this.updateCategoryNameDialog);
   }
@@ -115,8 +128,10 @@ export class TransparencyContent {
       formData.append('title', this.documentForm.value.title);
 
       const effectiveDate: Date = this.documentForm.get('effectiveDate')?.value;
-      const formattedDate = effectiveDate.toISOString().split('T')[0];
-      formData.append('effectiveDate', formattedDate);
+      if (effectiveDate) {
+        const formattedDate = effectiveDate.toISOString().split('T')[0];
+        formData.append('effectiveDate', formattedDate);
+      }
 
       formData.append('categoryId', this.content().id ?? '');
 
@@ -125,15 +140,16 @@ export class TransparencyContent {
         formData.append('file', file);
       }
 
-      this.transparencyService.createDocument(formData)
-      .pipe(
-        finalize(() => {
-          this.isUpdated.emit();
-          this.dialog.closeAll();
-          this.documentForm.reset();
-        })
-      )
-      .subscribe();
+      this.transparencyService
+        .createDocument(formData)
+        .pipe(
+          finalize(() => {
+            this.isUpdated.emit();
+            this.dialog.closeAll();
+            this.documentForm.reset();
+          })
+        )
+        .subscribe();
     }
   }
 
@@ -146,22 +162,26 @@ export class TransparencyContent {
       formData.append('description', this.collaboratorForm.value.description);
 
       formData.append('categoryId', this.content().id ?? '');
-      formData.append('priority', String(this.content().collaborators?.length ?? 0));
+      formData.append(
+        'priority',
+        String(this.content().collaborators?.length ?? 0)
+      );
 
       const image = this.collaboratorForm.value.image;
       if (image) {
         formData.append('image', image);
       }
 
-      this.transparencyService.createCollaborator(formData)
-      .pipe(
-        finalize(() => {
-          this.isUpdated.emit();
-          this.dialog.closeAll();
-          this.collaboratorForm.reset();
-        })
-      )
-      .subscribe();
+      this.transparencyService
+        .createCollaborator(formData)
+        .pipe(
+          finalize(() => {
+            this.isUpdated.emit();
+            this.dialog.closeAll();
+            this.collaboratorForm.reset();
+          })
+        )
+        .subscribe();
     }
   }
 
@@ -169,26 +189,27 @@ export class TransparencyContent {
     if (this.categoryForm.valid) {
       const data: TransparencyCategory = {
         name: this.categoryForm.value.name,
-        priority: this.content().priority
-      }
+        priority: this.content().priority,
+      };
 
-      this.transparencyService.updateCategory(this.content().id ?? '', data)
-      .pipe(
-        finalize(() => {
-          this.isUpdated.emit();
-          this.dialog.closeAll();
-          this.categoryForm.reset();
-        })
-      )
-      .subscribe();
+      this.transparencyService
+        .updateCategory(this.content().id ?? '', data)
+        .pipe(
+          finalize(() => {
+            this.isUpdated.emit();
+            this.dialog.closeAll();
+            this.categoryForm.reset();
+          })
+        )
+        .subscribe();
     }
   }
 
   onUpdateAllCollaborators(event: AccordionCollaborator[]) {
     event.forEach((item, index) => {
       const data: TransparencyCategory = {
-        priority: index
-      }
+        priority: index,
+      };
       this.transparencyService
         .updateCollaborator(item.id ?? '', data)
         .subscribe();
@@ -196,30 +217,32 @@ export class TransparencyContent {
   }
 
   onDeleteCategoryDialog() {
-    this.transparencyService.deleteCategory(this.content().id ?? '')
-    .pipe(
-      finalize(() => {
-        this.isUpdated.emit();
-        this.dialog.closeAll();
-      })
-    )
-    .subscribe();
+    this.transparencyService
+      .deleteCategory(this.content().id ?? '')
+      .pipe(
+        finalize(() => {
+          this.isUpdated.emit();
+          this.dialog.closeAll();
+        })
+      )
+      .subscribe();
   }
 
   onDeleteItemDialog(): void {
     const { id } = this.deleteItem;
     const deleteFn = this.content().documents
       ? this.transparencyService.deleteDocument.bind(this.transparencyService)
-      : this.transparencyService.deleteCollaborator.bind(this.transparencyService);
+      : this.transparencyService.deleteCollaborator.bind(
+          this.transparencyService
+        );
 
     deleteFn(id ?? '')
-    .pipe(
-      finalize(() => {
-        this.isUpdated.emit();
-        this.dialog.closeAll();
-      })
-    )
-    .subscribe();
+      .pipe(
+        finalize(() => {
+          this.isUpdated.emit();
+          this.dialog.closeAll();
+        })
+      )
+      .subscribe();
   }
-
 }

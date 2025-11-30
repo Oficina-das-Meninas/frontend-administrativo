@@ -50,15 +50,15 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
     FormInputComponent,
     DatePickerComponent,
     UploadFile,
-    MatProgressSpinner
-],
+  ],
   templateUrl: './transparency-content.html',
   styleUrl: './transparency-content.scss',
 })
 export class TransparencyContent {
   @ViewChild('addDocumentDialog') addDocumentDialog!: TemplateRef<any>;
   @ViewChild('addCollaboratorDialog') addCollaboratorDialog!: TemplateRef<any>;
-  @ViewChild('updateCategoryNameDialog') updateCategoryNameDialog!: TemplateRef<any>;
+  @ViewChild('updateCategoryNameDialog')
+  updateCategoryNameDialog!: TemplateRef<any>;
   @ViewChild('deleteCategoryDialog') deleteCategoryDialog!: TemplateRef<any>;
   @ViewChild('deleteItemDialog') deleteItemDialog!: TemplateRef<any>;
 
@@ -147,7 +147,6 @@ export class TransparencyContent {
         .createDocument(formData)
         .pipe(
           finalize(() => {
-            this.isLoading = false;
             this.isUpdated.emit();
             this.dialog.closeAll();
             this.documentForm.reset();
@@ -181,7 +180,6 @@ export class TransparencyContent {
         .createCollaborator(formData)
         .pipe(
           finalize(() => {
-            this.isLoading = false;
             this.isUpdated.emit();
             this.dialog.closeAll();
             this.collaboratorForm.reset();
@@ -203,7 +201,6 @@ export class TransparencyContent {
         .updateCategory(this.content().id ?? '', data)
         .pipe(
           finalize(() => {
-            this.isLoading = false;
             this.isUpdated.emit();
             this.dialog.closeAll();
             this.categoryForm.reset();

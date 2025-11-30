@@ -60,8 +60,7 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
     MatTooltipModule,
     FormInputComponent,
     FormSelect,
-    MatProgressSpinner
-],
+  ],
   templateUrl: './transparency.html',
   styleUrl: './transparency.scss',
 })
@@ -134,7 +133,6 @@ export class Transparency implements OnInit {
           });
         },
         complete: () => {
-          this.isLoading = false;
           this.loadAccordionContent();
           this.dialog.closeAll();
         },

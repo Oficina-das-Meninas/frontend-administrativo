@@ -16,16 +16,18 @@ import { Donor } from '../../models/donor';
 import { DonorFilters } from '../../models/donor-filters';
 import { DonorBadgePipe } from '../../pipes/donor-badge-pipe';
 import { DonorService } from '../../services/donor-service';
+import { MaskPipe } from '../../../../shared/pipes/mask.pipe';
 
 @Component({
   selector: 'app-donors',
-  imports: [CommonModule, DataTable, DonorBadgePipe],
+  imports: [CommonModule, DataTable, DonorBadgePipe, MaskPipe],
   templateUrl: './donors.html',
   styleUrls: ['./donors.scss'],
 })
 export class Donors {
   @ViewChild('totalDonatedTemplate') totalDonatedTemplate!: TemplateRef<any>;
   @ViewChild('donorBadgeTemplate') donorBadgeTemplate!: TemplateRef<any>;
+  @ViewChild('phoneTemplate') phoneTemplate!: TemplateRef<any>;
 
   donors$: Observable<DataPage<Donor>> | null = null;
 
@@ -53,6 +55,9 @@ export class Donors {
   }
 
   ngAfterViewInit() {
+    if (this.phoneTemplate) {
+      this.columns[2].cellTemplate = this.phoneTemplate;
+    }
     if (this.totalDonatedTemplate) {
       this.columns[3].cellTemplate = this.totalDonatedTemplate;
     }

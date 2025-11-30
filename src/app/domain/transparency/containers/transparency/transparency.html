@@ -7,11 +7,10 @@
     <div class="flex justify-end items-center gap-4 pt-4">
       <button
         mat-fab
-        matTooltip="Adicionar Categoria"
+        matTooltip="Adicionar categoria"
         class="md:w-auto! md:px-4!"
         (click)="openAddCategoryDialog()">
-        <mat-icon class="md:mr-2">add</mat-icon>
-        <span class="hidden md:inline">Criar nova</span>
+        <mat-icon>add</mat-icon>
       </button>
     </div>
 
@@ -21,8 +20,8 @@
           @for (item of accordionContentList; track $index) {
             <div class="cdk-box py-2" cdkDrag [cdkDragStartDelay]="100">
               <div class="cdk-placeholder" *cdkDragPlaceholder></div>
-              <app-transparency-content 
-                [content]="item" 
+              <app-transparency-content
+                [content]="item"
                 (isUpdated)="loadAccordionContent()"
               />
             </div>

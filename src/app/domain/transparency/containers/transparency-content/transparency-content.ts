@@ -58,7 +58,8 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
 export class TransparencyContent {
   @ViewChild('addDocumentDialog') addDocumentDialog!: TemplateRef<any>;
   @ViewChild('addCollaboratorDialog') addCollaboratorDialog!: TemplateRef<any>;
-  @ViewChild('updateCategoryNameDialog') updateCategoryNameDialog!: TemplateRef<any>;
+  @ViewChild('updateCategoryNameDialog')
+  updateCategoryNameDialog!: TemplateRef<any>;
   @ViewChild('deleteCategoryDialog') deleteCategoryDialog!: TemplateRef<any>;
   @ViewChild('deleteItemDialog') deleteItemDialog!: TemplateRef<any>;
 

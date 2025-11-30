@@ -134,6 +134,16 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'doadores',
+        loadComponent: () =>
+          import('./domain/donors/containers/donors/donors').then(
+            (m) => m.Donors
+          ),
+        data: {
+          breadcrumb: 'Doadores',
+        },
+      },
+      {
         path: 'admins',
         loadComponent: () =>
           import('./domain/admins/containers/admin/admins').then(

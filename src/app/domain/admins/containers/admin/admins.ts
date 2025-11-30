@@ -1,5 +1,18 @@
-import { Component, TemplateRef, ViewChild, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  Component,
+  TemplateRef,
+  ViewChild,
+  inject,
+  signal,
+  computed,
+} from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -9,11 +22,10 @@ import { Dialog } from '../../../../shared/components/dialog/dialog';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
 import { SnackbarService } from '../../../../shared/services/snackbar-service';
 import { PageEvent } from '@angular/material/paginator';
-import { Observable } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { DataTable } from '../../../../shared/components/data-table/data-table';
-import { DataPage, TableColumn } from '../../../../shared/models/data-table-helpers';
-import { AdminsService, AdminFilters } from '../../services/admin-service';
-import { Admin } from '../../models/admin';
+import { TableColumn } from '../../../../shared/models/data-table-helpers';
+import { AdminsService } from '../../services/admin-service';
 
 @Component({
   selector: 'app-admins',
@@ -26,74 +38,78 @@ import { Admin } from '../../models/admin';
     MatIconModule,
     MatTooltipModule,
     MatCardModule,
-    DataTable
+    DataTable,
   ],
   templateUrl: './admins.html',
 })
-export class Admins implements OnInit {
-
+export class Admins {
   @ViewChild('addAdminDialog') addAdminDialog!: TemplateRef<any>;
-
-  adminForm: FormGroup;
-
-  admins$: Observable<DataPage<Admin>> | null = null;
-
-  columns: TableColumn[] = [
-    { key: 'name', header: 'Nome', type: 'text' },
-    { key: 'email', header: 'Email', type: 'text' }
-  ];
-
-  searchTerm = '';
-  pageIndex = 0;
-  pageSize = 10;
-
-  deleteService = {
-    delete: (id: string) => {
-      return this.adminService.deleteAdmin(id);
-    }
-  };
 
   private adminService = inject(AdminsService);
   private dialog = inject(MatDialog);
   private formBuilder = inject(FormBuilder);
   private snackbar = inject(SnackbarService);
 
+  searchTerm = signal('');
+  pageIndex = signal(0);
+  pageSize = signal(10);
+
+  private refreshSignal = signal(0);
+
+  adminForm: FormGroup;
+
+  columns: TableColumn[] = [
+    { key: 'name', header: 'Nome', type: 'text' },
+    { key: 'email', header: 'Email', type: 'text' },
+  ];
+
+  private filterState = computed(() => ({
+    page: this.pageIndex(),
+    pageSize: this.pageSize(),
+    searchTerm: this.searchTerm() || undefined,
+    refresh: this.refreshSignal(),
+  }));
+
+  admins$ = toObservable(this.filterState).pipe(
+    switchMap((state) =>
+      this.adminService.getFilteredAdmins({
+        page: state.page,
+        pageSize: state.pageSize,
+        searchTerm: state.searchTerm,
+      })
+    )
+  );
+
+  deleteService = {
+    delete: (id: string) => {
+      return this.adminService.deleteAdmin(id);
+    },
+  };
+
   constructor() {
     this.adminForm = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(100)]],
-      email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
-      password: ['', [Validators.required, Validators.maxLength(14)]]
+      email: [
+        '',
+        [Validators.required, Validators.email, Validators.maxLength(100)],
+      ],
+      password: ['', [Validators.required, Validators.maxLength(14)]],
     });
   }
 
-  ngOnInit() {
-    this.loadAdminWithFilters();
-  }
-
-  onSearch(searchTerm: string) {
-    this.searchTerm = searchTerm;
-    this.pageIndex = 0;
-    this.loadAdminWithFilters();
+  onSearch(term: string) {
+    this.searchTerm.set(term);
+    this.pageIndex.set(0);
   }
 
   onClearSearch() {
-    this.searchTerm = '';
-    this.pageIndex = 0;
-    this.loadAdminWithFilters();
+    this.searchTerm.set('');
+    this.pageIndex.set(0);
   }
 
   onPageChange(event: PageEvent) {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
-    this.loadAdminWithFilters();
-  }
-
-  private loadAdminWithFilters() {
-    this.admins$ = this.adminService.getFilteredAdmins({
-      page: this.pageIndex,
-      pageSize: this.pageSize,
-      searchTerm: this.searchTerm || undefined
-    });
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
   }
 
   openAddAdminDialog() {
@@ -108,19 +124,25 @@ export class Admins implements OnInit {
           this.snackbar.success(response.message);
           this.dialog.closeAll();
           this.adminForm.reset();
-          this.loadAdminWithFilters();
         },
-        error: (err) => this.snackbar.error(err.error?.message)
+        error: (err) => this.snackbar.error(err.error?.message),
+        complete: () => this.refresh(),
       });
     }
   }
 
   onDeleteSuccess(message: string) {
     this.snackbar.success(message);
-    this.loadAdminWithFilters();
+    this.refresh();
   }
 
   onDeleteError(error: any) {
-    this.snackbar.error(error.error?.message || 'Erro ao excluir administrador');
+    this.snackbar.error(
+      error.error?.message || 'Erro ao excluir administrador'
+    );
+  }
+
+  private refresh() {
+    this.refreshSignal.update((v) => v + 1);
   }
 }

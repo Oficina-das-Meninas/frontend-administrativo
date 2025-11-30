@@ -84,10 +84,13 @@ export class LayoutComponent implements OnInit {
         path: '/doadores',
       },
       {
+        category: 'Configurações',
+        isCategory: true,
+      },
+      {
         matIcon: 'people',
         title: 'Administradores',
         path: '/admins',
-        position: 'bottom',
       },
     ];
 

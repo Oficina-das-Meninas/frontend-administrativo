@@ -26,7 +26,9 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./domain/dashboard/containers/dashboard/dashboard').then((m) => m.Dashboard),
+          import('./domain/dashboard/containers/dashboard/dashboard').then(
+            (m) => m.Dashboard
+          ),
         data: {
           breadcrumb: 'Dashboard',
         },
@@ -139,6 +141,16 @@ export const routes: Routes = [
           ),
         data: {
           breadcrumb: 'Doadores',
+        },
+      },
+      {
+        path: 'admins',
+        loadComponent: () =>
+          import('./domain/admins/containers/admin/admins').then(
+            (m) => m.Admins
+          ),
+        data: {
+          breadcrumb: 'Administradores',
         },
       },
     ],

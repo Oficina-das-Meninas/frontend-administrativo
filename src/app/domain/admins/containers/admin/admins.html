@@ -1,0 +1,61 @@
+<ng-template #addAdminDialog>
+  <app-dialog title="Adicionar Administrador" [formDialog]="adminForm">
+    <ng-container dialogContent>
+      <div [formGroup]="adminForm" class="flex flex-col gap-2">
+        <app-form-input
+          formControlName="name"
+          label="Nome*"
+          placeholder="Digite o nome do administrador"
+          [maxLength]="100"
+          errorMessage="Nome de administrador inválido"
+        />
+        <app-form-input
+          formControlName="email"
+          label="Email*"
+          placeholder="Digite o email do administrador"
+          [maxLength]="100"
+          errorMessage="Email de administrador inválido"
+        />
+        <app-form-input
+          formControlName="password"
+          label="Senha*"
+          placeholder="Digite a senha do administrador"
+          [maxLength]="14"
+          errorMessage="Senha de administrador inválida"
+        />
+      </div>
+    </ng-container>
+    <ng-container dialogConfirmButton>
+      <button matButton="filled" (click)="onAddAdmin()" [disabled]="!adminForm.valid">
+        <span class="text-lg font-semibold">Adicionar</span>
+      </button>
+    </ng-container>
+  </app-dialog>
+</ng-template>
+
+
+<app-data-table
+  dataTitle="Adminstradores"
+  [data$]="admins$"
+  [columns]="columns"
+  [enableDateFilter]="false"
+  [enableCardsView]="false"
+  [enableCreateButton]="false"
+  [removeEditAction]="true"
+  [deleteService]="deleteService"
+  titleProperty="name"
+  basePath="/admins"
+  (search)="onSearch($event)"
+  (clearSearch)="onClearSearch()"
+  (pageChange)="onPageChange($event)"
+  (deleteSuccess)="onDeleteSuccess($event)"
+  (deleteError)="onDeleteError($event)">
+  <button 
+    mat-fab 
+    matTooltip="Adicionar Administrador"
+    class="md:w-auto! md:px-4!"
+    (click)="openAddAdminDialog()">
+    <mat-icon class="md:mr-2">add</mat-icon>
+    <span class="hidden md:inline">Criar novo</span>
+  </button>
+</app-data-table>

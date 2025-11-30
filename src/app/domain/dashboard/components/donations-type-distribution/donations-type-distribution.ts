@@ -1,8 +1,8 @@
-import { DonationDistribution } from './../../models/indicator-data';
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { ApexNonAxisChartSeries, ApexChart, ApexLegend, ApexDataLabels, ApexPlotOptions, ApexTooltip, ApexResponsive } from 'ng-apexcharts';
-import { GenericChartComponent } from '../generic-chart/generic-chart.component';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ApexChart, ApexDataLabels, ApexLegend, ApexNonAxisChartSeries, ApexPlotOptions, ApexResponsive, ApexTooltip } from 'ng-apexcharts';
 import { THEME_COLORS } from '../../../../shared/constants/theme-colors';
+import { GenericChartComponent } from '../generic-chart/generic-chart.component';
+import { DonationDistribution } from './../../models/indicator-data';
 
 @Component({
   selector: 'app-donations-type-distribution',
@@ -11,6 +11,7 @@ import { THEME_COLORS } from '../../../../shared/constants/theme-colors';
 })
 export class DonationsTypeDistribution implements OnInit, OnChanges {
   @Input() data: DonationDistribution | null = null;
+  @Input() viewMode: 'valueLiquid' | 'value' = 'valueLiquid';
 
   series!: ApexNonAxisChartSeries;
   chart!: ApexChart;
@@ -27,19 +28,27 @@ export class DonationsTypeDistribution implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data']) {
+    if (changes['data'] || changes['viewMode']) {
       this.updateChartData();
     }
   }
 
   private updateChartData(): void {
     if (this.data) {
-      this.series = [this.data.recurring, this.data.oneTime];
+      const recurringValue = this.viewMode === 'valueLiquid' ? this.data.recurringLiquid : this.data.recurring;
+      const oneTimeValue = this.viewMode === 'valueLiquid' ? this.data.oneTimeLiquid : this.data.oneTime;
+      this.series = [recurringValue, oneTimeValue];
     }
   }
 
   private initializeChart(): void {
-    this.series = this.data ? [this.data.recurring, this.data.oneTime] : [0, 0];
+    const recurringValue = this.data
+      ? (this.viewMode === 'valueLiquid' ? this.data.recurringLiquid : this.data.recurring)
+      : 0;
+    const oneTimeValue = this.data
+      ? (this.viewMode === 'valueLiquid' ? this.data.oneTimeLiquid : this.data.oneTime)
+      : 0;
+    this.series = [recurringValue, oneTimeValue];
 
     this.chart = {
       type: 'donut',

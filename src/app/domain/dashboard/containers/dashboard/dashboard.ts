@@ -1,40 +1,30 @@
-import { Indicator } from '../../components/indicator/indicator';
-import { DonationsTypeDistribution } from '../../components/donations-type-distribution/donations-type-distribution';
-import {
-  PeriodPicker,
-  DateRange,
-} from '../../../../shared/components/period-picker/period-picker';
-import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import {
-  IndicatorData,
-  DonationData,
-  DonationDistribution,
-} from '../../models/indicator-data';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { Donations } from '../../components/donations/donations';
-import {
-  DashboardService,
-  DonationTimeSeriesData,
-  IndicatorsResponse,
-  DonationTypeDistributionResponse,
-  DonationTimeSeriesResponse,
-} from '../../services/dashboard-service';
 import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 import { Subject } from 'rxjs';
-import { switchMap, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
+import { DateRange, PeriodPicker } from '../../../../shared/components/period-picker/period-picker';
+import { DonationsTypeDistribution } from '../../components/donations-type-distribution/donations-type-distribution';
+import { Donations } from '../../components/donations/donations';
+import { Indicator } from '../../components/indicator/indicator';
+import { DonationTimeSeriesData, DonationTimeSeriesResponse, DonationTypeDistributionResponse, IndicatorsResponse } from '../../models/dashboard';
+import { DonationData, DonationDistribution, IndicatorData } from '../../models/indicator-data';
+import { DashboardService } from '../../services/dashboard-service';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [
-    Indicator,
-    DonationsTypeDistribution,
-    Donations,
-    PeriodPicker,
-    FormsModule,
-    MatCardModule,
-    CommonModule,
-  ],
+  imports: [Indicator,
+            DonationsTypeDistribution,
+            Donations,
+            PeriodPicker,
+            FormsModule,
+            MatCardModule,
+            MatButtonToggleModule,
+            MatIconModule,
+            CommonModule],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss'],
 })
@@ -49,6 +39,8 @@ export class Dashboard implements OnInit, OnDestroy {
   private indicatorsDateRangeSubject = new Subject<DateRange>();
   private donationDistributionDateRangeSubject = new Subject<DateRange>();
   private donationTimeSeriesDateRangeSubject = new Subject<DateRange>();
+
+  viewMode: 'valueLiquid' | 'value' = 'valueLiquid';
 
   ngOnInit(): void {
     const today = new Date();
@@ -81,6 +73,16 @@ export class Dashboard implements OnInit, OnDestroy {
     this.indicatorsDateRangeSubject.next(initialRange);
     this.donationDistributionDateRangeSubject.next(initialRange);
     this.donationTimeSeriesDateRangeSubject.next(initialRange);
+
+    this.setDefaultViewMode();
+  }
+
+  private setDefaultViewMode() {
+    this.viewMode = 'valueLiquid';
+  }
+
+  onViewModeChange(newViewMode: 'valueLiquid' | 'value') {
+    this.viewMode = newViewMode;
   }
 
   onIndicatorsDateRangeSelected(range: DateRange) {
@@ -107,13 +109,15 @@ export class Dashboard implements OnInit, OnDestroy {
           this.indicators.set([
             {
               title: 'Doações',
-              value: response.data.totalDonations,
+              value: response.data.totalDonation,
+              valueLiquid: response.data.totalDonationLiquid,
               valueType: 'currency',
               tooltipText: 'Valor total arrecadado em doações',
             },
             {
               title: 'Média de valor doado',
-              value: response.data.averageDonationValue,
+              value: response.data.averageDonation,
+              valueLiquid: response.data.averageDonationLiquid,
               valueType: 'currency',
               tooltipText:
                 'Indica quanto, em média, cada pessoa doa. Por que isso é importante? É possível estimar quantos doadores serão necessários para alcançar a meta de arrecadação',
@@ -121,12 +125,14 @@ export class Dashboard implements OnInit, OnDestroy {
             {
               title: 'Qtde. de doadores',
               value: response.data.totalDonors,
+              valueLiquid: response.data.totalDonors,
               valueType: 'number',
               tooltipText: 'Número total de pessoas que realizaram doações',
             },
             {
               title: 'Padrinhos ativos',
               value: response.data.activeSponsorships,
+              valueLiquid: response.data.activeSponsorships,
               valueType: 'number',
               tooltipText:
                 'Número de doadores que possuem doações recorrentes ativas',
@@ -150,8 +156,11 @@ export class Dashboard implements OnInit, OnDestroy {
         next: (response: DonationTypeDistributionResponse) => {
           this.donationDistribution.set({
             oneTime: response.data.oneTimeDonation,
+            oneTimeLiquid: response.data.oneTimeDonationLiquid,
             recurring: response.data.recurringDonation,
-            total: response.data.totalDonations,
+            recurringLiquid: response.data.recurringDonationLiquid,
+            total: response.data.totalDonation,
+            totalLiquid: response.data.totalDonationLiquid
           });
         },
         error: (error) => {
@@ -190,11 +199,14 @@ export class Dashboard implements OnInit, OnDestroy {
         dataMap.set(item.period, {
           period: item.period,
           oneTime: 0,
+          oneTimeLiquid: 0,
           recurring: 0,
+          recurringLiquid: 0
         });
       }
       const current = dataMap.get(item.period)!;
       current.oneTime += item.value;
+      current.oneTimeLiquid += item.valueLiquid;
     });
 
     data.recurringDonations.forEach((item) => {
@@ -202,11 +214,14 @@ export class Dashboard implements OnInit, OnDestroy {
         dataMap.set(item.period, {
           period: item.period,
           oneTime: 0,
+          oneTimeLiquid: 0,
           recurring: 0,
+          recurringLiquid: 0
         });
       }
       const current = dataMap.get(item.period)!;
       current.recurring += item.value;
+      current.recurringLiquid += item.valueLiquid;
     });
 
     return Array.from(dataMap.values()).sort((a, b) =>

@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment.development';
+import { environment } from '../../../../environments/environment';
 import { CategoriesResponse } from '../models/list/categories-response';
 import { AccordionContent } from '../models/transparency-accordion/accordion-content';
 import { AccordionContentType } from '../enums/transparency-accordion/accordion-content-type';

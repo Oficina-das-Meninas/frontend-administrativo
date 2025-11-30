@@ -1,21 +1,42 @@
 import { Indicator } from '../../components/indicator/indicator';
 import { DonationsTypeDistribution } from '../../components/donations-type-distribution/donations-type-distribution';
-import { PeriodPicker, DateRange } from '../../../../shared/components/period-picker/period-picker';
+import {
+  PeriodPicker,
+  DateRange,
+} from '../../../../shared/components/period-picker/period-picker';
 import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
-import { IndicatorData, DonationData, DonationDistribution } from '../../models/indicator-data';
+import {
+  IndicatorData,
+  DonationData,
+  DonationDistribution,
+} from '../../models/indicator-data';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { Donations } from '../../components/donations/donations';
-import { DashboardService, DonationTimeSeriesData, IndicatorsResponse, DonationTypeDistributionResponse, DonationTimeSeriesResponse } from '../../services/dashboard-service';
+import {
+  DashboardService,
+  DonationTimeSeriesData,
+  IndicatorsResponse,
+  DonationTypeDistributionResponse,
+  DonationTimeSeriesResponse,
+} from '../../services/dashboard-service';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [Indicator, DonationsTypeDistribution, Donations, PeriodPicker, FormsModule, MatCardModule, CommonModule],
+  imports: [
+    Indicator,
+    DonationsTypeDistribution,
+    Donations,
+    PeriodPicker,
+    FormsModule,
+    MatCardModule,
+    CommonModule,
+  ],
   templateUrl: './dashboard.html',
-  styleUrls: ['./dashboard.scss']
+  styleUrls: ['./dashboard.scss'],
 })
 export class Dashboard implements OnInit, OnDestroy {
   private dashboardService = inject(DashboardService);
@@ -36,31 +57,30 @@ export class Dashboard implements OnInit, OnDestroy {
     const initialRange: DateRange = {
       startDate: thirtyDaysAgo,
       endDate: today,
-      label: 'Últimos 30 dias'
+      label: 'Últimos 30 dias',
     };
 
     this.indicatorsDateRangeSubject
       .pipe(takeUntil(this.destroy$))
-      .subscribe(range => {
+      .subscribe((range) => {
         this.loadIndicators(range);
       });
 
     this.donationDistributionDateRangeSubject
       .pipe(takeUntil(this.destroy$))
-      .subscribe(range => {
+      .subscribe((range) => {
         this.loadDonationTypeDistribution(range);
       });
 
     this.donationTimeSeriesDateRangeSubject
       .pipe(takeUntil(this.destroy$))
-      .subscribe(range => {
+      .subscribe((range) => {
         this.loadDonationTimeSeries(range);
       });
 
     this.indicatorsDateRangeSubject.next(initialRange);
     this.donationDistributionDateRangeSubject.next(initialRange);
     this.donationTimeSeriesDateRangeSubject.next(initialRange);
-
   }
 
   onIndicatorsDateRangeSelected(range: DateRange) {
@@ -89,31 +109,33 @@ export class Dashboard implements OnInit, OnDestroy {
               title: 'Doações',
               value: response.data.totalDonations,
               valueType: 'currency',
-              tooltipText: 'Valor total arrecadado em doações'
+              tooltipText: 'Valor total arrecadado em doações',
             },
             {
               title: 'Média de valor doado',
               value: response.data.averageDonationValue,
               valueType: 'currency',
-              tooltipText: 'Indica quanto, em média, cada pessoa doa. Por que isso é importante? É possível estimar quantos doadores serão necessários para alcançar a meta de arrecadação'
+              tooltipText:
+                'Indica quanto, em média, cada pessoa doa. Por que isso é importante? É possível estimar quantos doadores serão necessários para alcançar a meta de arrecadação',
             },
             {
               title: 'Qtde. de doadores',
               value: response.data.totalDonors,
               valueType: 'number',
-              tooltipText: 'Número total de pessoas que realizaram doações'
+              tooltipText: 'Número total de pessoas que realizaram doações',
             },
             {
               title: 'Padrinhos ativos',
               value: response.data.activeSponsorships,
               valueType: 'number',
-              tooltipText: 'Número de doadores que possuem doações recorrentes ativas'
-            }
+              tooltipText:
+                'Número de doadores que possuem doações recorrentes ativas',
+            },
           ]);
         },
         error: (error) => {
           console.error('Erro ao carregar indicadores:', error);
-        }
+        },
       });
   }
 
@@ -129,12 +151,12 @@ export class Dashboard implements OnInit, OnDestroy {
           this.donationDistribution.set({
             oneTime: response.data.oneTimeDonation,
             recurring: response.data.recurringDonation,
-            total: response.data.totalDonations
+            total: response.data.totalDonations,
           });
         },
         error: (error) => {
           console.error('Erro ao carregar distribuição de doações:', error);
-        }
+        },
       });
   }
 
@@ -142,8 +164,6 @@ export class Dashboard implements OnInit, OnDestroy {
     const startDate = this.formatDateToString(range.startDate);
     const endDate = this.formatDateToString(range.endDate);
     const groupBy = this.calculateGroupBy(range);
-
-    console.log(startDate, endDate, groupBy);
 
     this.dashboardService
       .getDonationsByPeriod(startDate, endDate, groupBy)
@@ -156,30 +176,42 @@ export class Dashboard implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Erro ao carregar série temporal de doações:', error);
-        }
+        },
       });
   }
 
-  private transformTimeSeriesData(data: DonationTimeSeriesData): DonationData[] {
+  private transformTimeSeriesData(
+    data: DonationTimeSeriesData
+  ): DonationData[] {
     const dataMap = new Map<string, DonationData>();
 
-    data.oneTimeDonations.forEach(item => {
+    data.oneTimeDonations.forEach((item) => {
       if (!dataMap.has(item.period)) {
-        dataMap.set(item.period, { period: item.period, oneTime: 0, recurring: 0 });
+        dataMap.set(item.period, {
+          period: item.period,
+          oneTime: 0,
+          recurring: 0,
+        });
       }
       const current = dataMap.get(item.period)!;
       current.oneTime += item.value;
     });
 
-    data.recurringDonations.forEach(item => {
+    data.recurringDonations.forEach((item) => {
       if (!dataMap.has(item.period)) {
-        dataMap.set(item.period, { period: item.period, oneTime: 0, recurring: 0 });
+        dataMap.set(item.period, {
+          period: item.period,
+          oneTime: 0,
+          recurring: 0,
+        });
       }
       const current = dataMap.get(item.period)!;
       current.recurring += item.value;
     });
 
-    return Array.from(dataMap.values()).sort((a, b) => a.period.localeCompare(b.period));
+    return Array.from(dataMap.values()).sort((a, b) =>
+      a.period.localeCompare(b.period)
+    );
   }
 
   private calculateGroupBy(range: DateRange): 'month' | 'day' {

@@ -49,7 +49,6 @@ export class Donations implements OnInit, OnChanges {
     if (changes['data']) {
       this.updateChartData();
     }
-    console.log(this.data);
   }
 
   private updateChartData(): void {
@@ -57,7 +56,6 @@ export class Donations implements OnInit, OnChanges {
       const recurringData = this.data.map((d) => d.recurring);
       const oneTimeData = this.data.map((d) => d.oneTime);
       const categories = this.data.map((d) => this.formatPeriod(d.period));
-      console.log('Categories:', categories);
 
       this.series = [
         {
@@ -197,7 +195,6 @@ export class Donations implements OnInit, OnChanges {
       return `${monthNames[parseInt(month) - 1]} ${year}`;
     } else if (period.length === 10) {
       const [_, month, day] = period.split('-');
-      console.log('Month:', month, 'Day:', day);
       const monthNames = [
         'Jan',
         'Fev',

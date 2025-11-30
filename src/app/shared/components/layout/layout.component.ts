@@ -82,12 +82,6 @@ export class LayoutComponent implements OnInit {
         title: "Doadores",
         path: "/doadores"
       },
-      {
-        matIcon: "settings",
-        title: "Configurações",
-        path: "/configuracoes",
-        position: "bottom"
-      }
     ];
 
     this.menuItems = [

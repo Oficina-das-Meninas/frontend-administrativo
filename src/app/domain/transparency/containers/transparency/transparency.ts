@@ -157,5 +157,4 @@ export class Transparency implements OnInit {
       this.transparencyService.updateCategory(item.id ?? '', data).subscribe();
     });
   }
-    
 }

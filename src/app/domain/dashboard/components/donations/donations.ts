@@ -1,25 +1,25 @@
-import { DonationData } from '../../models/indicator-data';
 import {
   Component,
   Input,
-  OnInit,
   OnChanges,
+  OnInit,
   SimpleChanges,
 } from '@angular/core';
 import {
   ApexAxisChartSeries,
   ApexChart,
+  ApexDataLabels,
+  ApexGrid,
+  ApexLegend,
+  ApexResponsive,
+  ApexStroke,
+  ApexTooltip,
   ApexXAxis,
   ApexYAxis,
-  ApexStroke,
-  ApexLegend,
-  ApexGrid,
-  ApexTooltip,
-  ApexResponsive,
-  ApexDataLabels,
 } from 'ng-apexcharts';
-import { GenericChartComponent } from '../generic-chart/generic-chart.component';
 import { THEME_COLORS } from '../../../../shared/constants/theme-colors';
+import { DonationData } from '../../models/indicator-data';
+import { GenericChartComponent } from '../generic-chart/generic-chart.component';
 
 @Component({
   selector: 'app-donations',
@@ -28,6 +28,7 @@ import { THEME_COLORS } from '../../../../shared/constants/theme-colors';
 })
 export class Donations implements OnInit, OnChanges {
   @Input() data: DonationData[] = [];
+  @Input() viewMode: 'valueLiquid' | 'value' = 'valueLiquid';
 
   series!: ApexAxisChartSeries;
   chart!: ApexChart;
@@ -46,15 +47,19 @@ export class Donations implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data']) {
+    if (changes['data'] || changes['viewMode']) {
       this.updateChartData();
     }
   }
 
   private updateChartData(): void {
     if (this.data && this.data.length > 0) {
-      const recurringData = this.data.map((d) => d.recurring);
-      const oneTimeData = this.data.map((d) => d.oneTime);
+      const recurringData = this.data.map((d) =>
+        this.viewMode === 'valueLiquid' ? d.recurringLiquid : d.recurring
+      );
+      const oneTimeData = this.data.map((d) =>
+        this.viewMode === 'valueLiquid' ? d.oneTimeLiquid : d.oneTime
+      );
       const categories = this.data.map((d) => this.formatPeriod(d.period));
 
       this.series = [
@@ -168,7 +173,6 @@ export class Donations implements OnInit, OnChanges {
       },
     ];
 
-    // Atualiza os dados se fornecidos
     if (this.data && this.data.length > 0) {
       this.updateChartData();
     }

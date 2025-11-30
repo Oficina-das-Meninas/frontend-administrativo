@@ -2,55 +2,11 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-
-export interface TimeSeriesFilters {
-  startDate: string;
-  endDate: string;
-  groupBy?: 'month' | 'day';
-}
-
-export interface StatisticsFilters {
-  startDate?: string;
-  endDate?: string;
-}
-
-export interface IndicatorsData {
-  totalDonations: number;
-  averageDonationValue: number;
-  totalDonors: number;
-  activeSponsorships: number;
-}
-
-export interface IndicatorsResponse {
-  data: IndicatorsData;
-  date: string;
-}
-
-export interface DonationTypeDistributionResponse {
-  data: DonationDistributionData;
-  date: string;
-}
-
-export interface DonationTimeSeriesItem {
-  period: string;
-  value: number;
-}
-
-export interface DonationTimeSeriesData {
-  oneTimeDonations: DonationTimeSeriesItem[];
-  recurringDonations: DonationTimeSeriesItem[];
-}
-
-export interface DonationTimeSeriesResponse {
-  data: DonationTimeSeriesData;
-  date: string;
-}
-
-export interface DonationDistributionData {
-  oneTimeDonation: number;
-  recurringDonation: number;
-  totalDonations: number;
-}
+import {
+  DonationTimeSeriesResponse,
+  DonationTypeDistributionResponse,
+  IndicatorsResponse
+} from '../models/dashboard';
 
 @Injectable({
   providedIn: 'root',

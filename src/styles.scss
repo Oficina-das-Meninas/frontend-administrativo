@@ -48,7 +48,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .mat-mdc-fab-base{
-  width: 3rem !important;
+  height: 3rem !important;
+}
+
+.mat-mdc-button-base.mdc-button--outlined{
+  border-radius: var(--mat-sys-corner-large);
   height: 3rem !important;
 }
 

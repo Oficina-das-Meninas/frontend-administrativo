@@ -7,7 +7,6 @@ import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-upload-file',
-  standalone: true,
   imports: [
     CommonModule,
     MatFormFieldModule,

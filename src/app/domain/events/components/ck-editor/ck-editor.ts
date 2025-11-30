@@ -7,7 +7,6 @@ import {
   Autoformat,
   AutoLink,
   Autosave,
-  BalloonToolbar,
   BlockQuote,
   BlockToolbar,
   Bold,
@@ -124,7 +123,6 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
         Autoformat,
         AutoLink,
         Autosave,
-        BalloonToolbar,
         BlockQuote,
         BlockToolbar,
         Bold,
@@ -151,7 +149,6 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
         WordCount,
       ],
       initialData: this.editorData,
-      balloonToolbar: ['bold', 'italic', '|', 'link', '|', 'bulletedList', 'numberedList'],
       fontFamily: {
         supportAllValues: true,
       },
@@ -232,6 +229,13 @@ export class CKEditorComponent implements OnInit, AfterViewInit, ControlValueAcc
 
   onEditorReady(editor: any): void {
     this.editor = editor;
+
+    editor.model.document.on('paste', (evt: any, data: any) => {
+      const text = data.dataTransfer.getData('text/plain');
+      if (text) {
+        data.content = editor.model.createText(text);
+      }
+    });
 
     const maxLength = this.maxLength;
 

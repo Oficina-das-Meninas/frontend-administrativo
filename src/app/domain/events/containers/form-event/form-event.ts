@@ -13,7 +13,6 @@ import { FormInputComponent } from '../../../../shared/components/form-input/for
 import { ImageInputComponent } from '../../../../shared/components/image-input/image-input';
 import { CanComponentDeactivate } from '../../../../shared/guards/unsaved-changes.guard';
 import { FormHelperService } from '../../../../shared/services/form/form-helps';
-import { SnackbarService } from '../../../../shared/services/snackbar-service';
 import { CKEditorComponent } from '../../components/ck-editor/ck-editor';
 import { DatePickerComponent } from '../../components/date-picker/date-picker';
 import { TimePickerComponent } from '../../components/time-picker/time-picker';
@@ -64,7 +63,6 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
   private fb = inject(FormBuilder);
   private eventService = inject(EventService);
   private formHelperService = inject(FormHelperService);
-  private snackbarService = inject(SnackbarService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -80,12 +78,12 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
     description: ['', [Validators.required]],
     eventDate: [null as Date | null, [Validators.required]],
     eventTime: ['', [EventValidators.timeValidator]],
-    location: ['', [Validators.required]],
+    location: [''],
     urlToPlatform: [
       '',
-      [Validators.required, Validators.pattern(/^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/)],
+      [Validators.pattern(/^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/)],
     ],
-    partnersImage: [[] as File[], [Validators.required, EventValidators.imageValidator]],
+    partnersImage: [[] as File[]],
     previewImage: [[] as File[], [Validators.required, EventValidators.imageValidator]],
   });
 
@@ -104,11 +102,7 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
         previewControl.setValidators([Validators.required, EventValidators.imageValidator]);
       }
 
-      if (this.existingPartnersImageUrl()?.trim()) {
-        partnersControl.setValidators([EventValidators.imageValidator]);
-      } else {
-        partnersControl.setValidators([Validators.required, EventValidators.imageValidator]);
-      }
+      partnersControl.setValidators([]);
     }
 
     previewControl.updateValueAndValidity();
@@ -233,8 +227,6 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
 
     request$.subscribe({
       next: () => {
-        const successMessage = this.isEditMode() ? 'Evento atualizado com sucesso!' : 'Evento cadastrado com sucesso!';
-        this.snackbarService.success(successMessage);
         this.eventForm.reset();
         this.description.set('');
         this.existingPreviewImageUrl.set('');
@@ -243,9 +235,6 @@ export class FormEventComponent implements OnInit, CanComponentDeactivate {
         this.router.navigate(['/eventos'], { replaceUrl: true });
       },
       error: error => {
-        const errorMessage = this.isEditMode() ? 'Erro ao atualizar evento. Tente novamente.' : 'Erro ao cadastrar evento. Tente novamente.';
-
-        this.snackbarService.error(errorMessage);
         console.error('Erro ao salvar evento:', error);
         this.isLoading.set(false);
       }

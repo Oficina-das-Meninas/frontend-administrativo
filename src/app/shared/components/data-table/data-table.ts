@@ -116,7 +116,7 @@ export class DataTable<T extends { id: string }> implements OnInit {
     this.setDefaultViewMode();
   }
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   onResize() {
     this.checkScreenSize();
     this.setDefaultViewMode();

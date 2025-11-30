@@ -52,7 +52,6 @@ export const BR_DATE_FORMATS = {
 
 @Component({
   selector: 'app-date-picker',
-  standalone: true,
   imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatNativeDateModule, MatIconModule, ReactiveFormsModule],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' },

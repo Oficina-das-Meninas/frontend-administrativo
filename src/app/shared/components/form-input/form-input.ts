@@ -7,7 +7,6 @@ import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-form-input',
-  standalone: true,
   imports: [CommonModule, MatFormFieldModule, MatInputModule, MatIconModule, ReactiveFormsModule],
   templateUrl: './form-input.html',
   styleUrls: ['./form-input.scss'],

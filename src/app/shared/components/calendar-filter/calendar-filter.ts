@@ -35,6 +35,7 @@ export class CalendarFilter {
   @Output() dateRangeChange = new EventEmitter<DateRange>();
   @Output() apply = new EventEmitter<DateRange>();
   @Output() clear = new EventEmitter<void>();
+  @Output() dateRangeSelected = new EventEmitter<DateRange>();
 
   onClearDateFilter(): void {
     this.dateRange = { start: null, end: null };
@@ -45,6 +46,7 @@ export class CalendarFilter {
   onApplyDateFilter(): void {
     this.dateRangeChange.emit(this.dateRange);
     this.apply.emit(this.dateRange);
+    this.dateRangeSelected.emit(this.dateRange);
   }
 
   onDateRangeChanged(): void {

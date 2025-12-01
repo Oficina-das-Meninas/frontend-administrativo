@@ -55,7 +55,7 @@
       <mat-card-content class="p-4">
         <div class="flex justify-between items-center mb-4">
           <mat-card-title>Doações no período</mat-card-title>
-          <app-period-picker #donationsDatePicker [excludePeriods]="['Hoje']" (dateRangeSelected)="onDonationsDateRangeSelected($event)"></app-period-picker>
+          <app-period-picker #donationsDatePicker (dateRangeSelected)="onDonationsDateRangeSelected($event)"></app-period-picker>
         </div>
         <app-donations [data]="donationTimeSeries()" [viewMode]="viewMode"/>
       </mat-card-content>

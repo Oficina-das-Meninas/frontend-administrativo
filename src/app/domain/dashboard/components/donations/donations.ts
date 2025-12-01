@@ -20,19 +20,20 @@ import {
 import { THEME_COLORS } from '../../../../shared/constants/theme-colors';
 import { DonationData } from '../../models/indicator-data';
 import { GenericChartComponent } from '../generic-chart/generic-chart.component';
+import { FlowerSpinner } from '../../../../shared/components/flower-spinner/flower-spinner';
 
 @Component({
   selector: 'app-donations',
-  imports: [GenericChartComponent],
+  imports: [GenericChartComponent, FlowerSpinner],
   templateUrl: './donations.html',
 })
-export class Donations implements OnInit, OnChanges {
+export class Donations {
   @Input() data: DonationData[] = [];
   @Input() viewMode: 'valueLiquid' | 'value' = 'valueLiquid';
 
   series!: ApexAxisChartSeries;
   chart!: ApexChart;
-  xaxis!: ApexXAxis; // aqui
+  xaxis!: ApexXAxis;
   yaxis!: ApexYAxis;
   stroke!: ApexStroke;
   legend!: ApexLegend;
@@ -42,25 +43,49 @@ export class Donations implements OnInit, OnChanges {
   dataLabels!: ApexDataLabels;
   colors: string[] = [THEME_COLORS.PINK, THEME_COLORS.BLUE];
 
+  private chartInitialized = false;
+  private monthNames = [
+    'Jan',
+    'Fev',
+    'Mar',
+    'Abr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Set',
+    'Out',
+    'Nov',
+    'Dez',
+  ];
+
   ngOnInit(): void {
-    this.initializeChart();
+    if (this.data && this.data.length > 0) {
+      this.initializeChart();
+      this.chartInitialized = true;
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['viewMode']) {
+    if (!this.chartInitialized && this.data && this.data.length > 0) {
+      this.initializeChart();
+      this.chartInitialized = true;
+      return;
+    }
+
+    if (changes['viewMode'] && !changes['data'] && this.chartInitialized) {
+      this.updateChartData();
+      return;
+    }
+
+    if (changes['data'] && this.chartInitialized) {
       this.updateChartData();
     }
   }
 
   private updateChartData(): void {
     if (this.data && this.data.length > 0) {
-      const recurringData = this.data.map((d) =>
-        this.viewMode === 'valueLiquid' ? d.recurringLiquid : d.recurring
-      );
-      const oneTimeData = this.data.map((d) =>
-        this.viewMode === 'valueLiquid' ? d.oneTimeLiquid : d.oneTime
-      );
-      const categories = this.data.map((d) => this.formatPeriod(d.period));
+      const { recurringData, oneTimeData, categories } = this.buildChartData();
 
       this.series = [
         {
@@ -81,14 +106,16 @@ export class Donations implements OnInit, OnChanges {
   }
 
   private initializeChart(): void {
+    const { recurringData, oneTimeData, categories } = this.buildChartData();
+
     this.series = [
       {
         name: 'Padrinho',
-        data: [],
+        data: recurringData,
       },
       {
         name: 'Doação Única',
-        data: [],
+        data: oneTimeData,
       },
     ];
 
@@ -117,7 +144,7 @@ export class Donations implements OnInit, OnChanges {
     };
 
     this.xaxis = {
-      categories: [],
+      categories: categories,
       title: {
         text: 'Período',
         style: {
@@ -172,48 +199,32 @@ export class Donations implements OnInit, OnChanges {
         },
       },
     ];
+  }
 
-    if (this.data && this.data.length > 0) {
-      this.updateChartData();
+  private buildChartData(): { recurringData: number[]; oneTimeData: number[]; categories: string[] } {
+    if (!this.data || this.data.length === 0) {
+      return { recurringData: [], oneTimeData: [], categories: [] };
     }
+
+    const recurringData = this.data.map((d) =>
+      this.viewMode === 'valueLiquid' ? d.recurringLiquid : d.recurring
+    );
+    const oneTimeData = this.data.map((d) =>
+      this.viewMode === 'valueLiquid' ? d.oneTimeLiquid : d.oneTime
+    );
+    const categories = this.data.map((d) => this.formatPeriod(d.period));
+
+    return { recurringData, oneTimeData, categories };
   }
 
   private formatPeriod(period: string): string {
     if (period.length === 7) {
       // YYYY-MM
       const [year, month] = period.split('-');
-      const monthNames = [
-        'Jan',
-        'Fev',
-        'Mar',
-        'Abr',
-        'Mai',
-        'Jun',
-        'Jul',
-        'Ago',
-        'Set',
-        'Out',
-        'Nov',
-        'Dez',
-      ];
-      return `${monthNames[parseInt(month) - 1]} ${year}`;
+      return `${this.monthNames[parseInt(month) - 1]} ${year}`;
     } else if (period.length === 10) {
       const [_, month, day] = period.split('-');
-      const monthNames = [
-        'Jan',
-        'Fev',
-        'Mar',
-        'Abr',
-        'Mai',
-        'Jun',
-        'Jul',
-        'Ago',
-        'Set',
-        'Out',
-        'Nov',
-        'Dez',
-      ];
-      return `${day} ${monthNames[parseInt(month) - 1]}`;
+      return `${day} ${this.monthNames[parseInt(month) - 1]}`;
     }
     return period;
   }

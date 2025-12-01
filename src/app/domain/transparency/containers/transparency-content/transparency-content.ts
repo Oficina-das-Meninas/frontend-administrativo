@@ -148,6 +148,7 @@ export class TransparencyContent {
         .createDocument(formData)
         .pipe(
           finalize(() => {
+            this.isLoading = false;
             this.isUpdated.emit();
             this.dialog.closeAll();
             this.documentForm.reset();

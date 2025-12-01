@@ -134,6 +134,7 @@ export class Transparency implements OnInit {
           });
         },
         complete: () => {
+          this.isLoading = false;
           this.loadAccordionContent();
           this.dialog.closeAll();
         },

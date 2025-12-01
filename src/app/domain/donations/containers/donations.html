@@ -11,6 +11,14 @@
   </span>
 </ng-template>
 
+<ng-template #statusTemplate let-item>
+  @if (getBadgeStyles(item.status); as styles) {
+    <span [ngClass]="'inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ' + styles.bgColor + ' ' + styles.textColor">
+      {{ item.status }}
+    </span>
+  }
+</ng-template>
+
 <app-data-table
   dataTitle="Doações"
   [showActions]="false"

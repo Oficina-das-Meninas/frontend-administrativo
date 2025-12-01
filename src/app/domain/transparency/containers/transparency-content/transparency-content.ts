@@ -50,6 +50,7 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
     FormInputComponent,
     DatePickerComponent,
     UploadFile,
+    MatProgressSpinner
   ],
   templateUrl: './transparency-content.html',
   styleUrl: './transparency-content.scss',

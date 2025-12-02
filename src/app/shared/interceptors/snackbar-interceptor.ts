@@ -13,6 +13,8 @@ const IGNORED_URLS = [
   '/sessions',
   '/login',
   '/logout',
+  '/esqueci-senha',
+  '/alterar-senha',
 ];
 
 const IGNORED_METHODS: string[] = ['GET'];

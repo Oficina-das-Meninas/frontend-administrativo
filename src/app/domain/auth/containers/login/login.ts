@@ -4,8 +4,9 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../../auth/services/auth-service';
 import { LoginRequest } from '../../models/login-request';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { SessionService } from '../../services/session-service';
+import { Logo } from '../../../../shared/components/logo/logo';
 
 @Component({
   selector: 'app-login',
@@ -13,8 +14,10 @@ import { SessionService } from '../../services/session-service';
     MatButtonModule,
     FormInputComponent,
     FormsModule,
-    ReactiveFormsModule
-  ],
+    ReactiveFormsModule,
+    RouterLink,
+    Logo
+],
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })
@@ -58,18 +61,6 @@ export class Login {
         }
       });
     }
-  }
-
-  handlePasswordErrorMessage(): string {
-    const passwordErrors = this.loginForm.get('password')?.errors;
-
-    if (passwordErrors) {
-      if (passwordErrors['maxlength']) {
-        return "Senha muito longa";
-      }
-    }
-
-    return "Senha inválida";
   }
 
 }

@@ -6,6 +6,20 @@ import { authGuard } from './shared/guards/auth/auth-guard';
 
 export const routes: Routes = [
   {
+    path: 'esqueci-senha',
+    loadComponent: () =>
+      import('./domain/auth/containers/forgot-password/forgot-password').then(
+        (m) => m.ForgotPassword
+      ),
+  },
+  {
+    path: 'alterar-senha',
+    loadComponent: () =>
+      import('./domain/auth/containers/reset-password/reset-password').then(
+        (m) => m.ResetPassword
+      ),
+  },
+  {
     path: 'login',
     loadComponent: () =>
       import('./domain/auth/containers/login/login').then((m) => m.Login),

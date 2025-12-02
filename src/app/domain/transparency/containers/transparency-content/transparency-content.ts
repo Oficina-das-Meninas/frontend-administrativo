@@ -22,7 +22,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Dialog } from '../../../../shared/components/dialog/dialog';
 import { FormInputComponent } from '../../../../shared/components/form-input/form-input';
-import { DatePickerComponent } from '../../../events/components/date-picker/date-picker';
+import { DatePickerComponent } from '../../../../shared/components/date-picker/date-picker';
 import { TransparencyAccordionComponent } from '../../components/transparency-accordion/transparency-accordion';
 import { UploadFile } from '../../components/upload-file/upload-file';
 import { UploadProfileImage } from '../../components/upload-profile-image/upload-profile-image';

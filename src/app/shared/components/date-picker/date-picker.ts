@@ -66,6 +66,8 @@ export class DatePickerComponent implements ControlValueAccessor {
   @Input() placeholder: string = 'DD/MM/YYYY';
   @Input() errorMessage: string = '';
   @Input() showError: boolean = false;
+  @Input() min: Date | null = null;
+  @Input() max: Date | null = null;
 
   value: Date | null = null;
   disabled = false;

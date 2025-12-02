@@ -223,7 +223,7 @@ export class Donations {
       const [year, month] = period.split('-');
       return `${this.monthNames[parseInt(month) - 1]} ${year}`;
     } else if (period.length === 10) {
-      const [_, month, day] = period.split('-');
+      const [year, month, day] = period.split('-');
       return `${day} ${this.monthNames[parseInt(month) - 1]}`;
     }
     return period;

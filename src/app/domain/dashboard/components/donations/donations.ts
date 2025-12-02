@@ -30,6 +30,17 @@ import { FlowerSpinner } from '../../../../shared/components/flower-spinner/flow
 export class Donations {
   @Input() data: DonationData[] = [];
   @Input() viewMode: 'valueLiquid' | 'value' = 'valueLiquid';
+  @Input() isLoading = false;
+
+  get hasData(): boolean {
+    return this.data && this.data.length > 0 && this.data.some(
+      (donation) =>
+        donation.recurring > 0 ||
+        donation.recurringLiquid > 0 ||
+        donation.oneTime > 0 ||
+        donation.oneTimeLiquid > 0
+    );
+  }
 
   series!: ApexAxisChartSeries;
   chart!: ApexChart;

@@ -36,6 +36,10 @@ export class Dashboard implements OnInit, OnDestroy {
   donationDistribution = signal<DonationDistribution | null>(null);
   donationTimeSeries = signal<DonationData[]>([]);
 
+  indicatorsLoading = signal(false);
+  donationDistributionLoading = signal(false);
+  donationTimeSeriesLoading = signal(false);
+
   private indicatorsDateRangeSubject = new Subject<DateRange>();
   private donationDistributionDateRangeSubject = new Subject<DateRange>();
   private donationTimeSeriesDateRangeSubject = new Subject<DateRange>();
@@ -101,6 +105,7 @@ export class Dashboard implements OnInit, OnDestroy {
     const startDate = this.formatDateToString(range.startDate);
     const endDate = this.formatDateToString(range.endDate);
 
+    this.indicatorsLoading.set(true);
     this.dashboardService
       .getIndicators(startDate, endDate)
       .pipe(takeUntil(this.destroy$))
@@ -138,9 +143,11 @@ export class Dashboard implements OnInit, OnDestroy {
                 'Número de doadores que possuem doações recorrentes ativas',
             },
           ]);
+          this.indicatorsLoading.set(false);
         },
         error: (error) => {
           console.error('Erro ao carregar indicadores:', error);
+          this.indicatorsLoading.set(false);
         },
       });
   }
@@ -149,22 +156,26 @@ export class Dashboard implements OnInit, OnDestroy {
     const startDate = this.formatDateToString(range.startDate);
     const endDate = this.formatDateToString(range.endDate);
 
+    this.donationDistributionLoading.set(true);
     this.dashboardService
       .getDonationTypeDistribution(startDate, endDate)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: DonationTypeDistributionResponse) => {
-          this.donationDistribution.set({
+          const distribution = {
             oneTime: response.data.oneTimeDonation,
             oneTimeLiquid: response.data.oneTimeDonationLiquid,
             recurring: response.data.recurringDonation,
             recurringLiquid: response.data.recurringDonationLiquid,
             total: response.data.totalDonation,
             totalLiquid: response.data.totalDonationLiquid
-          });
+          };
+          this.donationDistribution.set(distribution);
+          this.donationDistributionLoading.set(false);
         },
         error: (error) => {
           console.error('Erro ao carregar distribuição de doações:', error);
+          this.donationDistributionLoading.set(false);
         },
       });
   }
@@ -174,17 +185,19 @@ export class Dashboard implements OnInit, OnDestroy {
     const endDate = this.formatDateToString(range.endDate);
     const groupBy = this.calculateGroupBy(range);
 
+    this.donationTimeSeriesLoading.set(true);
     this.dashboardService
       .getDonationsByPeriod(startDate, endDate, groupBy)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: DonationTimeSeriesResponse) => {
-          this.donationTimeSeries.set(
-            this.transformTimeSeriesData(response.data)
-          );
+          const timeSeries = this.transformTimeSeriesData(response.data);
+          this.donationTimeSeries.set(timeSeries);
+          this.donationTimeSeriesLoading.set(false);
         },
         error: (error) => {
           console.error('Erro ao carregar série temporal de doações:', error);
+          this.donationTimeSeriesLoading.set(false);
         },
       });
   }

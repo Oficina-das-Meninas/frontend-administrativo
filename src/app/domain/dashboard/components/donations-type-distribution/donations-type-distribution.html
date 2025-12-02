@@ -1,4 +1,8 @@
-@if (data) {
+@if (isLoading) {
+  <div class="flex items-center justify-center h-96">
+    <app-flower-spinner></app-flower-spinner>
+  </div>
+} @else if (hasData) {
   <app-generic-chart
     [series]="series"
     [chart]="chart"
@@ -12,6 +16,6 @@
   </app-generic-chart>
 } @else {
   <div class="flex items-center justify-center h-96">
-    <app-flower-spinner></app-flower-spinner>
+    <p class="text-gray-500">Nenhum dado disponível para o período selecionado</p>
   </div>
 }

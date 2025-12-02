@@ -39,6 +39,8 @@
                 <app-date-picker
                   [label]="'Data início'"
                   [placeholder]="'DD/MM/YYYY'"
+                  [min]="minDateLimit"
+                  [max]="endDate.value || maxDateLimit"
                   [formControl]="startDate">
                 </app-date-picker>
               </div>
@@ -46,6 +48,8 @@
                 <app-date-picker
                   [label]="'Data fim'"
                   [placeholder]="'DD/MM/YYYY'"
+                  [min]="startDate.value || minDateLimit"
+                  [max]="maxDateLimit"
                   [formControl]="endDate">
                 </app-date-picker>
               </div>

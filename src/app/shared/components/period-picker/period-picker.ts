@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { BR_DATE_FORMATS, CustomDateAdapter, DatePickerComponent } from '../../../domain/events/components/date-picker/date-picker';
+import { BR_DATE_FORMATS, CustomDateAdapter, DatePickerComponent } from '../date-picker/date-picker';
 import { SnackbarService } from '../../services/snackbar-service';
 
 export interface DateRange {
@@ -84,6 +84,7 @@ export class PeriodPicker implements OnInit, OnDestroy {
 
     this.currentStartDate = startDate;
     this.currentEndDate = endDate;
+    this.updateDateLimits();
 
     this.dateRangeSelected.emit({
       startDate,
@@ -92,12 +93,26 @@ export class PeriodPicker implements OnInit, OnDestroy {
     });
   }
 
+  private updateDateLimits() {
+    this.maxDate = new Date();
+    this.minDate = new Date();
+    this.minDate.setDate(this.minDate.getDate() - this.maxDaysInPast);
+  }
+
   get startDate(): FormControl {
     return this.dateForm.get('startDate') as FormControl;
   }
 
   get endDate(): FormControl {
     return this.dateForm.get('endDate') as FormControl;
+  }
+
+  get minDateLimit(): Date | null {
+    return this.minDate;
+  }
+
+  get maxDateLimit(): Date | null {
+    return this.maxDate;
   }
 
   periods = [
@@ -110,6 +125,9 @@ export class PeriodPicker implements OnInit, OnDestroy {
   private tempSelectedLabel = '';
   private currentStartDate: Date | null = null;
   private currentEndDate: Date | null = null;
+  private maxDaysInPast = 365;
+  private minDate: Date | null = null;
+  private maxDate: Date | null = null;
 
   toggleDrawer() {
     this.isOpen = !this.isOpen;
@@ -134,8 +152,12 @@ export class PeriodPicker implements OnInit, OnDestroy {
     this.selectedPeriod = label;
 
     const endDate = new Date();
-    const startDate = new Date();
+    let startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
+
+    if (this.minDate && startDate < this.minDate) {
+      startDate = new Date(this.minDate);
+    }
 
     this.currentStartDate = startDate;
     this.currentEndDate = endDate;
@@ -151,9 +173,8 @@ export class PeriodPicker implements OnInit, OnDestroy {
     const endDate = this.dateForm.get('endDate')?.value;
 
     if (startDate && endDate) {
-      if (!this.isStartDateBeforeEndDate(startDate, endDate)) {
-        this.snackBar.error('Data de início deve ser menor que a data de fim');
-      } else if (!this.isPeriodGreaterThanOneDay(startDate, endDate)) {
+
+      if (!this.isPeriodGreaterThanOneDay(startDate, endDate)) {
         this.snackBar.error('O período deve ser maior que 1 dia');
       } else {
         let label = this.tempSelectedLabel;

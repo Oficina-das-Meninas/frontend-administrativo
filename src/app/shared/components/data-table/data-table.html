@@ -23,11 +23,11 @@
       </div>
 
       <div class="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-        @if (enableCardsView) {
+        @if (enableCardsView && !isMobile) {
         <mat-button-toggle-group
           name="view"
           aria-label="Visualização"
-          class="hidden sm:inline-flex view-toggle-group"
+          class="view-toggle-group"
           [value]="viewMode"
           (change)="onViewModeChange($event.value)">
           <mat-button-toggle value="cards">
@@ -37,7 +37,7 @@
             <mat-icon>format_align_justify</mat-icon>
           </mat-button-toggle>
         </mat-button-toggle-group>
-        } 
+        }
         <ng-content></ng-content>
         @if (enableCreateButton) {
         <button matFab matTooltip="Criar novo" class="h-12 w-12 sm:h-auto sm:w-auto transition-all duration-200" (click)="navigateToCreate()">
@@ -270,7 +270,7 @@
                   }
 
                   <mat-card-content class="p-4">
-                    @for (column of columns.slice(0, 5); track column.key) {
+                    @for (column of columns; track column.key) {
                       @if ($index === 0) {
                         <div class="mb-4 pb-3 border-b border-gray-200">
                           <div class="text-lg font-bold text-gray-800 truncate hover:text-[var(--mat-sys-on-primary-fixed-variant)] transition-colors">

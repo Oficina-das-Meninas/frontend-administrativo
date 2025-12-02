@@ -13,6 +13,17 @@ import { FlowerSpinner } from '../../../../shared/components/flower-spinner/flow
 export class DonationsTypeDistribution implements OnInit, OnChanges {
   @Input() data: DonationDistribution | null = null;
   @Input() viewMode: 'valueLiquid' | 'value' = 'valueLiquid';
+  @Input() isLoading = false;
+
+  get hasData(): boolean {
+    return (
+      this.data !== null &&
+      (this.data.recurring > 0 ||
+        this.data.recurringLiquid > 0 ||
+        this.data.oneTime > 0 ||
+        this.data.oneTimeLiquid > 0)
+    );
+  }
 
   series!: ApexNonAxisChartSeries;
   chart!: ApexChart;

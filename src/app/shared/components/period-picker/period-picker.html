@@ -20,7 +20,6 @@
 
         <div class="flex-1 overflow-y-auto p-0">
           @for (period of periods; track period.label) {
-            @if (!excludePeriods.includes(period.label)) {
               <button
                 (click)="selectPeriod(period.label, period.days)"
                 type="button"
@@ -29,7 +28,6 @@
                 class="w-full text-left px-6 py-4 m-0 bg-none border-b border-gray-100 text-sm text-gray-900 cursor-pointer transition-all font-medium hover:bg-gray-100 hover:text-pink-600 active:bg-gray-200">
                 {{ period.label }}
               </button>
-            }
           }
 
           <div class="h-2 bg-gray-50 border-t border-b border-gray-100"></div>

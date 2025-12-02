@@ -1,13 +1,19 @@
-<app-generic-chart
-  [series]="series"
-  [chart]="chart"
-  [xaxis]="xaxis"
-  [yaxis]="yaxis"
-  [stroke]="stroke"
-  [legend]="legend"
-  [grid]="grid"
-  [tooltip]="tooltip"
-  [responsive]="responsive"
-  [dataLabels]="dataLabels"
-  [colors]="colors">
-</app-generic-chart>
+@if (data && data.length > 0) {
+  <app-generic-chart
+    [series]="series"
+    [chart]="chart"
+    [xaxis]="xaxis"
+    [yaxis]="yaxis"
+    [stroke]="stroke"
+    [legend]="legend"
+    [grid]="grid"
+    [tooltip]="tooltip"
+    [responsive]="responsive"
+    [dataLabels]="dataLabels"
+    [colors]="colors">
+  </app-generic-chart>
+} @else {
+  <div class="flex items-center justify-center h-96">
+    <app-flower-spinner></app-flower-spinner>
+  </div>
+}

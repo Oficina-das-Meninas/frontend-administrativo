@@ -3,10 +3,11 @@ import { ApexChart, ApexDataLabels, ApexLegend, ApexNonAxisChartSeries, ApexPlot
 import { THEME_COLORS } from '../../../../shared/constants/theme-colors';
 import { GenericChartComponent } from '../generic-chart/generic-chart.component';
 import { DonationDistribution } from './../../models/indicator-data';
+import { FlowerSpinner } from '../../../../shared/components/flower-spinner/flower-spinner';
 
 @Component({
   selector: 'app-donations-type-distribution',
-  imports: [GenericChartComponent],
+  imports: [GenericChartComponent, FlowerSpinner],
   templateUrl: './donations-type-distribution.html'
 })
 export class DonationsTypeDistribution implements OnInit, OnChanges {
@@ -24,11 +25,17 @@ export class DonationsTypeDistribution implements OnInit, OnChanges {
   labels: string[] = ['Padrinho', 'Doação Única'];
 
   ngOnInit(): void {
-    this.initializeChart();
+    if (this.data) {
+      this.initializeChart();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['viewMode']) {
+    if (changes['data']) {
+      if (this.data) {
+        this.initializeChart();
+      }
+    } else if (changes['viewMode'] && this.data) {
       this.updateChartData();
     }
   }

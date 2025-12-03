@@ -34,10 +34,8 @@ export class ResetPassword implements OnInit {
   router = inject(Router);
   snackBar = inject(MatSnackBar);
   route = inject(ActivatedRoute);
-
   loadingRequest = signal(false);
-  validatingToken = signal(true);
-  tokenValid = signal(false);
+  tokenValid = signal(true);
   showPassword = signal(false);
   showConfirmPassword = signal(false);
 
@@ -61,7 +59,6 @@ export class ResetPassword implements OnInit {
       this.token = params['token'];
 
       if (!this.token) {
-        this.validatingToken.set(false);
         this.tokenValid.set(false);
         this.snackBar.open('Token inválido ou expirado.', 'Fechar', {
           duration: 5000,
@@ -72,40 +69,6 @@ export class ResetPassword implements OnInit {
         return;
       }
 
-      this.validateToken();
-    });
-  }
-
-  private validateToken() {
-    if (!this.token) return;
-
-    this.authService.validateResetToken(this.token).subscribe({
-      next: () => {
-        this.tokenValid.set(true);
-        this.validatingToken.set(false);
-      },
-      error: (err: unknown) => {
-        this.validatingToken.set(false);
-        this.tokenValid.set(false);
-
-        let message = 'Token inválido ou expirado. Solicite um novo link.';
-
-        if (err instanceof Object && 'status' in err) {
-          const status = (err as Record<string, unknown>)['status'];
-          if (status === 400) {
-            message = 'O link de recuperação expirou. Solicite um novo.';
-          } else if (status === 401) {
-            message = 'Token não autenticado. Solicite um novo link.';
-          }
-        }
-
-        this.snackBar.open(message, 'Fechar', {
-          duration: 5000,
-          horizontalPosition: 'end',
-          verticalPosition: 'bottom',
-          panelClass: ['snackbar-error'],
-        });
-      },
     });
   }
 
@@ -184,10 +147,28 @@ export class ResetPassword implements OnInit {
     const passwordErrors = this.form.get('password')?.errors;
 
     if (passwordErrors) {
+      if (passwordErrors['required']) {
+        return "Informe uma senha";
+      }
+      if (passwordErrors['minlength']) {
+        return "A senha deve conter no mínimo 6 caracteres";
+      }
       if (passwordErrors['maxlength']) {
         return "Senha muito longa";
       }
-      if (passwordErrors['passwordMismatch']) {
+    }
+
+    return "Senha inválida";
+  }
+
+  handleConfirmPasswordErrorMessage(): string {
+    const confirmErrors = this.form.get('confirmPassword')?.errors;
+
+    if (confirmErrors) {
+      if (confirmErrors['required']) {
+        return "Confirme a senha";
+      }
+      if (confirmErrors['passwordMismatch']) {
         return "As senhas não correspondem";
       }
     }

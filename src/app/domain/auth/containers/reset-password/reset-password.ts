@@ -69,6 +69,38 @@ export class ResetPassword implements OnInit {
         return;
       }
 
+      this.validateToken();
+    });
+  }
+
+  private validateToken() {
+    if (!this.token) return;
+
+    this.authService.validateResetToken(this.token).subscribe({
+      next: () => {
+        this.tokenValid.set(true);
+      },
+      error: (err: unknown) => {
+        this.tokenValid.set(false);
+
+        let message = 'Token inválido ou expirado. Solicite um novo link.';
+
+        if (err instanceof Object && 'status' in err) {
+          const status = (err as Record<string, unknown>)['status'];
+          if (status === 400) {
+            message = 'O link de recuperação expirou. Solicite um novo.';
+          } else if (status === 401) {
+            message = 'Token não autenticado. Solicite um novo link.';
+          }
+        }
+
+        this.snackBar.open(message, 'Fechar', {
+          duration: 5000,
+          horizontalPosition: 'end',
+          verticalPosition: 'bottom',
+          panelClass: ['snackbar-error'],
+        });
+      },
     });
   }
 

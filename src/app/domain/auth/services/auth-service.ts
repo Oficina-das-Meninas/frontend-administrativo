@@ -22,4 +22,38 @@ export class AuthService {
     return this.httpClient.get<void>(`${this.API_URL}/logout`, { withCredentials: true });
   }
 
+  forgotPassword(email: string): Observable<void> {
+    return this.httpClient.get<void>(
+      `${this.API_URL}/forgot-password`,
+      {
+        params: { email },
+        withCredentials: true,
+      }
+    );
+  }
+
+  verifyEmail(token: string): Observable<void> {
+    return this.httpClient.get<void>(
+      `${this.API_URL}/verify-email`,
+      {
+        params: { token },
+        withCredentials: true,
+      }
+    );
+  }
+
+  resetPassword(
+    token: string,
+    resetPasswordDto: { newPassword: string }
+  ): Observable<void> {
+    return this.httpClient.post<void>(
+      `${this.API_URL}/reset-password`,
+      resetPasswordDto,
+      {
+        params: { token },
+        withCredentials: true,
+      }
+    );
+  }
+
 }

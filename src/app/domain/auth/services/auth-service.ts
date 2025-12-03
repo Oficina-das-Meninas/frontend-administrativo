@@ -1,8 +1,8 @@
-import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { LoginRequest } from '../models/login-request';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+import { LoginRequest } from '../models/login-request';
 import { LoginResponse } from '../models/login-response';
 
 @Injectable({
@@ -35,6 +35,16 @@ export class AuthService {
   verifyEmail(token: string): Observable<void> {
     return this.httpClient.get<void>(
       `${this.API_URL}/verify-email`,
+      {
+        params: { token },
+        withCredentials: true,
+      }
+    );
+  }
+
+  validateResetToken(token: string): Observable<void> {
+    return this.httpClient.get<void>(
+      `${this.API_URL}/validate-reset-token`,
       {
         params: { token },
         withCredentials: true,

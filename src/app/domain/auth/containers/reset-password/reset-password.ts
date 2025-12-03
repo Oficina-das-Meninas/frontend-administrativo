@@ -3,13 +3,13 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIcon, MatIconModule } from "@angular/material/icon";
+import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth-service';
 import { FormInputComponent } from "../../../../shared/components/form-input/form-input";
 import { Logo } from '../../../../shared/components/logo/logo';
+import { AuthService } from '../../services/auth-service';
 
 @Component({
   selector: 'app-reset-password',
@@ -72,34 +72,40 @@ export class ResetPassword implements OnInit {
         return;
       }
 
-      this.authService.verifyEmail(this.token).subscribe({
-        next: () => {
-          this.tokenValid.set(true);
-          this.validatingToken.set(false);
-        },
-        error: (err: unknown) => {
-          this.validatingToken.set(false);
-          this.tokenValid.set(false);
+      this.validateToken();
+    });
+  }
 
-          let message = 'Token inválido ou expirado. Solicite um novo link.';
+  private validateToken() {
+    if (!this.token) return;
 
-          if (err instanceof Object && 'status' in err) {
-            const status = (err as Record<string, unknown>)['status'];
-            if (status === 400) {
-              message = 'O link de recuperação expirou. Solicite um novo.';
-            } else if (status === 401) {
-              message = 'Token não autenticado. Solicite um novo link.';
-            }
+    this.authService.validateResetToken(this.token).subscribe({
+      next: () => {
+        this.tokenValid.set(true);
+        this.validatingToken.set(false);
+      },
+      error: (err: unknown) => {
+        this.validatingToken.set(false);
+        this.tokenValid.set(false);
+
+        let message = 'Token inválido ou expirado. Solicite um novo link.';
+
+        if (err instanceof Object && 'status' in err) {
+          const status = (err as Record<string, unknown>)['status'];
+          if (status === 400) {
+            message = 'O link de recuperação expirou. Solicite um novo.';
+          } else if (status === 401) {
+            message = 'Token não autenticado. Solicite um novo link.';
           }
+        }
 
-          this.snackBar.open(message, 'Fechar', {
-            duration: 5000,
-            horizontalPosition: 'end',
-            verticalPosition: 'bottom',
-            panelClass: ['snackbar-error'],
-          });
-        },
-      });
+        this.snackBar.open(message, 'Fechar', {
+          duration: 5000,
+          horizontalPosition: 'end',
+          verticalPosition: 'bottom',
+          panelClass: ['snackbar-error'],
+        });
+      },
     });
   }
 

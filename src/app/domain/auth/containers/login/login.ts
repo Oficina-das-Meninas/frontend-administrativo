@@ -1,10 +1,11 @@
 import { Component, inject } from '@angular/core';
-import { FormInputComponent } from "../../../../shared/components/form-input/form-input";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { Router, RouterLink } from '@angular/router';
+import { FormInputComponent } from "../../../../shared/components/form-input/form-input";
+import { Logo } from '../../../../shared/components/logo/logo';
 import { AuthService } from '../../../auth/services/auth-service';
 import { LoginRequest } from '../../models/login-request';
-import { Router } from '@angular/router';
 import { SessionService } from '../../services/session-service';
 
 @Component({
@@ -13,8 +14,10 @@ import { SessionService } from '../../services/session-service';
     MatButtonModule,
     FormInputComponent,
     FormsModule,
-    ReactiveFormsModule
-  ],
+    ReactiveFormsModule,
+    RouterLink,
+    Logo
+],
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })
@@ -48,28 +51,23 @@ export class Login {
           this.loginForm.reset();
 
           const user = response.data.user;
+
+          if (!user.isAdmin) {
+            this.errorMessage = 'Acesso restrito a administradores.';
+            return;
+          }
+
           this.sessionService.setUsername(user.name);
-          
+          this.sessionService.setIsAdmin(user.isAdmin);
+
           this.router.navigate(['/']);
         },
         error: (response) => {
-          this.loginForm.reset();    
+          this.loginForm.reset();
           this.errorMessage = response.error?.message;
         }
       });
     }
-  }
-
-  handlePasswordErrorMessage(): string {
-    const passwordErrors = this.loginForm.get('password')?.errors;
-
-    if (passwordErrors) {
-      if (passwordErrors['maxlength']) {
-        return "Senha muito longa";
-      }
-    }
-
-    return "Senha inválida";
   }
 
 }

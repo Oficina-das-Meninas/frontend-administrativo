@@ -1,17 +1,16 @@
-import { Component, Output, EventEmitter, Input, inject, OnInit, OnDestroy } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Component, EventEmitter, inject, OnDestroy, OnInit, Output } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule, MAT_DATE_LOCALE, DateAdapter } from '@angular/material/core';
-import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { DatePickerComponent } from '../../../domain/events/components/date-picker/date-picker';
-import { CustomDateAdapter, BR_DATE_FORMATS } from '../../../domain/events/components/date-picker/date-picker';
-import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { BR_DATE_FORMATS, CustomDateAdapter, DatePickerComponent } from '../date-picker/date-picker';
+import { SnackbarService } from '../../services/snackbar-service';
 
 export interface DateRange {
   startDate: Date;
@@ -40,13 +39,13 @@ export interface DateRange {
 })
 export class PeriodPicker implements OnInit, OnDestroy {
   @Output() dateRangeSelected = new EventEmitter<DateRange>();
-  @Input() excludePeriods: string[] = [];
 
   dateForm: FormGroup;
   isOpen = false;
   selectedPeriod = 'Últimos 30 dias';
   private destroy$ = new Subject<void>();
   private periodFilterService?: any;
+  private snackBar = inject(SnackbarService);
 
   constructor() {
     this.dateForm = new FormGroup({
@@ -85,12 +84,19 @@ export class PeriodPicker implements OnInit, OnDestroy {
 
     this.currentStartDate = startDate;
     this.currentEndDate = endDate;
+    this.updateDateLimits();
 
     this.dateRangeSelected.emit({
       startDate,
       endDate,
       label: 'Últimos 30 dias'
     });
+  }
+
+  private updateDateLimits() {
+    this.maxDate = new Date();
+    this.minDate = new Date();
+    this.minDate.setDate(this.minDate.getDate() - this.maxDaysInPast);
   }
 
   get startDate(): FormControl {
@@ -101,9 +107,15 @@ export class PeriodPicker implements OnInit, OnDestroy {
     return this.dateForm.get('endDate') as FormControl;
   }
 
+  get minDateLimit(): Date | null {
+    return this.minDate;
+  }
+
+  get maxDateLimit(): Date | null {
+    return this.maxDate;
+  }
+
   periods = [
-    { label: 'Hoje', days: 0 },
-    { label: 'Ontem', days: 1 },
     { label: 'Últimos 7 dias', days: 7 },
     { label: 'Últimos 30 dias', days: 30 },
     { label: 'Últimos 90 dias', days: 90 }
@@ -113,6 +125,9 @@ export class PeriodPicker implements OnInit, OnDestroy {
   private tempSelectedLabel = '';
   private currentStartDate: Date | null = null;
   private currentEndDate: Date | null = null;
+  private maxDaysInPast = 365;
+  private minDate: Date | null = null;
+  private maxDate: Date | null = null;
 
   toggleDrawer() {
     this.isOpen = !this.isOpen;
@@ -137,8 +152,12 @@ export class PeriodPicker implements OnInit, OnDestroy {
     this.selectedPeriod = label;
 
     const endDate = new Date();
-    const startDate = new Date();
+    let startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
+
+    if (this.minDate && startDate < this.minDate) {
+      startDate = new Date(this.minDate);
+    }
 
     this.currentStartDate = startDate;
     this.currentEndDate = endDate;
@@ -154,32 +173,37 @@ export class PeriodPicker implements OnInit, OnDestroy {
     const endDate = this.dateForm.get('endDate')?.value;
 
     if (startDate && endDate) {
-      let label = this.tempSelectedLabel;
 
-      if (!label) {
-        const formattedStartDate = this.formatDate(startDate);
-        const formattedEndDate = this.formatDate(endDate);
-        label = `${formattedStartDate} - ${formattedEndDate}`;
+      if (!this.isPeriodGreaterThanOneDay(startDate, endDate)) {
+        this.snackBar.error('O período deve ser maior que 1 dia');
+      } else {
+        let label = this.tempSelectedLabel;
+
+        if (!label) {
+          const formattedStartDate = this.formatDate(startDate);
+          const formattedEndDate = this.formatDate(endDate);
+          label = `${formattedStartDate} - ${formattedEndDate}`;
+        }
+
+        this.selectedPeriod = label;
+
+        this.currentStartDate = startDate;
+        this.currentEndDate = endDate;
+
+        const range: DateRange = {
+          startDate,
+          endDate,
+          label
+        };
+
+        this.dateRangeSelected.emit(range);
+        if (this.periodFilterService) {
+          this.periodFilterService.emitPeriodFilter(range);
+        }
+        this.isOpen = false;
+        this.tempSelectedDays = 0;
+        this.tempSelectedLabel = '';
       }
-
-      this.selectedPeriod = label;
-
-      this.currentStartDate = startDate;
-      this.currentEndDate = endDate;
-
-      const range: DateRange = {
-        startDate,
-        endDate,
-        label
-      };
-
-      this.dateRangeSelected.emit(range);
-      if (this.periodFilterService) {
-        this.periodFilterService.emitPeriodFilter(range);
-      }
-      this.isOpen = false;
-      this.tempSelectedDays = 0;
-      this.tempSelectedLabel = '';
     }
   }
 
@@ -188,5 +212,17 @@ export class PeriodPicker implements OnInit, OnDestroy {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
+  }
+
+  private isStartDateBeforeEndDate(startDate: Date, endDate: Date): boolean {
+    return startDate < endDate;
+  }
+
+  private isPeriodGreaterThanOneDay(startDate: Date, endDate: Date): boolean {
+    const startDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const endDay = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+    const differenceInMs = endDay.getTime() - startDay.getTime();
+    const oneDayInMs = 24 * 60 * 60 * 1000;
+    return differenceInMs > oneDayInMs;
   }
 }

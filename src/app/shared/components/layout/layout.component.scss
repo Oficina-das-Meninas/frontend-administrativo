@@ -16,3 +16,9 @@
   flex-direction: column;
   justify-content: start;
 }
+
+::ng-deep .mat-drawer-content {
+  @media (min-width: 768px) {
+    z-index: 9997 !important;
+  }
+}

@@ -29,7 +29,6 @@ import { AdminsService } from '../../services/admin-service';
 
 @Component({
   selector: 'app-admins',
-  standalone: true,
   imports: [
     Dialog,
     ReactiveFormsModule,

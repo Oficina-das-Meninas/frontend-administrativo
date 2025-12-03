@@ -15,12 +15,14 @@ import { PageEvent } from '@angular/material/paginator';
 })
 export class Donations implements AfterViewInit {
   @ViewChild('donationTypeTemplate') donationTypeTemplate!: TemplateRef<any>;
+  @ViewChild('statusTemplate') statusTemplate!: TemplateRef<any>;
 
   donations$: Observable<DataPage<Donation>> | null = null;
 
   columns: TableColumn[] = [
     { key: 'donorName', header: 'Doador', type: 'text', sortable: true, sortField: 'donorName' },
-    { key: 'value', header: 'Valor', type: 'currency', sortable: true, sortField: 'value' },
+    { key: 'value', header: 'Valor Bruto', type: 'currency', sortable: true, sortField: 'value' },
+    { key: 'valueLiquid', header: 'Valor Líquido', type: 'currency', sortable: true, sortField: 'valueLiquid' },
     { key: 'donationAt', header: 'Data', type: 'date', sortable: true, sortField: 'donationAt' },
     {
       key: 'donationType',
@@ -32,12 +34,7 @@ export class Donations implements AfterViewInit {
     {
       key: 'status',
       header: 'Status',
-      type: 'badge',
-      badgeConfig: {
-        'pendente': 'yellow',
-        'concluído': 'green',
-        'cancelado': 'gray'
-      },
+      type: 'custom',
       sortable: true,
       sortField: 'status'
     }
@@ -57,8 +54,14 @@ export class Donations implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    if (this.donationTypeTemplate) {
-      this.columns[3].cellTemplate = this.donationTypeTemplate;
+    const donationTypeColumn = this.columns.find(col => col.key === 'donationType');
+    if (donationTypeColumn && this.donationTypeTemplate) {
+      donationTypeColumn.cellTemplate = this.donationTypeTemplate;
+    }
+
+    const statusColumn = this.columns.find(col => col.key === 'status');
+    if (statusColumn && this.statusTemplate) {
+      statusColumn.cellTemplate = this.statusTemplate;
     }
   }
 
@@ -68,7 +71,7 @@ export class Donations implements AfterViewInit {
       'inativa': { bgColor: 'bg-gray-200', textColor: 'text-gray-900' },
       'pendente': { bgColor: 'bg-yellow-200', textColor: 'text-yellow-900' },
       'concluído': { bgColor: 'bg-green-200', textColor: 'text-green-900' },
-      'cancelado': { bgColor: 'bg-gray-200', textColor: 'text-gray-900' }
+      'cancelado': { bgColor: 'bg-red-200', textColor: 'text-red-900' }
     };
     return colors[value.toLowerCase()] || { bgColor: 'bg-gray-200', textColor: 'text-gray-900' };
   }

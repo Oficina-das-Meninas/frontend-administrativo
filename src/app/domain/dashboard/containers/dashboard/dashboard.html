@@ -31,7 +31,8 @@
               [title]="indicator.title"
               [value]="viewMode === 'valueLiquid' ? indicator.valueLiquid : indicator.value"
               [valueType]="indicator.valueType"
-              [tooltipText]="indicator.tooltipText">
+              [tooltipText]="indicator.tooltipText"
+              [isLoading]="indicatorsLoading()">
             </app-indicator>
           }
         </div>
@@ -48,16 +49,17 @@
         </div>
         <app-donations-type-distribution
           [data]="donationDistribution()"
-          [viewMode]="viewMode"/>
+          [viewMode]="viewMode"
+          [isLoading]="donationDistributionLoading()"/>
       </mat-card-content>
     </mat-card>
     <mat-card class="w-full" appearance="outlined">
       <mat-card-content class="p-4">
         <div class="flex justify-between items-center mb-4">
           <mat-card-title>Doações no período</mat-card-title>
-          <app-period-picker #donationsDatePicker [excludePeriods]="['Hoje']" (dateRangeSelected)="onDonationsDateRangeSelected($event)"></app-period-picker>
+          <app-period-picker #donationsDatePicker (dateRangeSelected)="onDonationsDateRangeSelected($event)"></app-period-picker>
         </div>
-        <app-donations [data]="donationTimeSeries()" [viewMode]="viewMode"/>
+        <app-donations [data]="donationTimeSeries()" [viewMode]="viewMode" [isLoading]="donationTimeSeriesLoading()"/>
       </mat-card-content>
     </mat-card>
   </section>

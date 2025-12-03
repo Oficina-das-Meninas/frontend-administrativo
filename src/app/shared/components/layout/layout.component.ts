@@ -1,13 +1,13 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Router, RouterOutlet } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { Router, RouterOutlet } from '@angular/router';
+import { AuthService } from '../../../domain/auth/services/auth-service';
+import { SessionService } from '../../../domain/auth/services/session-service';
+import { NavItem } from '../../models/nav-item';
 import { HeaderComponent } from './header/header.component';
 import { SidenavComponent } from './sidenav/sidenav.component';
-import { NavItem } from '../../models/nav-item';
-import { SessionService } from '../../../domain/auth/services/session-service';
-import { AuthService } from '../../../domain/auth/services/auth-service';
 
 @Component({
   selector: 'app-layout',
@@ -105,7 +105,10 @@ export class LayoutComponent implements OnInit {
 
   onLogout(): void {
     this.authService.logout().subscribe({
-      next: () => this.router.navigate(['/login']),
+      next: () => {
+        this.sessionService.clearSession();
+        this.router.navigate(['/login']);
+      }
     });
   }
 }

@@ -61,7 +61,7 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
     FormInputComponent,
     FormSelect,
     MatProgressSpinner
-],
+  ],
   templateUrl: './transparency.html',
   styleUrl: './transparency.scss',
 })

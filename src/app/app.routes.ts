@@ -1,8 +1,9 @@
 import { Routes } from '@angular/router';
 import { eventResolver } from './domain/events/guards/event-resolver';
 import { partnerResolver } from './domain/partners/guards/partner-resolver';
-import { unsavedChangesGuard } from './shared/guards/unsaved-changes.guard';
+import { adminGuard } from './shared/guards/admin/admin-guard';
 import { authGuard } from './shared/guards/auth/auth-guard';
+import { unsavedChangesGuard } from './shared/guards/unsaved-changes.guard';
 
 export const routes: Routes = [
   {
@@ -30,7 +31,7 @@ export const routes: Routes = [
       import('./shared/components/layout/layout.component').then(
         (m) => m.LayoutComponent
       ),
-    canActivate: [authGuard],
+    canActivate: [authGuard, adminGuard],
     children: [
       {
         path: '',

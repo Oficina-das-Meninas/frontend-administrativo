@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { FormInputComponent } from "../../../../shared/components/form-input/form-input";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { Router, RouterLink } from '@angular/router';
+import { FormInputComponent } from "../../../../shared/components/form-input/form-input";
+import { Logo } from '../../../../shared/components/logo/logo';
 import { AuthService } from '../../../auth/services/auth-service';
 import { LoginRequest } from '../../models/login-request';
-import { Router, RouterLink } from '@angular/router';
 import { SessionService } from '../../services/session-service';
-import { Logo } from '../../../../shared/components/logo/logo';
 
 @Component({
   selector: 'app-login',
@@ -51,12 +51,19 @@ export class Login {
           this.loginForm.reset();
 
           const user = response.data.user;
+
+          if (!user.isAdmin) {
+            this.errorMessage = 'Acesso restrito a administradores.';
+            return;
+          }
+
           this.sessionService.setUsername(user.name);
-          
+          this.sessionService.setIsAdmin(user.isAdmin);
+
           this.router.navigate(['/']);
         },
         error: (response) => {
-          this.loginForm.reset();    
+          this.loginForm.reset();
           this.errorMessage = response.error?.message;
         }
       });
